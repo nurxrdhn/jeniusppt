@@ -1,3 +1,4 @@
+import PPTManualEditor from "./components/editor/PPTManualEditor";
 import { useState } from "react";
 import {
   BarChart3, Bell, BookOpen, CheckCircle2, ClipboardList, Code2, Copy, Download,
