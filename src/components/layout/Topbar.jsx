@@ -1,0 +1,24 @@
+import { Bell, Plus, Search } from "lucide-react";
+
+export default function Topbar({ title, user, onCreate }) {
+  return (
+    <header className="topbar">
+      <div>
+        <span>JeniusPPT</span>
+        <h1>{title}</h1>
+      </div>
+
+      <div className="topbar-search">
+        <Search size={17} />
+        <input placeholder="Cari materi, peserta, kuis..." />
+      </div>
+
+      <button className="icon-button"><Bell size={18} /></button>
+      <button className="primary-button" onClick={onCreate}><Plus size={18} /> Buat Materi</button>
+
+      <div className="top-profile">
+        {user?.photoURL ? <img src={user.photoURL} alt={user.name} /> : <div>{user?.name?.[0] || "G"}</div>}
+      </div>
+    </header>
+  );
+}
