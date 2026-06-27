@@ -1,4 +1,5 @@
 import { useState } from "react";
+import BackgroundPicker from "./BackgroundPicker";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -17,6 +18,10 @@ export default function PPTManualEditor() {
 
   const [active, setActive] = useState(0);
   const [preview, setPreview] = useState(false);
+  const [background, setBackground] = useState({
+    type: "css",
+    value: "linear-gradient(135deg, #111827, #283c75)",
+  });
 
   const editor = useEditor({
     extensions: [
@@ -171,7 +176,14 @@ export default function PPTManualEditor() {
           </aside>
 
           <main className="word-canvas">
-            <div className="slide-page">
+            <div
+              className="slide-page"
+              style={
+                background.type === "image"
+                  ? { backgroundImage: `url(${background.value})` }
+                  : { background: background.value }
+              }
+            >
               <EditorContent editor={editor} />
             </div>
           </main>
