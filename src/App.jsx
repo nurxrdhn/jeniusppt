@@ -1,3 +1,4 @@
+import StudentPlayer from "./components/student/StudentPlayer";
 import { useEffect, useMemo, useState } from "react";
 import {
   Archive,
@@ -86,6 +87,9 @@ function nowTime() {
 }
 
 export default function App() {
+  if (window.location.pathname.startsWith("/play/")) {
+    return <StudentPlayer />;
+  }
   const [user, setUser] = useState(null);
   const [page, setPage] = useState("dashboard");
   const [state, setState] = useState(loadState);
