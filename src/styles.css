@@ -10,3 +10,249 @@
 .editor-grid,.share-layout{display:grid;grid-template-columns:minmax(330px,.8fr) minmax(0,1.2fr);gap:24px}.form-card label{display:block;margin:14px 0 8px;color:#46556e;font-weight:850}.two-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}.slide-canvas{min-height:470px;border-radius:26px;display:grid;grid-template-columns:160px 1fr;overflow:hidden}.slide-sidebar{padding:18px;background:#f4f6fb;display:grid;align-content:start;gap:12px}.slide-sidebar span,.slide-sidebar button{border:0;border-radius:14px;background:white;padding:13px;text-align:left;font-weight:850}.slide-preview{background:radial-gradient(circle at 18% 18%,rgba(109,74,255,.3),transparent 26%),linear-gradient(135deg,#111827,#283c75);color:white;padding:44px;display:flex;flex-direction:column;justify-content:center}.slide-preview span{color:#b8c6e8;font-weight:850}.slide-preview h2{margin:12px 0;font-size:clamp(36px,5vw,64px);letter-spacing:-.06em;color:white}.slide-preview p{color:#dbe7ff;max-width:580px;line-height:1.7}.code-panel textarea{min-height:470px;resize:vertical;background:#07152f;color:#e6efff;border:0;line-height:1.65;font-family:Consolas,monospace}.output-list{display:grid;gap:14px}.output-list span,.setting-row{display:flex;justify-content:space-between;gap:14px;align-items:center;border-radius:16px;background:#f6f8fc;padding:16px;color:#40506b;font-weight:850}.output-list svg{color:var(--green)}.share-card{display:grid;place-items:center;text-align:center}.qr-box{width:180px;height:180px;border-radius:30px;background:#f0ecff;display:grid;place-items:center;color:var(--primary)}.share-code{padding:10px 14px;border-radius:999px;background:#f6f8fc;color:var(--primary);font-weight:950}.copy-box{display:grid;grid-template-columns:1fr 48px;gap:10px}.copy-box button{border:0;border-radius:14px;background:var(--primary);color:white}
 .progress-block{margin-top:20px}.progress-block div:first-child{display:flex;justify-content:space-between;margin-bottom:10px;font-weight:950}.progress-line{height:12px;border-radius:999px;overflow:hidden;background:#edf2f7}.progress-line i{display:block;height:100%;border-radius:999px}.progress-line .green{background:var(--green)}.progress-line .blue{background:var(--blue)}.progress-line .orange{background:var(--orange)}.table-wrap{width:100%;overflow-x:auto}table{width:100%;min-width:820px;border-collapse:collapse}th{text-align:left;color:var(--muted);font-size:13px;padding:14px;border-bottom:1px solid var(--line)}td{padding:16px 14px;border-bottom:1px solid var(--line);font-weight:750;color:var(--text)}
 @media(max-width:1240px){.stats-grid,.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-grid,.dash-grid.bottom,.editor-grid,.share-layout{grid-template-columns:1fr}.materials-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.search-box{width:320px}}@media(max-width:900px){.sidebar{position:fixed;left:0;top:0;transform:translateX(-105%);transition:.25s ease}.sidebar.show{transform:translateX(0)}.overlay.show{display:block;position:fixed;inset:0;z-index:45;background:rgba(15,23,42,.45)}.close-menu{display:grid;place-items:center}.topbar{height:auto;min-height:76px;flex-wrap:wrap;padding-top:12px;padding-bottom:12px}.search-box{order:4;width:100%;margin-left:0}.teacher-profile{margin-left:auto}.top-logout,.top-title{display:none}.hero-panel,.page-head{align-items:flex-start;flex-direction:column}.hero-actions,.page-actions{width:100%;display:grid;grid-template-columns:1fr}.stats-grid,.quick-grid,.materials-grid{grid-template-columns:1fr}.mini-card{grid-template-columns:48px 1fr}.mini-card .badge{grid-column:2;width:fit-content}.chart-bars{height:220px;gap:9px}.chart-days{font-size:10px}.slide-canvas{grid-template-columns:1fr}.slide-sidebar{grid-template-columns:repeat(3,1fr);overflow-x:auto}.two-cols{grid-template-columns:1fr}.login-screen{grid-template-columns:1fr;padding:20px}.login-left{padding:12px}.login-preview{display:none}}@media(max-width:560px){.page{padding:16px}.hero-panel,.panel,.quick-panel,.material-card,.login-card,.student-card{border-radius:20px;padding:18px}.teacher-profile div:not(.avatar){display:none}.hero-panel h1,.page-head h1{font-size:32px}.quick-card{min-height:145px}.card-actions{grid-template-columns:1fr}.meta-grid{grid-template-columns:1fr}.copy-box{grid-template-columns:1fr}.qr-box{width:140px;height:140px}}
+
+/* MANUAL PPT BUILDER */
+
+.manual-editor {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr) 330px;
+  gap: 22px;
+  align-items: stretch;
+}
+
+.slide-list-panel,
+.property-panel,
+.canvas-area {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.slide-list-panel {
+  padding: 18px;
+}
+
+.slide-list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.slide-list-head h3,
+.property-panel h3 {
+  margin: 0;
+}
+
+.slide-list-head button {
+  border: 0;
+  background: var(--primary);
+  color: white;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight: 900;
+}
+
+.slide-list {
+  display: grid;
+  gap: 12px;
+}
+
+.slide-thumb {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #f8faff;
+  border-radius: 16px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 10px;
+  text-align: left;
+  align-items: center;
+}
+
+.slide-thumb span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #ede9fe;
+  color: var(--primary);
+  font-weight: 900;
+}
+
+.slide-thumb b {
+  display: block;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.slide-thumb small {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.slide-thumb.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(109, 74, 255, 0.10);
+}
+
+.canvas-area {
+  padding: 22px;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 16px;
+}
+
+.ppt-canvas {
+  min-height: 520px;
+  border-radius: 26px;
+  padding: clamp(28px, 5vw, 70px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.ppt-canvas.gradient {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(109, 74, 255, .35), transparent 28%),
+    linear-gradient(135deg, #111827, #283c75);
+  color: white;
+}
+
+.ppt-canvas.dark {
+  background: linear-gradient(135deg, #020617, #0f172a);
+  color: white;
+}
+
+.ppt-canvas.light {
+  background: linear-gradient(135deg, #ffffff, #eef2ff);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.ppt-canvas.green {
+  background: linear-gradient(135deg, #064e3b, #22c55e);
+  color: white;
+}
+
+.slide-label {
+  font-weight: 900;
+  opacity: .75;
+  margin-bottom: 16px;
+}
+
+.ppt-canvas h1 {
+  margin: 0;
+  font-size: clamp(42px, 6vw, 76px);
+  letter-spacing: -0.07em;
+  line-height: 1;
+}
+
+.ppt-canvas p {
+  margin: 22px 0 0;
+  max-width: 780px;
+  font-size: clamp(17px, 2vw, 24px);
+  line-height: 1.65;
+  opacity: .9;
+}
+
+.canvas-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.canvas-actions button {
+  border: 0;
+  background: #f2f5fb;
+  color: #334155;
+  border-radius: 14px;
+  padding: 13px;
+  font-weight: 900;
+}
+
+.canvas-actions button:hover {
+  background: #ede9fe;
+  color: var(--primary);
+}
+
+.property-panel {
+  padding: 20px;
+  overflow: auto;
+}
+
+.property-panel label {
+  display: block;
+  margin: 15px 0 8px;
+  color: #475569;
+  font-weight: 900;
+  font-size: 13px;
+}
+
+.property-panel textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.property-panel .mt {
+  margin-top: 26px;
+}
+
+.insert-tools {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 9px;
+  margin: 16px 0;
+}
+
+.insert-tools button {
+  border: 0;
+  border-radius: 13px;
+  background: #f2f5fb;
+  padding: 12px;
+  font-weight: 900;
+  color: #334155;
+}
+
+.insert-tools button:hover {
+  background: #ede9fe;
+  color: var(--primary);
+}
+
+@media (max-width: 1250px) {
+  .manual-editor {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .property-panel {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 850px) {
+  .manual-editor {
+    grid-template-columns: 1fr;
+  }
+
+  .slide-list {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+
+  .slide-thumb {
+    min-width: 190px;
+  }
+
+  .ppt-canvas {
+    min-height: 380px;
+  }
+
+  .canvas-actions {
+    grid-template-columns: 1fr;
+  }
+}

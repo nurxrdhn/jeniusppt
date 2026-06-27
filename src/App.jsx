@@ -201,8 +201,168 @@ function Materials({ materials, setPage, duplicateMaterial, deleteMaterial, publ
 }
 
 function ManualCreate({ createManual }) {
-  return <section className="page"><PageHead title="Buat PPT Manual" desc="Buat draft PPT dengan informasi dasar, lalu lanjutkan ke editor slide." /><div className="editor-grid"><form className="panel form-card" onSubmit={createManual}><SectionTitle title="Informasi Materi" desc="Lengkapi data materi pembelajaran." /><label>Judul Materi</label><input name="title" placeholder="Contoh: Inflasi dan Deflasi" required /><label>Mata Pelajaran</label><input name="subject" defaultValue="Ekonomi" required /><label>Kelas</label><input name="className" placeholder="Contoh: XI IPS" required /><div className="two-cols"><div><label>Jumlah Slide Awal</label><input name="slides" type="number" defaultValue="8" min="1" /></div><div><label>Jumlah Kuis Awal</label><input name="quizzes" type="number" defaultValue="5" min="0" /></div></div><button className="btn primary full"><Plus size={18}/> Simpan Draft</button></form><div className="slide-canvas"><div className="slide-sidebar"><span>Slide 1</span><span>Slide 2</span><span>Slide 3</span><button>+ Slide</button></div><div className="slide-preview"><span>Preview Slide</span><h2>Judul Materi</h2><p>Area ini akan menjadi editor PPT interaktif.</p></div></div></div></section>;
+  const [slides, setSlides] = useState([
+    {
+      id: 1,
+      title: "Judul Materi",
+      content: "Tulis isi materi di sini...",
+      layout: "Title",
+      bg: "gradient",
+    },
+  ]);
+  const [active, setActive] = useState(0);
+
+  const current = slides[active];
+
+  function updateSlide(field, value) {
+    setSlides(slides.map((s, i) => i === active ? { ...s, [field]: value } : s));
+  }
+
+  function addSlide() {
+    const next = {
+      id: Date.now(),
+      title: "Slide Baru",
+      content: "Isi materi slide baru...",
+      layout: "Content",
+      bg: "gradient",
+    };
+    setSlides([...slides, next]);
+    setActive(slides.length);
+  }
+
+  function duplicateSlide() {
+    const copy = {
+      ...current,
+      id: Date.now(),
+      title: current.title + " - Copy",
+    };
+    const nextSlides = [...slides];
+    nextSlides.splice(active + 1, 0, copy);
+    setSlides(nextSlides);
+    setActive(active + 1);
+  }
+
+  function deleteSlide() {
+    if (slides.length === 1) return;
+    const nextSlides = slides.filter((_, i) => i !== active);
+    setSlides(nextSlides);
+    setActive(Math.max(0, active - 1));
+  }
+
+  return (
+    <section className="page manual-builder-page">
+      <PageHead
+        title="Buat PPT Manual"
+        desc="Editor manual untuk membuat slide, mengedit isi, copy slide, hapus slide, preview, dan simpan draft."
+        actions={
+          <>
+            <button className="btn light" type="button">Preview</button>
+            <button className="btn primary" form="manual-material-form">
+              <SaveIcon /> Simpan Draft
+            </button>
+          </>
+        }
+      />
+
+      <div className="manual-editor">
+        <aside className="slide-list-panel">
+          <div className="slide-list-head">
+            <h3>Slide</h3>
+            <button onClick={addSlide}>+ Slide</button>
+          </div>
+
+          <div className="slide-list">
+            {slides.map((slide, index) => (
+              <button
+                key={slide.id}
+                className={active === index ? "slide-thumb active" : "slide-thumb"}
+                onClick={() => setActive(index)}
+              >
+                <span>{index + 1}</span>
+                <div>
+                  <b>{slide.title}</b>
+                  <small>{slide.layout}</small>
+                </div>
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        <main className="canvas-area">
+          <div className={`ppt-canvas ${current.bg}`}>
+            <span className="slide-label">Slide {active + 1}</span>
+            <h1>{current.title}</h1>
+            <p>{current.content}</p>
+          </div>
+
+          <div className="canvas-actions">
+            <button onClick={addSlide}>Tambah Slide</button>
+            <button onClick={duplicateSlide}>Copy Slide</button>
+            <button onClick={deleteSlide}>Hapus Slide</button>
+          </div>
+        </main>
+
+        <aside className="property-panel">
+          <form id="manual-material-form" onSubmit={createManual}>
+            <h3>Properti Materi</h3>
+
+            <label>Judul Materi</label>
+            <input name="title" value={current.title} onChange={(e) => updateSlide("title", e.target.value)} required />
+
+            <label>Mata Pelajaran</label>
+            <input name="subject" defaultValue="Ekonomi" required />
+
+            <label>Kelas</label>
+            <input name="className" defaultValue="XI IPS" required />
+
+            <input type="hidden" name="slides" value={slides.length} />
+            <input type="hidden" name="quizzes" value="0" />
+
+            <h3 className="mt">Properti Slide</h3>
+
+            <label>Judul Slide</label>
+            <input value={current.title} onChange={(e) => updateSlide("title", e.target.value)} />
+
+            <label>Isi Slide</label>
+            <textarea value={current.content} onChange={(e) => updateSlide("content", e.target.value)} />
+
+            <label>Layout</label>
+            <select value={current.layout} onChange={(e) => updateSlide("layout", e.target.value)}>
+              <option>Title</option>
+              <option>Content</option>
+              <option>Image</option>
+              <option>Quiz</option>
+            </select>
+
+            <label>Background</label>
+            <select value={current.bg} onChange={(e) => updateSlide("bg", e.target.value)}>
+              <option value="gradient">Gradient</option>
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+              <option value="green">Green</option>
+            </select>
+
+            <div className="insert-tools">
+              <button type="button">Text</button>
+              <button type="button">Image</button>
+              <button type="button">Video</button>
+              <button type="button">Quiz</button>
+            </div>
+
+            <button className="btn primary full">
+              <SaveIcon /> Simpan Draft
+            </button>
+          </form>
+        </aside>
+      </div>
+    </section>
+  );
 }
+
+function SaveIcon() {
+  return <span style={{ fontWeight: 900 }}>＋</span>;
+}
+
 
 function CodeCreate({ createFromCode }) {
   const [code, setCode] = useState(sampleCode);
