@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Login from "./pages/auth/Login";
 import "./App.css";
 import Sidebar from "./components/layout/Sidebar";
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -10,10 +11,15 @@ import Settings from "./pages/settings/Settings";
 
 function App() {
   const [page, setPage] = useState("dashboard");
+  const [user, setUser] = useState(null);
+
+  if (!user) {
+    return <Login setUser={setUser} />;
+  }
 
   return (
     <div className="app">
-      <Sidebar page={page} setPage={setPage} />
+      <Sidebar page={page} setPage={setPage} user={user} setUser={setUser} />
 
       <main className="main">
         {page === "dashboard" && <Dashboard setPage={setPage} />}
