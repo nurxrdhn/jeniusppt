@@ -5,19 +5,9 @@ import {
   Search, Settings, Share2, Sparkles, Trash2, Users, Wand2, X
 } from "lucide-react";
 
-const seedMaterials = [
-  { id: 1, title: "Inflasi dan Deflasi", subject: "Ekonomi", className: "XI IPS", status: "Published", slides: 8, quizzes: 6, participants: 82, score: 88, createdAt: "24 Jun 2025", shareCode: "EKO-XI-82" },
-  { id: 2, title: "Sistem Perbankan Indonesia", subject: "Ekonomi", className: "XI IPS", status: "Published", slides: 10, quizzes: 8, participants: 64, score: 84, createdAt: "23 Jun 2025", shareCode: "BANK-XI-64" },
-  { id: 3, title: "Permintaan dan Penawaran", subject: "Ekonomi", className: "X IPS", status: "Draft", slides: 6, quizzes: 4, participants: 0, score: "-", createdAt: "22 Jun 2025", shareCode: "DEMAND-X-01" },
-  { id: 4, title: "Perdagangan Internasional", subject: "Ekonomi", className: "XII IPS", status: "Published", slides: 9, quizzes: 7, participants: 47, score: 90, createdAt: "21 Jun 2025", shareCode: "TRD-XII-47" },
-];
+const seedMaterials = [];
 
-const seedParticipants = [
-  { id: 1, name: "Budi Santoso", gender: "Laki-laki", className: "XI IPS 1", material: "Inflasi dan Deflasi", progress: 75, score: "-", time: "08.15", status: "Belajar" },
-  { id: 2, name: "Rina Putri", gender: "Perempuan", className: "XI IPS 2", material: "Inflasi dan Deflasi", progress: 100, score: 92, time: "08.32", status: "Selesai" },
-  { id: 3, name: "Andi Pratama", gender: "Laki-laki", className: "X IPS 1", material: "Permintaan dan Penawaran", progress: 45, score: "-", time: "09.10", status: "Belajar" },
-  { id: 4, name: "Salsa Amira", gender: "Perempuan", className: "XII IPS", material: "Perdagangan Internasional", progress: 100, score: 88, time: "10.05", status: "Selesai" },
-];
+const seedParticipants = [];
 
 const sampleCode = `{
   "title": "Inflasi dan Deflasi",
@@ -50,7 +40,7 @@ export default function App() {
   const [materials, setMaterials] = useState(seedMaterials);
   const [participants, setParticipants] = useState(seedParticipants);
   const [toast, setToast] = useState("");
-  const [selectedMaterial, setSelectedMaterial] = useState(seedMaterials[0]);
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [studentView, setStudentView] = useState(false);
   const [previewMaterial, setPreviewMaterial] = useState(null);
 
@@ -382,9 +372,9 @@ function Reports({ participants, materials }) {
   return <section className="page"><PageHead title="Nilai & Laporan" desc="Pantau nilai, progress, dan export laporan belajar." actions={<button className="btn primary"><Download size={18}/> Export Excel</button>} /><div className="stats-grid"><Stat icon={BarChart3} label="Rata-rata Nilai" value="86.4" note="+5.2 meningkat" /><Stat icon={Users} label="Peserta Selesai" value={participants.filter(p=>p.status==="Selesai").length} note="Hari ini" /><Stat icon={BookOpen} label="Materi Aktif" value={materials.filter(m=>m.status==="Published").length} note="Published" /><Stat icon={Gauge} label="Progress Rata-rata" value="72%" note="Semua peserta" /></div><div className="panel"><ParticipantsTable participants={participants} /></div></section>;
 }
 
-function SharePage({ materials, selectedMaterial, setSelectedMaterial, setStudentView, showToast }) {
-  const shareUrl = `https://jeniusppt.online/m/${selectedMaterial.shareCode}`;
-  return <section className="page"><PageHead title="Link Bagikan" desc="Bagikan link materi kepada siswa. Siswa cukup isi nama, jenis kelamin, dan kelas." /><div className="share-layout"><div className="panel form-card"><SectionTitle title="Pilih Materi" desc="Link akan mengikuti materi yang dipilih." /><select value={selectedMaterial.id} onChange={(e)=>setSelectedMaterial(materials.find(m=>m.id===Number(e.target.value)))}>{materials.map(m=><option key={m.id} value={m.id}>{m.title}</option>)}</select><label>Link Materi</label><div className="copy-box"><input value={shareUrl} readOnly /><button onClick={()=>showToast("Link berhasil dicopy.")}><Copy size={18}/></button></div><div className="share-actions"><button className="btn primary" onClick={()=>setStudentView(true)}><Eye size={18}/> Preview Link Siswa</button><button className="btn light" onClick={()=>showToast("QR Code siap dibuat.")}><QrCode size={18}/> QR Code</button></div></div><div className="panel share-card"><div className="qr-box"><QrCode size={86}/></div><h2>{selectedMaterial.title}</h2><p>{selectedMaterial.className} • {selectedMaterial.slides} slide • {selectedMaterial.quizzes} kuis</p><span className="share-code">{selectedMaterial.shareCode}</span></div></div></section>;
+function SharePage({ materials, selectedMaterial, setSelectedMaterial, setStudentView, showToast, setPage }) {
+  const shareUrl = selectedMaterial ? `https://jeniusppt.online/m/${selectedMaterial.shareCode}` : "";
+  return <section className="page"><PageHead title="Link Bagikan" desc="Bagikan link materi kepada siswa. Siswa cukup isi nama, jenis kelamin, dan kelas." /><div className="share-layout"><div className="panel form-card"><SectionTitle title="Pilih Materi" desc="Link akan mengikuti materi yang dipilih." /><select value={selectedMaterial.id} onChange={(e)=>setSelectedMaterial(materials.find(m=>m.id===Number(e.target.value)))}>{materials.map(m=><option key={m.id} value={m.id}>{m.title}</option>)}</select><label>Link Materi</label><div className="copy-box"><input value={shareUrl || "Belum ada link. Pilih atau buat materi dulu."} readOnly /><button onClick={()=>showToast("Link berhasil dicopy.")}><Copy size={18}/></button></div><div className="share-actions"><button className="btn primary" onClick={()=>setStudentView(true)}><Eye size={18}/> Preview Link Siswa</button><button className="btn light" onClick={()=>showToast("QR Code siap dibuat.")}><QrCode size={18}/> QR Code</button></div></div><div className="panel share-card"><div className="qr-box"><QrCode size={86}/></div><h2>{selectedMaterial.title}</h2><p>{selectedMaterial.className} • {selectedMaterial.slides} slide • {selectedMaterial.quizzes} kuis</p><span className="share-code">{selectedMaterial.shareCode}</span></div></div></section>;
 }
 
 function SettingsPage({ user, showToast }) {
