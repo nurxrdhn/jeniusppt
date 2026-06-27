@@ -52,10 +52,15 @@ export default function App() {
   const [toast, setToast] = useState("");
   const [selectedMaterial, setSelectedMaterial] = useState(seedMaterials[0]);
   const [studentView, setStudentView] = useState(false);
+  const [previewMaterial, setPreviewMaterial] = useState(null);
 
   function showToast(text) {
     setToast(text);
     setTimeout(() => setToast(""), 2400);
+  }
+
+  if (previewMaterial) {
+    return <PPTPreview material={previewMaterial} onClose={() => setPreviewMaterial(null)} />;
   }
 
   if (studentView) {
@@ -118,12 +123,14 @@ export default function App() {
       <main className="main">
         <Topbar page={page} user={user} setSidebarOpen={setSidebarOpen} onLogout={() => setUser(null)} />
         {page === "dashboard" && <Dashboard setPage={setPage} materials={materials} participants={participants} stats={{ totalMaterials: materials.length, totalSlides, totalQuizzes, totalParticipants, avgScore }} />}
-        {page === "materials" && <Materials materials={materials} setPage={setPage} duplicateMaterial={duplicateMaterial} deleteMaterial={deleteMaterial} publishMaterial={publishMaterial} setSelectedMaterial={setSelectedMaterial} />}
+        {page === "materials" && <Materials materials={materials} setPage={setPage} duplicateMaterial={duplicateMaterial} deleteMaterial={deleteMaterial} publishMaterial={publishMaterial} setSelectedMaterial={setSelectedMaterial}
+            setPreviewMaterial={setPreviewMaterial} />}
         {page === "manual" && <ManualCreate createManual={createManual} />}
         {page === "code" && <CodeCreate createFromCode={createFromCode} />}
         {page === "participants" && <Participants participants={participants} />}
         {page === "reports" && <Reports participants={participants} materials={materials} />}
-        {page === "share" && <SharePage materials={materials} selectedMaterial={selectedMaterial} setSelectedMaterial={setSelectedMaterial} setStudentView={setStudentView} showToast={showToast} />}
+        {page === "share" && <SharePage materials={materials} selectedMaterial={selectedMaterial} setSelectedMaterial={setSelectedMaterial}
+            setPreviewMaterial={setPreviewMaterial} setStudentView={setStudentView} showToast={showToast} />}
         {page === "settings" && <SettingsPage user={user} showToast={showToast} />}
       </main>
     </div>
@@ -196,7 +203,7 @@ function Dashboard({ setPage, materials, participants, stats }) {
   );
 }
 
-function Materials({ materials, setPage, duplicateMaterial, deleteMaterial, publishMaterial, setSelectedMaterial }) {
+function Materials({ materials, setPage, duplicateMaterial, deleteMaterial, publishMaterial, setSelectedMaterial, setPreviewMaterial }) {
   return <section className="page"><PageHead title="Semua Materi" desc="Kelola materi, edit, copy, hapus, publish, dan share link." actions={<><button className="btn light" onClick={()=>setPage("code")}><Code2 size={18} /> Buat dari Kode</button><button className="btn primary" onClick={()=>setPage("manual")}><Plus size={18} /> Buat Manual</button></>} /><div className="materials-grid">{materials.map(m=><div className="material-card large" key={m.id}><div className="card-top"><div className="thumb big">{m.subject[0]}</div><Badge status={m.status} /></div><h3>{m.title}</h3><p>{m.subject} • {m.className}</p><div className="meta-grid"><span>{m.slides} Slide</span><span>{m.quizzes} Kuis</span><span>{m.participants} Peserta</span><span>Nilai {m.score}</span></div><div className="card-actions"><button onClick={()=>publishMaterial(m.id)}><CheckCircle2 size={16}/> Publish</button><button onClick={()=>duplicateMaterial(m)}><Copy size={16}/> Copy</button><button onClick={()=>{setSelectedMaterial(m);setPage("share")}}><Share2 size={16}/> Share</button><button onClick={()=>deleteMaterial(m.id)} className="danger"><Trash2 size={16}/> Hapus</button></div></div>)}</div></section>;
 }
 
@@ -383,6 +390,82 @@ function SharePage({ materials, selectedMaterial, setSelectedMaterial, setStuden
 function SettingsPage({ user, showToast }) {
   return <section className="page"><PageHead title="Pengaturan" desc="Atur profil guru, sekolah, dan preferensi dashboard." /><div className="editor-grid"><div className="panel form-card"><SectionTitle title="Profil Guru" desc="Data profil yang muncul di dashboard." /><label>Nama Guru</label><input defaultValue={user.name} /><label>Email</label><input defaultValue={user.email} /><label>Nama Sekolah</label><input defaultValue="SMA Budi Luhur" /><button className="btn primary full" onClick={()=>showToast("Pengaturan berhasil disimpan.")}>Simpan Pengaturan</button></div><div className="panel"><SectionTitle title="Preferensi" desc="Tampilan dan fitur aplikasi." /><div className="setting-row"><span>Mode siswa tanpa akun</span><b>Aktif</b></div><div className="setting-row"><span>Link publik materi</span><b>Aktif</b></div><div className="setting-row"><span>Auto-save draft</span><b>Aktif</b></div></div></div></section>;
 }
+
+
+function PPTPreview({ material, onClose }) {
+  const [slide, setSlide] = useState(0);
+
+  const slides = [
+    {
+      title: material.title,
+      subtitle: `${material.subject} • ${material.className}`,
+      content: "Materi pembelajaran interaktif yang dapat dipelajari siswa melalui link yang dibagikan guru.",
+    },
+    {
+      title: "Tujuan Pembelajaran",
+      subtitle: "Slide 2",
+      content: "Siswa mampu memahami konsep utama, menjawab kuis, dan melihat pembahasan jawaban.",
+    },
+    {
+      title: "Kuis Interaktif",
+      subtitle: "Slide 3",
+      content: `Materi ini memiliki ${material.quizzes} kuis dan ${material.slides} slide pembelajaran.`,
+    },
+  ];
+
+  const current = slides[slide];
+
+  function nextSlide() {
+    setSlide((slide + 1) % slides.length);
+  }
+
+  function prevSlide() {
+    setSlide(slide === 0 ? slides.length - 1 : slide - 1);
+  }
+
+  return (
+    <div className="preview-page">
+      <header className="preview-topbar">
+        <div>
+          <h2>Preview PPT</h2>
+          <p>{material.title}</p>
+        </div>
+        <div className="preview-actions">
+          <button onClick={prevSlide}>← Sebelumnya</button>
+          <button onClick={nextSlide}>Berikutnya →</button>
+          <button className="close-preview" onClick={onClose}>Tutup</button>
+        </div>
+      </header>
+
+      <main className="preview-stage">
+        <aside className="preview-thumbs">
+          {slides.map((s, index) => (
+            <button
+              key={s.title}
+              className={slide === index ? "active" : ""}
+              onClick={() => setSlide(index)}
+            >
+              <span>{index + 1}</span>
+              <b>{s.title}</b>
+            </button>
+          ))}
+        </aside>
+
+        <section className="preview-slide">
+          <span>{current.subtitle}</span>
+          <h1>{current.title}</h1>
+          <p>{current.content}</p>
+
+          <div className="preview-footer">
+            <small>Slide {slide + 1} dari {slides.length}</small>
+            <small>JeniusPPT Preview Mode</small>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
 
 function Stat({ icon: Icon, label, value, note }) { return <div className="stat"><div className="stat-icon"><Icon size={24}/></div><p>{label}</p><h2>{value}</h2><span>{note}</span></div>; }
 function QuickCard({ tone, icon: Icon, title, desc, onClick }) { return <button className={`quick-card ${tone}`} onClick={onClick}><Icon size={34}/><h3>{title}</h3><p>{desc}</p><span>Mulai →</span></button>; }
