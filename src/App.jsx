@@ -1,3 +1,4 @@
+import OpeningLogin from "./components/auth/OpeningLogin";
 import StudentPlayer from "./components/student/StudentPlayer";
 import { useEffect, useMemo, useState } from "react";
 import {
