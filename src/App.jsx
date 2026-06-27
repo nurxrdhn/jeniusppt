@@ -1,4 +1,5 @@
 import PPTManualEditor from "./components/editor/PPTManualEditor";
+import QuizBuilder from "./components/quiz/QuizBuilder";
 import { useState } from "react";
 import {
   BarChart3, Bell, BookOpen, CheckCircle2, ClipboardList, Code2, Copy, Download,
@@ -28,6 +29,7 @@ const menu = [
   { key: "materials", label: "Semua Materi", icon: BookOpen },
   { key: "manual", label: "Buat PPT Manual", icon: FilePlus2 },
   { key: "code", label: "Buat dari Kode", icon: Code2 },
+  { key: "quiz", label: "Quiz Builder", icon: ClipboardList },
   { key: "participants", label: "Peserta Masuk", icon: Users },
   { key: "reports", label: "Nilai & Laporan", icon: BarChart3 },
   { key: "share", label: "Link Bagikan", icon: Link2 },
@@ -118,6 +120,8 @@ export default function App() {
             setPreviewMaterial={setPreviewMaterial} />}
         {page === "manual" && <ManualCreate createManual={createManual} />}
         {page === "code" && <CodeCreate createFromCode={createFromCode} />}
+        {page === "quiz" && <QuizPage />}
+
         {page === "participants" && <Participants participants={participants} />}
         {page === "reports" && <Reports participants={participants} materials={materials} />}
         {page === "share" && <SharePage materials={materials} selectedMaterial={selectedMaterial} setSelectedMaterial={setSelectedMaterial}
@@ -220,6 +224,19 @@ function ManualCreate({ createManual }) {
 function CodeCreate({ createFromCode }) {
   const [code, setCode] = useState(sampleCode);
   return <section className="page"><PageHead title="Buat dari Kode" desc="Tempel JSON untuk menghasilkan slide, kuis, esai, dan alasan jawaban." /><div className="editor-grid"><div className="panel code-panel"><SectionTitle title="Kode JSON" desc="Pastikan format JSON valid." /><textarea value={code} onChange={(e)=>setCode(e.target.value)} /><button className="btn primary full" onClick={()=>createFromCode(code)}><Wand2 size={18}/> Generate Materi</button></div><div className="panel output-panel"><SectionTitle title="Output Otomatis" desc="Data yang akan dibuat dari kode." /><div className="output-list"><span><CheckCircle2/> Slide materi</span><span><CheckCircle2/> Kuis A–D</span><span><CheckCircle2/> Benar/Salah</span><span><CheckCircle2/> Esai</span><span><CheckCircle2/> Alasan jawaban</span></div></div></div></section>;
+}
+
+function QuizPage() {
+  return (
+    <section className="page">
+      <PageHead
+        title="Quiz Builder"
+        desc="Buat kuis bergaya Kahoot dengan timer, poin, jawaban benar, dan pembahasan."
+      />
+
+      <QuizBuilder />
+    </section>
+  );
 }
 
 function Participants({ participants }) { return <section className="page"><PageHead title="Peserta Masuk" desc="Siswa yang membuka link materi tanpa membuat akun." /><div className="panel"><ParticipantsTable participants={participants} /></div></section>; }
