@@ -1,6 +1,4 @@
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -9,10 +7,11 @@ body {
   color: #0f172a;
 }
 
-button {
+button, input, textarea {
   font-family: inherit;
-  cursor: pointer;
 }
+
+button { cursor: pointer; }
 
 .app {
   min-height: 100vh;
@@ -20,7 +19,7 @@ button {
 }
 
 .sidebar {
-  width: 280px;
+  width: 285px;
   background: linear-gradient(180deg, #06142f, #0f172a);
   color: white;
   padding: 28px 20px;
@@ -28,7 +27,7 @@ button {
 
 .brand {
   font-size: 26px;
-  font-weight: 800;
+  font-weight: 900;
   margin-bottom: 35px;
 }
 
@@ -39,13 +38,14 @@ button {
 
 .sidebar button {
   border: 0;
+  width: 100%;
   background: transparent;
   color: #cbd5e1;
   text-align: left;
   padding: 15px 16px;
   border-radius: 14px;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .sidebar button:hover,
@@ -66,9 +66,16 @@ button {
   margin-bottom: 28px;
 }
 
-.topbar h1 {
+.topbar h1,
+.page-title h1 {
   margin: 0;
   font-size: 32px;
+}
+
+.topbar p,
+.page-title p {
+  color: #64748b;
+  margin-top: 8px;
 }
 
 .new-btn {
@@ -77,7 +84,7 @@ button {
   color: white;
   padding: 13px 20px;
   border-radius: 14px;
-  font-weight: 800;
+  font-weight: 900;
   box-shadow: 0 12px 28px rgba(109, 74, 255, 0.25);
 }
 
@@ -88,38 +95,26 @@ button {
   margin-bottom: 24px;
 }
 
-.stat {
+.stat,
+.panel,
+.slide-preview {
   background: white;
   padding: 24px;
   border-radius: 22px;
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
 }
 
-.stat span {
-  font-size: 30px;
-}
+.stat span { font-size: 30px; }
 
 .stat p {
   color: #64748b;
   margin: 12px 0 8px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .stat h2 {
   margin: 0;
   font-size: 34px;
-}
-
-.panel {
-  background: white;
-  border-radius: 24px;
-  padding: 24px;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-  margin-bottom: 24px;
-}
-
-.panel h3 {
-  margin-top: 0;
 }
 
 .actions {
@@ -139,58 +134,115 @@ button {
   gap: 8px;
 }
 
-.action b {
-  font-size: 20px;
-}
+.action b { font-size: 20px; }
 
 .action small {
   font-size: 14px;
   opacity: 0.9;
 }
 
-.purple {
-  background: linear-gradient(135deg, #6d4aff, #a855f7);
+.purple { background: linear-gradient(135deg, #6d4aff, #a855f7); }
+.blue { background: linear-gradient(135deg, #2563eb, #60a5fa); }
+.green { background: linear-gradient(135deg, #10b981, #4ade80); }
+
+.page-title {
+  margin-bottom: 24px;
 }
 
-.blue {
-  background: linear-gradient(135deg, #2563eb, #60a5fa);
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.green {
-  background: linear-gradient(135deg, #10b981, #4ade80);
+th {
+  text-align: left;
+  color: #64748b;
+  padding: 14px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.grid {
+td {
+  padding: 14px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.badge {
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.green-badge {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.blue-badge {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.small-btn {
+  border: 0;
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 8px 10px;
+  border-radius: 10px;
+  margin-right: 6px;
+  font-weight: 800;
+}
+
+.small-btn.danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.editor {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1.2fr;
   gap: 24px;
 }
 
-.item {
-  display: flex;
-  justify-content: space-between;
-  padding: 16px 0;
-  border-bottom: 1px solid #e5e7eb;
-  font-weight: 700;
+input,
+textarea {
+  width: 100%;
+  border: 1px solid #dbe3f0;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+  outline: none;
 }
 
-.item span {
-  color: #2563eb;
-  font-size: 13px;
+textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.code-area {
+  min-height: 420px;
+  background: #06142f;
+  color: #e5edff;
+  font-family: Consolas, monospace;
+  line-height: 1.6;
+}
+
+.slide-preview {
+  background: linear-gradient(135deg, #111827, #243b73);
+  color: white;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.slide-preview h2 {
+  font-size: 42px;
+  margin: 12px 0;
 }
 
 @media (max-width: 900px) {
-  .app {
-    display: block;
-  }
-
-  .sidebar {
-    width: 100%;
-  }
-
-  .stats,
-  .actions,
-  .grid {
-    grid-template-columns: 1fr;
-  }
+  .app { display: block; }
+  .sidebar { width: 100%; }
+  .stats, .actions, .editor { grid-template-columns: 1fr; }
 }

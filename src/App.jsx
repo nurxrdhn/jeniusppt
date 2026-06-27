@@ -1,70 +1,27 @@
+import { useState } from "react";
 import "./App.css";
+import Sidebar from "./components/layout/Sidebar";
+import Dashboard from "./pages/dashboard/Dashboard";
+import Materials from "./pages/materials/Materials";
+import Manual from "./pages/materials/Manual";
+import CodeGenerator from "./pages/materials/CodeGenerator";
+import Activity from "./pages/activity/Activity";
+import Settings from "./pages/settings/Settings";
 
 function App() {
+  const [page, setPage] = useState("dashboard");
+
   return (
     <div className="app">
-      <aside className="sidebar">
-        <div className="brand">⚡ JeniusPPT</div>
-
-        <nav>
-          <button className="active">🏠 Dashboard</button>
-          <button>📚 Semua Materi</button>
-          <button>➕ Buat Manual</button>
-          <button>📋 Buat dari Kode</button>
-          <button>👨‍🎓 Aktivitas Siswa</button>
-          <button>📊 Nilai</button>
-          <button>⚙️ Pengaturan</button>
-        </nav>
-      </aside>
+      <Sidebar page={page} setPage={setPage} />
 
       <main className="main">
-        <header className="topbar">
-          <h1>Selamat datang, Guru Ekonomi! 👋</h1>
-          <button className="new-btn">+ Materi Baru</button>
-        </header>
-
-        <section className="stats">
-          <div className="stat"><span>📚</span><p>Total Materi</p><h2>24</h2></div>
-          <div className="stat"><span>👨‍🎓</span><p>Siswa Aktif</p><h2>132</h2></div>
-          <div className="stat"><span>📝</span><p>Kuis Dibuat</p><h2>56</h2></div>
-          <div className="stat"><span>📊</span><p>Rata-rata Nilai</p><h2>86.4</h2></div>
-        </section>
-
-        <section className="panel">
-          <h3>Aksi Cepat</h3>
-          <div className="actions">
-            <button className="action purple">
-              <b>Buat Manual</b>
-              <small>CRUD slide, copy, preview, publish</small>
-            </button>
-
-            <button className="action blue">
-              <b>Buat dari Kode</b>
-              <small>Tempel JSON jadi slide dan kuis</small>
-            </button>
-
-            <button className="action green">
-              <b>Aktivitas Siswa</b>
-              <small>Lihat siapa saja yang sudah masuk</small>
-            </button>
-          </div>
-        </section>
-
-        <section className="grid">
-          <div className="panel">
-            <h3>Materi Terbaru</h3>
-            <div className="item">📈 Inflasi dan Deflasi <span>Published</span></div>
-            <div className="item">🏦 Sistem Perbankan Indonesia <span>Published</span></div>
-            <div className="item">📊 Permintaan dan Penawaran <span>Draft</span></div>
-          </div>
-
-          <div className="panel">
-            <h3>Aktivitas Hari Ini</h3>
-            <div className="item">Budi masuk materi Inflasi <span>08.15</span></div>
-            <div className="item">Rina selesai kuis <span>Nilai 92</span></div>
-            <div className="item">Andi membuka slide 3 <span>09.10</span></div>
-          </div>
-        </section>
+        {page === "dashboard" && <Dashboard setPage={setPage} />}
+        {page === "materials" && <Materials />}
+        {page === "manual" && <Manual />}
+        {page === "code" && <CodeGenerator />}
+        {page === "activity" && <Activity />}
+        {page === "settings" && <Settings />}
       </main>
     </div>
   );
