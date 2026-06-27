@@ -1,18 +1,38 @@
 import "./App.css";
 
+const stats = [
+  ["Total Materi", "24", "📚", "+4 minggu ini"],
+  ["Total Slide", "186", "🎞️", "+38 slide"],
+  ["Kuis Dibuat", "56", "📝", "+7 kuis"],
+  ["Peserta Masuk", "342", "👥", "+82 hari ini"],
+];
+
+const materials = [
+  ["Inflasi dan Deflasi", "XI IPS", "8 slide", "6 kuis", "82 peserta", "Published"],
+  ["Sistem Perbankan Indonesia", "XI IPS", "10 slide", "8 kuis", "64 peserta", "Published"],
+  ["Permintaan dan Penawaran", "X IPS", "6 slide", "4 kuis", "0 peserta", "Draft"],
+  ["Perdagangan Internasional", "XII IPS", "9 slide", "7 kuis", "47 peserta", "Published"],
+];
+
+const participants = [
+  ["Budi Santoso", "Laki-laki", "XI IPS 1", "Inflasi", "75%", "-"],
+  ["Rina Putri", "Perempuan", "XI IPS 2", "Inflasi", "100%", "92"],
+  ["Andi Pratama", "Laki-laki", "X IPS 1", "Permintaan", "45%", "-"],
+];
+
 function App() {
   return (
     <div className="app">
       <aside className="sidebar">
         <div className="brand">
-          <div className="logo">J</div>
+          <div className="brand-icon">J</div>
           <div>
             <h2>JeniusPPT</h2>
-            <p>Teacher Dashboard</p>
+            <p>Teacher Workspace</p>
           </div>
         </div>
 
-        <nav>
+        <nav className="menu">
           <button className="active">🏠 Dashboard</button>
           <button>📚 Semua Materi</button>
           <button>➕ Buat PPT Manual</button>
@@ -24,157 +44,173 @@ function App() {
           <button>⚙️ Pengaturan</button>
         </nav>
 
-        <div className="sidebar-card">
+        <div className="upgrade">
           <h3>JeniusPPT Pro</h3>
-          <p>Kelola PPT, kuis, peserta, nilai, dan laporan dalam satu tempat.</p>
+          <p>Kelola PPT, kuis, peserta, nilai, dan laporan dalam satu dashboard.</p>
           <button>Upgrade</button>
         </div>
       </aside>
 
       <main className="main">
         <header className="topbar">
-          <div>
-            <span className="label">Dashboard Guru</span>
-            <h1>Selamat datang, Guru 👋</h1>
-            <p>Kelola materi PPT, kuis, peserta, link belajar, dan hasil nilai siswa.</p>
+          <button className="hamburger">☰</button>
+
+          <div className="search">
+            <span>🔍</span>
+            <input placeholder="Cari materi, peserta, kuis..." />
           </div>
 
-          <div className="top-actions">
-            <button className="secondary-btn">Export Laporan</button>
-            <button className="primary-btn">+ Buat Materi</button>
+          <div className="profile">
+            <button className="notif">🔔</button>
+            <div className="avatar">G</div>
+            <div>
+              <b>Guru Ekonomi</b>
+              <p>Guru</p>
+            </div>
           </div>
         </header>
 
-        <section className="stats">
-          <Stat icon="📚" title="Total Materi" value="24" note="+4 minggu ini" />
-          <Stat icon="🎞️" title="Total Slide" value="186" note="+38 slide baru" />
-          <Stat icon="📝" title="Total Kuis" value="56" note="+7 kuis baru" />
-          <Stat icon="👥" title="Peserta Masuk" value="342" note="+82 hari ini" />
-          <Stat icon="📊" title="Rata-rata Nilai" value="86.4" note="+5.2 meningkat" />
-          <Stat icon="✅" title="Selesai Belajar" value="218" note="63% peserta" />
-          <Stat icon="⏱️" title="Durasi Rata-rata" value="18m" note="per materi" />
-          <Stat icon="🔗" title="Link Aktif" value="12" note="sedang dibagikan" />
+        <section className="hero">
+          <div>
+            <span className="label">Dashboard Guru</span>
+            <h1>Selamat datang, Guru 👋</h1>
+            <p>Kelola PPT, kuis, link belajar, peserta masuk, dan nilai siswa dalam satu tempat.</p>
+          </div>
+
+          <div className="hero-actions">
+            <button className="btn light">Export Laporan</button>
+            <button className="btn primary">+ Buat Materi</button>
+          </div>
         </section>
 
-        <section className="quick-panel">
-          <div className="section-head">
-            <div>
-              <h2>Aksi Cepat</h2>
-              <p>Pilih cara membuat materi atau pantau aktivitas siswa.</p>
+        <section className="stats">
+          {stats.map(([title, value, icon, note]) => (
+            <div className="stat" key={title}>
+              <div className="stat-icon">{icon}</div>
+              <p>{title}</p>
+              <h2>{value}</h2>
+              <span>{note}</span>
             </div>
+          ))}
+        </section>
+
+        <section className="quick">
+          <div className="section-title">
+            <h2>Aksi Cepat</h2>
+            <p>Pilih fitur utama untuk membuat dan membagikan materi.</p>
           </div>
 
           <div className="quick-grid">
-            <Action color="purple" title="Buat PPT Manual" desc="Tambah slide, edit, hapus, copy, preview, dan publish." />
-            <Action color="blue" title="Buat dari Kode" desc="Tempel JSON lalu otomatis jadi slide, kuis, esai, dan alasan jawaban." />
-            <Action color="green" title="Lihat Peserta Masuk" desc="Pantau nama, jenis kelamin, kelas, waktu masuk, progress, dan nilai." />
-            <Action color="orange" title="Bagikan Link" desc="Buat link PPT dan kuis agar siswa masuk tanpa akun." />
+            <button className="quick-card purple">
+              <h3>Buat Manual</h3>
+              <p>CRUD slide, copy, preview, publish.</p>
+              <span>Mulai →</span>
+            </button>
+            <button className="quick-card blue">
+              <h3>Buat dari Kode</h3>
+              <p>Tempel JSON menjadi slide dan kuis.</p>
+              <span>Generate →</span>
+            </button>
+            <button className="quick-card green">
+              <h3>Peserta Masuk</h3>
+              <p>Lihat siswa yang membuka link.</p>
+              <span>Lihat →</span>
+            </button>
+            <button className="quick-card orange">
+              <h3>Bagikan Link</h3>
+              <p>Siswa isi nama, gender, kelas.</p>
+              <span>Share →</span>
+            </button>
           </div>
         </section>
 
-        <section className="content-grid">
-          <div className="panel wide">
-            <div className="section-head">
+        <section className="dashboard-grid">
+          <div className="panel chart-panel">
+            <div className="section-title row">
+              <div>
+                <h2>Aktivitas Peserta</h2>
+                <p>Perkembangan peserta selama 7 hari terakhir.</p>
+              </div>
+              <button className="mini">7 Hari</button>
+            </div>
+
+            <div className="chart">
+              <div className="bar h62"></div>
+              <div className="bar h54"></div>
+              <div className="bar h76"></div>
+              <div className="bar h64"></div>
+              <div className="bar h43"></div>
+              <div className="bar h55"></div>
+              <div className="bar h74"></div>
+            </div>
+            <div className="chart-labels">
+              <span>18 Jun</span><span>19 Jun</span><span>20 Jun</span><span>21 Jun</span><span>22 Jun</span><span>23 Jun</span><span>24 Jun</span>
+            </div>
+          </div>
+
+          <div className="panel">
+            <div className="section-title row">
               <div>
                 <h2>Materi Terbaru</h2>
-                <p>Daftar PPT dan kuis yang baru dibuat.</p>
+                <p>PPT dan kuis yang baru dibuat.</p>
               </div>
-              <button className="mini-btn">Lihat Semua</button>
+              <button className="mini">Lihat Semua</button>
             </div>
 
-            <div className="materials">
-              <Material title="Inflasi dan Deflasi" kelas="XI IPS" status="Published" slide="8" quiz="6" peserta="82" />
-              <Material title="Sistem Perbankan Indonesia" kelas="XI IPS" status="Published" slide="10" quiz="8" peserta="64" />
-              <Material title="Permintaan dan Penawaran" kelas="X IPS" status="Draft" slide="6" quiz="4" peserta="0" />
-              <Material title="Perdagangan Internasional" kelas="XII IPS" status="Published" slide="9" quiz="7" peserta="47" />
-            </div>
-          </div>
-
-          <div className="panel">
-            <div className="section-head">
-              <div>
-                <h2>Aktivitas Hari Ini</h2>
-                <p>Peserta terbaru yang membuka link.</p>
-              </div>
-            </div>
-
-            <div className="activity-list">
-              <Activity name="Budi Santoso" kelas="XI IPS 1" action="Masuk materi Inflasi" time="08.15" />
-              <Activity name="Rina Putri" kelas="XI IPS 2" action="Selesai kuis" time="08.32" />
-              <Activity name="Andi Pratama" kelas="X IPS 1" action="Membuka slide 3" time="09.10" />
-              <Activity name="Salsa Amira" kelas="XII IPS" action="Nilai masuk: 92" time="10.05" />
+            <div className="material-list">
+              {materials.map((m) => (
+                <div className="material" key={m[0]}>
+                  <div className="thumb">📘</div>
+                  <div className="material-info">
+                    <h3>{m[0]}</h3>
+                    <p>{m[1]} • {m[2]} • {m[3]} • {m[4]}</p>
+                  </div>
+                  <span className={m[5] === "Published" ? "badge publish" : "badge draft"}>{m[5]}</span>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="content-grid">
+        <section className="dashboard-grid bottom">
           <div className="panel">
-            <h2>Progress Peserta</h2>
-            <div className="progress-item">
-              <span>Sudah selesai</span>
-              <b>63%</b>
+            <div className="section-title">
+              <h2>Progress Peserta</h2>
+              <p>Status penyelesaian materi.</p>
             </div>
-            <div className="bar"><span style={{ width: "63%" }}></span></div>
 
-            <div className="progress-item">
-              <span>Sedang belajar</span>
-              <b>24%</b>
-            </div>
-            <div className="bar blue"><span style={{ width: "24%" }}></span></div>
-
-            <div className="progress-item">
-              <span>Belum selesai</span>
-              <b>13%</b>
-            </div>
-            <div className="bar orange"><span style={{ width: "13%" }}></span></div>
+            <Progress title="Sudah selesai" value="63%" color="green" />
+            <Progress title="Sedang belajar" value="24%" color="blue" />
+            <Progress title="Belum selesai" value="13%" color="orange" />
           </div>
 
-          <div className="panel wide">
-            <div className="section-head">
-              <div>
-                <h2>Peserta Masuk Terbaru</h2>
-                <p>Data dari siswa yang membuka link materi.</p>
-              </div>
+          <div className="panel table-panel">
+            <div className="section-title">
+              <h2>Peserta Masuk Terbaru</h2>
+              <p>Data dari siswa yang membuka link materi.</p>
             </div>
 
-            <table>
-              <thead>
-                <tr>
-                  <th>Nama</th>
-                  <th>Jenis Kelamin</th>
-                  <th>Kelas</th>
-                  <th>Materi</th>
-                  <th>Progress</th>
-                  <th>Nilai</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Budi Santoso</td>
-                  <td>Laki-laki</td>
-                  <td>XI IPS 1</td>
-                  <td>Inflasi</td>
-                  <td>75%</td>
-                  <td>-</td>
-                </tr>
-                <tr>
-                  <td>Rina Putri</td>
-                  <td>Perempuan</td>
-                  <td>XI IPS 2</td>
-                  <td>Inflasi</td>
-                  <td>100%</td>
-                  <td>92</td>
-                </tr>
-                <tr>
-                  <td>Andi Pratama</td>
-                  <td>Laki-laki</td>
-                  <td>X IPS 1</td>
-                  <td>Permintaan</td>
-                  <td>45%</td>
-                  <td>-</td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th>Jenis Kelamin</th>
+                    <th>Kelas</th>
+                    <th>Materi</th>
+                    <th>Progress</th>
+                    <th>Nilai</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {participants.map((p) => (
+                    <tr key={p[0]}>
+                      {p.map((x) => <td key={x}>{x}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
       </main>
@@ -182,53 +218,16 @@ function App() {
   );
 }
 
-function Stat({ icon, title, value, note }) {
+function Progress({ title, value, color }) {
   return (
-    <div className="stat-card">
-      <div className="stat-icon">{icon}</div>
-      <p>{title}</p>
-      <h2>{value}</h2>
-      <span>{note}</span>
-    </div>
-  );
-}
-
-function Action({ color, title, desc }) {
-  return (
-    <button className={`action-card ${color}`}>
-      <h3>{title}</h3>
-      <p>{desc}</p>
-      <span>Mulai →</span>
-    </button>
-  );
-}
-
-function Material({ title, kelas, status, slide, quiz, peserta }) {
-  return (
-    <div className="material-row">
+    <div className="progress-item">
       <div>
-        <h3>{title}</h3>
-        <p>{kelas} • {slide} slide • {quiz} kuis • {peserta} peserta</p>
+        <span>{title}</span>
+        <b>{value}</b>
       </div>
-      <span className={status === "Published" ? "badge publish" : "badge draft"}>{status}</span>
-      <div className="row-actions">
-        <button>Edit</button>
-        <button>Copy</button>
-        <button>Share</button>
+      <div className="progress">
+        <i className={color} style={{ width: value }}></i>
       </div>
-    </div>
-  );
-}
-
-function Activity({ name, kelas, action, time }) {
-  return (
-    <div className="activity">
-      <div className="avatar">{name[0]}</div>
-      <div>
-        <h4>{name}</h4>
-        <p>{kelas} • {action}</p>
-      </div>
-      <span>{time}</span>
     </div>
   );
 }
