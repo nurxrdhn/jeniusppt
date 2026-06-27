@@ -222,7 +222,7 @@ export default function App() {
     notify("Laporan CSV berhasil diunduh.");
   }
 
-  if (!user) return <LoginPage onLogin={setUser} />;
+  if (!user) return <OpeningLogin setUser={setUser} setStudentView={() => setPage("dashboard")} />;
 
   if (joinMaterialId) {
     const material = state.materials.find((m) => m.id === joinMaterialId);
