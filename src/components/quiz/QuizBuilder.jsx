@@ -1,20 +1,23 @@
 import { useState } from "react";
 
+const colors = ["red", "blue", "yellow", "green"];
+
 export default function QuizBuilder() {
   const [questions, setQuestions] = useState([
     {
       id: 1,
-      type: "Pilihan Ganda",
       question: "Apa yang dimaksud inflasi?",
-      options: ["Harga naik secara umum", "Harga turun", "Produksi naik", "Ekspor naik"],
+      options: ["Harga naik", "Harga turun", "Produksi naik", "Ekspor naik"],
       answer: 0,
       timer: 15,
       points: 1000,
-      explanation: "Inflasi adalah kenaikan harga barang dan jasa secara umum.",
     },
   ]);
 
   const [active, setActive] = useState(0);
+  const [preview, setPreview] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+
   const q = questions[active];
 
   function updateQuestion(field, value) {
@@ -26,39 +29,39 @@ export default function QuizBuilder() {
   }
 
   function updateOption(index, value) {
-    const nextOptions = [...q.options];
-    nextOptions[index] = value;
-    updateQuestion("options", nextOptions);
+    const next = [...q.options];
+    next[index] = value;
+    updateQuestion("options", next);
   }
 
   function addQuestion() {
     const next = {
       id: Date.now(),
-      type: "Pilihan Ganda",
       question: "Pertanyaan baru",
       options: ["Pilihan A", "Pilihan B", "Pilihan C", "Pilihan D"],
       answer: 0,
       timer: 15,
       points: 1000,
-      explanation: "",
     };
 
     setQuestions([...questions, next]);
     setActive(questions.length);
+    setSelectedAnswer(null);
   }
 
   function deleteQuestion() {
     if (questions.length === 1) return alert("Minimal harus ada 1 soal.");
-    const next = questions.filter((_, index) => index !== active);
+    const next = questions.filter((_, i) => i !== active);
     setQuestions(next);
     setActive(Math.max(0, active - 1));
+    setSelectedAnswer(null);
   }
 
   return (
-    <div className="quiz-builder">
-      <aside className="quiz-list">
-        <div className="quiz-list-head">
-          <h3>Soal</h3>
+    <div className="quiz-slide-builder">
+      <aside className="quiz-slide-list">
+        <div className="quiz-side-head">
+          <h3>Quiz</h3>
           <button onClick={addQuestion}>+ Soal</button>
         </div>
 
@@ -66,123 +69,138 @@ export default function QuizBuilder() {
           <button
             key={item.id}
             className={active === index ? "active" : ""}
-            onClick={() => setActive(index)}
+            onClick={() => {
+              setActive(index);
+              setSelectedAnswer(null);
+            }}
           >
             <span>{index + 1}</span>
-            <div>
-              <b>Soal {index + 1}</b>
-              <small>{item.type}</small>
-            </div>
+            <b>Soal {index + 1}</b>
           </button>
         ))}
+
+        <button className="delete-question" onClick={deleteQuestion}>
+          Hapus Soal
+        </button>
       </aside>
 
-      <main className="quiz-editor">
-        <div className="quiz-top">
-          <select value={q.type} onChange={(e) => updateQuestion("type", e.target.value)}>
-            <option>Pilihan Ganda</option>
-            <option>Benar / Salah</option>
-            <option>Essay</option>
-            <option>Polling</option>
-          </select>
+      <main className="quiz-canvas-wrap">
+        <div className="quiz-toolbar">
+          <button>Undo</button>
+          <button>Redo</button>
 
-          <button onClick={deleteQuestion}>Hapus Soal</button>
-        </div>
-
-        <label>Pertanyaan</label>
-        <textarea
-          value={q.question}
-          onChange={(e) => updateQuestion("question", e.target.value)}
-        />
-
-        <div className="media-box">
-          <button>Upload Gambar</button>
-          <button>Upload Video</button>
-        </div>
-
-        {q.type === "Pilihan Ganda" && (
-          <div className="kahoot-options">
-            {q.options.map((option, index) => (
-              <div className={`option option-${index}`} key={index}>
-                <span>{["A", "B", "C", "D"][index]}</span>
-                <input
-                  value={option}
-                  onChange={(e) => updateOption(index, e.target.value)}
-                />
-              </div>
+          <div className="chip-group">
+            {[5, 10, 15, 20, 30, 60].map((time) => (
+              <button
+                key={time}
+                className={q.timer === time ? "chip active" : "chip"}
+                onClick={() => updateQuestion("timer", time)}
+              >
+                {time}s
+              </button>
             ))}
+          </div>
 
-            <div className="answer-box">
-              <h3>Jawaban Benar</h3>
-              {q.options.map((_, index) => (
-                <label key={index}>
-                  <input
-                    type="radio"
-                    name="answer"
-                    checked={q.answer === index}
-                    onChange={() => updateQuestion("answer", index)}
-                  />
-                  {["A", "B", "C", "D"][index]}
-                </label>
-              ))}
+          <div className="chip-group">
+            {[0, 500, 1000, 2000].map((point) => (
+              <button
+                key={point}
+                className={q.points === point ? "chip active" : "chip"}
+                onClick={() => updateQuestion("points", point)}
+              >
+                {point}
+              </button>
+            ))}
+          </div>
+
+          <button className="preview-btn" onClick={() => setPreview(!preview)}>
+            {preview ? "Edit" : "Preview"}
+          </button>
+        </div>
+
+        <section className="quiz-canvas">
+          <div className="quiz-top-info">
+            <span>{q.timer}s</span>
+            <span>{q.points} poin</span>
+          </div>
+
+          <textarea
+            className="quiz-question-input"
+            value={q.question}
+            onChange={(e) => updateQuestion("question", e.target.value)}
+            disabled={preview}
+          />
+
+          <div className="quiz-media-placeholder">
+            + Tambah Gambar / Video
+          </div>
+
+          <div className="quiz-answer-grid">
+            {q.options.map((option, index) => {
+              const isCorrect = q.answer === index;
+              const isSelected = selectedAnswer === index;
+              const showResult = preview && selectedAnswer !== null;
+
+              return (
+                <button
+                  key={index}
+                  className={[
+                    "answer-card",
+                    colors[index],
+                    isCorrect && !preview ? "correct-edit" : "",
+                    showResult && isCorrect ? "result-correct" : "",
+                    showResult && isSelected && !isCorrect ? "result-wrong" : "",
+                  ].join(" ")}
+                  onClick={() => {
+                    if (preview) {
+                      setSelectedAnswer(index);
+                    } else {
+                      updateQuestion("answer", index);
+                    }
+                  }}
+                >
+                  <strong>{["A", "B", "C", "D"][index]}</strong>
+
+                  {preview ? (
+                    <span>{option}</span>
+                  ) : (
+                    <input
+                      value={option}
+                      onChange={(e) => updateOption(index, e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  )}
+
+                  {isCorrect && !preview && <em>✓ Jawaban Benar</em>}
+                  {showResult && isCorrect && <em>✓ Benar</em>}
+                  {showResult && isSelected && !isCorrect && <em>✕ Salah</em>}
+                </button>
+              );
+            })}
+          </div>
+
+          {preview && selectedAnswer !== null && (
+            <div className="quiz-result-box">
+              {selectedAnswer === q.answer ? (
+                <b className="right">Jawaban kamu benar ✅</b>
+              ) : (
+                <b className="wrong">
+                  Jawaban salah ❌. Jawaban benar: {["A", "B", "C", "D"][q.answer]}
+                </b>
+              )}
             </div>
-          </div>
-        )}
-
-        {q.type === "Benar / Salah" && (
-          <div className="true-false">
-            <button onClick={() => updateQuestion("answer", "Benar")}>Benar</button>
-            <button onClick={() => updateQuestion("answer", "Salah")}>Salah</button>
-          </div>
-        )}
-
-        {q.type === "Essay" && (
-          <>
-            <label>Jawaban Acuan</label>
-            <textarea placeholder="Tulis jawaban acuan..." />
-          </>
-        )}
-
-        <label>Penjelasan Jawaban</label>
-        <textarea
-          value={q.explanation}
-          onChange={(e) => updateQuestion("explanation", e.target.value)}
-        />
+          )}
+        </section>
       </main>
 
-      <aside className="quiz-properties">
-        <h3>Properties</h3>
-
-        <label>Timer</label>
-        <select value={q.timer} onChange={(e) => updateQuestion("timer", e.target.value)}>
-          <option>5</option>
-          <option>10</option>
-          <option>15</option>
-          <option>20</option>
-          <option>30</option>
-          <option>60</option>
-        </select>
-
-        <label>Poin</label>
-        <select value={q.points} onChange={(e) => updateQuestion("points", e.target.value)}>
-          <option>0</option>
-          <option>500</option>
-          <option>1000</option>
-          <option>2000</option>
-        </select>
-
-        <div className="toggle-row">
-          <span>Acak Jawaban</span>
-          <input type="checkbox" />
-        </div>
-
-        <div className="toggle-row">
-          <span>Tampilkan Pembahasan</span>
-          <input type="checkbox" defaultChecked />
-        </div>
-
-        <button className="quiz-preview">Preview</button>
-        <button className="quiz-save">Simpan Kuis</button>
+      <aside className="quiz-mini-tools">
+        <h3>Tools</h3>
+        <button>Theme</button>
+        <button>Background</button>
+        <button>Music</button>
+        <button>Transition</button>
+        <button>Simpan Quiz</button>
+        <button>Publish</button>
       </aside>
     </div>
   );
