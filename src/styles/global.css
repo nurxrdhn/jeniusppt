@@ -94,3 +94,61 @@
 .empty-state .secondary-button{
   margin:8px;
 }
+
+.clean-share{
+  background:#fff;
+  color:#111;
+  max-width:430px;
+}
+
+.clean-share header h2{
+  color:#111;
+  margin:0;
+}
+
+.clean-share header p,
+.clean-share label,
+.qr-help{
+  color:#333;
+}
+
+.clean-share label{
+  display:block;
+  font-weight:800;
+  margin:18px 0 8px;
+}
+
+.qr-like-example{
+  background:#fff;
+  border:0;
+  box-shadow:none;
+  padding:12px;
+}
+
+.qr-like-example svg{
+  width:260px;
+  height:260px;
+  display:block;
+  margin:auto;
+}
+
+.qr-help{
+  text-align:center;
+  margin-top:8px;
+}
+
+.clean-share .link-box{
+  background:#f8fafc;
+  border:1px solid #dbe2ea;
+}
+
+.clean-share .link-box span{
+  color:#111;
+}
+
+.clean-share .share-actions button,
+.clean-share .share-actions a{
+  background:#fff;
+  border:1px solid #dbe2ea;
+  color:#111;
+}

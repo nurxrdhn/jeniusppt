@@ -149,6 +149,7 @@ export default function App() {
     const updated = {
       ...material,
       status: "Published",
+      publishedAtLocal: new Date().toISOString(),
     };
 
     localStorage.setItem(
@@ -156,19 +157,46 @@ export default function App() {
       JSON.stringify(updated)
     );
 
-    await publishMaterialToFirestore(updated);
-
     updateMaterial(updated.id, {
       status: "Published",
+      publishedAtLocal: updated.publishedAtLocal,
     });
 
-    notify("Published.");
+    try {
+      await publishMaterialToFirestore(updated);
+      notify("Materi berhasil dipublish.");
+    } catch (err) {
+      console.error(err);
+      notify("Link lokal siap. Firebase gagal, cek koneksi/config.");
+    }
+
     return updated;
   }
 
-  async function openShare(material) {
-    const updated = await publishMaterial(material);
-    setShareMaterial(updated);
+  function openShare(material) {
+    const instant = {
+      ...material,
+      status: "Published",
+      publishedAtLocal: new Date().toISOString(),
+    };
+
+    localStorage.setItem(
+      `jeniusppt_package_${instant.shareCode}`,
+      JSON.stringify(instant)
+    );
+
+    updateMaterial(instant.id, {
+      status: "Published",
+      publishedAtLocal: instant.publishedAtLocal,
+    });
+
+    setShareMaterial(instant);
+    notify("QR dan link siswa siap.");
+
+    publishMaterialToFirestore(instant).catch((err) => {
+      console.error(err);
+      notify("Firebase gagal. Cek koneksi/config.");
+    });
   }
 
   function duplicateMaterial(material) {
