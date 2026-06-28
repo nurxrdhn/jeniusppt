@@ -1,26 +1,18 @@
-# JeniusPPT v3 Part 1
+# JeniusPPT v3 Part 2
 
-Fondasi JeniusPPT:
+Fitur:
 - Opening 3 slide
-- Login Google via Firebase
+- Login Google Firebase
 - Dashboard guru
-- Dashboard siswa basic
-- Link siswa `/play/:code`
-- UI putih + biru tua
-- Responsive
-- Siap Vercel
-
-## Cara pakai
+- Materi CRUD lokal
+- Wizard: Informasi → PPT → Quiz → Preview → Publish
+- PPT Editor dasar
+- Background bawaan + upload lokal + URL
+- Quiz Builder PG + benar/salah
+- Student Player `/play/:code`
+- Nilai akumulasi sesuai jumlah soal
 
 ```bash
 npm install
 npm run dev
-```
-
-## Push ke GitHub
-
-```bash
-git add .
-git commit -m "feat: JeniusPPT v3 part 1"
-git push --force
 ```
