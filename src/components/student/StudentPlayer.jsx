@@ -1,208 +1,225 @@
 import { useEffect, useState } from "react";
-import { SLIDE_SIZES, ratioStyle } from "../../utils/slideSizes";
 import { getPublishedMaterial } from "../../services/materialService";
 
 export default function StudentPlayer() {
   const code = decodeURIComponent(window.location.pathname.split("/play/")[1] || "");
-
-  const [data, setData] = useState(null);
+  const [material, setMaterial] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const [student, setStudent] = useState(null);
-  const [mode, setMode] = useState("slide");
-  const [slide, setSlide] = useState(0);
-  const [question, setQuestion] = useState(0);
-  const [answer, setAnswer] = useState(null);
-  const [correct, setCorrect] = useState(0);
+  const [mode, setMode] = useState("form");
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [quizIndex, setQuizIndex] = useState(0);
+  const [picked, setPicked] = useState(null);
+  const [answers, setAnswers] = useState([]);
 
   useEffect(() => {
-    let alive = true;
-
-    async function loadMaterial() {
-      setLoading(true);
-
+    async function load() {
       try {
-        const firestoreData = await getPublishedMaterial(code);
-
-        if (firestoreData && firestoreData.shareCode === code) {
-          localStorage.setItem(`jeniusppt_package_${code}`, JSON.stringify(firestoreData));
-          if (alive) setData(firestoreData);
+        const online = await getPublishedMaterial(code);
+        if (online) {
+          setMaterial(online);
+          localStorage.setItem(`jeniusppt_package_${code}`, JSON.stringify(online));
           return;
         }
-
-        const saved = localStorage.getItem(`jeniusppt_package_${code}`);
-        const localData = saved ? JSON.parse(saved) : null;
-
-        if (localData && localData.shareCode === code) {
-          if (alive) setData(localData);
-          return;
-        }
-
-        if (alive) setData(null);
-      } catch (err) {
-        console.error(err);
-
-        const saved = localStorage.getItem(`jeniusppt_package_${code}`);
-        const localData = saved ? JSON.parse(saved) : null;
-
-        if (localData && localData.shareCode === code) {
-          if (alive) setData(localData);
-        } else {
-          if (alive) setData(null);
-        }
-      } finally {
-        if (alive) setLoading(false);
+      } catch (e) {
+        console.error(e);
       }
+
+      const saved = localStorage.getItem(`jeniusppt_package_${code}`);
+      setMaterial(saved ? JSON.parse(saved) : null);
+      setLoading(false);
     }
 
-    loadMaterial();
-
-    return () => {
-      alive = false;
-    };
+    load().finally(() => setLoading(false));
   }, [code]);
 
   if (loading) {
-    return (
-      <main className="student-page">
-        <section className="student-card center">
-          <span className="eyebrow">Loading</span>
-          <h1>Membuka materi...</h1>
-          <p>Mohon tunggu sebentar.</p>
-        </section>
-      </main>
-    );
+    return <main className="student-clean"><h1>Membuka materi...</h1></main>;
   }
 
-  if (!data) {
+  if (!material) {
     return (
-      <main className="student-page">
-        <section className="student-card center">
-          <span className="eyebrow">404</span>
+      <main className="student-clean">
+        <section className="student-box">
           <h1>Materi tidak ditemukan</h1>
-          <p>Periksa link atau publish ulang materi.</p>
+          <p>Link siswa belum aktif atau materi belum dipublish.</p>
         </section>
       </main>
     );
   }
 
-  const slides = data.slides || [];
-  const questions = data.questions || [];
-  const score = questions.length ? Math.round((correct / questions.length) * 100) : 0;
+  const slides = material.slides || [];
+  const questions = material.questions || [];
+  const currentSlide = slides[slideIndex];
+  const currentQuiz = questions[quizIndex];
 
-  if (!student) {
+  const correctCount = answers.filter((a) => a.correct).length;
+  const score = questions.length ? Math.round((correctCount / questions.length) * 100) : 0;
+
+  function normalizeAnswer(q) {
+    if (q.type === "truefalse") return q.answer === true || q.answer === "Benar" || q.answer === 0 ? 0 : 1;
+    return Number(q.answer ?? q.correctAnswer ?? 0);
+  }
+
+  function startQuizOrResult() {
+    if (questions.length > 0) {
+      setMode("quiz");
+    } else {
+      setMode("result");
+    }
+  }
+
+  function chooseAnswer(value) {
+    const correctAnswer = normalizeAnswer(currentQuiz);
+    const isCorrect = value === correctAnswer;
+
+    setPicked(value);
+
+    setAnswers((prev) => {
+      const copy = [...prev];
+      copy[quizIndex] = {
+        question: currentQuiz.question,
+        picked: value,
+        correctAnswer,
+        correct: isCorrect,
+      };
+      return copy;
+    });
+  }
+
+  function nextQuestion() {
+    setPicked(null);
+    if (quizIndex < questions.length - 1) {
+      setQuizIndex(quizIndex + 1);
+    } else {
+      setMode("result");
+    }
+  }
+
+  if (mode === "form") {
     return (
-      <main className="student-page">
-        <form
-          className="student-card"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const f = new FormData(e.currentTarget);
-            setStudent({
-              name: f.get("name"),
-              gender: f.get("gender"),
-              className: f.get("className"),
-            });
-          }}
-        >
-          <span className="eyebrow">Masuk Kelas</span>
-          <h1>{data.title}</h1>
+      <main className="student-clean">
+        <section className="student-box">
+          <h1>{material.title}</h1>
+          <p>Isi data terlebih dahulu untuk mulai belajar.</p>
 
-          <input name="name" placeholder="Nama" required />
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const f = new FormData(e.currentTarget);
+              setStudent({
+                name: f.get("name"),
+                gender: f.get("gender"),
+                className: f.get("className"),
+              });
+              setMode("slide");
+            }}
+          >
+            <input name="name" placeholder="Nama siswa" required />
 
-          <select name="gender" required>
-            <option value="">Gender</option>
-            <option>Laki-laki</option>
-            <option>Perempuan</option>
-          </select>
+            <select name="gender" required>
+              <option value="">Jenis kelamin</option>
+              <option value="Laki-laki">Laki-laki</option>
+              <option value="Perempuan">Perempuan</option>
+            </select>
 
-          <input name="className" placeholder="Kelas" required />
+            <input name="className" placeholder="Nama kelas" required />
 
-          <button className="primary-button full">Lanjut →</button>
-        </form>
+            <button>Mulai Materi</button>
+          </form>
+        </section>
       </main>
     );
   }
 
-  if (mode === "result") {
+  if (mode === "slide") {
     return (
-      <main className="student-page">
-        <section className="student-card center">
-          <span className="eyebrow">Skor</span>
-          <div className="big-score">{score}</div>
-          <p>{correct} Benar • {questions.length - correct} Salah</p>
+      <main className="student-clean">
+        <section className="student-slide-clean">
+          <div className="student-top">
+            <b>{student.name}</b>
+            <span>{student.className}</span>
+          </div>
+
+          <small>Slide {slideIndex + 1} dari {slides.length}</small>
+          <h1>{currentSlide?.title || material.title}</h1>
+          <p>{currentSlide?.body || currentSlide?.content || "Materi belum memiliki isi."}</p>
+
+          <div className="student-nav">
+            <button disabled={slideIndex === 0} onClick={() => setSlideIndex(slideIndex - 1)}>
+              Sebelumnya
+            </button>
+
+            {slideIndex < slides.length - 1 ? (
+              <button onClick={() => setSlideIndex(slideIndex + 1)}>
+                Lanjut
+              </button>
+            ) : (
+              <button onClick={startQuizOrResult}>
+                Mulai Kuis
+              </button>
+            )}
+          </div>
         </section>
       </main>
     );
   }
 
   if (mode === "quiz") {
-    const q = questions[question];
-
-    if (!q) {
-      return (
-        <main className="student-page">
-          <section className="student-card center">
-            <span className="eyebrow">Selesai</span>
-            <h1>Tidak ada kuis</h1>
-            <p>Materi ini belum memiliki soal.</p>
-          </section>
-        </main>
-      );
-    }
-
-    const isTF = q.type === "truefalse";
-    const options = isTF ? ["Benar", "Salah"] : q.options || [];
+    const isTrueFalse = currentQuiz?.type === "truefalse";
+    const options = isTrueFalse ? ["Benar", "Salah"] : currentQuiz?.options || [];
 
     return (
-      <main className="student-page">
-        <section className="student-slide">
-          <div className="student-meta">
-            <b>{student.name}</b>
-            <span>Soal {question + 1}/{questions.length}</span>
-          </div>
+      <main className="student-clean">
+        <section className="student-box">
+          <small>Soal {quizIndex + 1} dari {questions.length}</small>
+          <h1>{currentQuiz?.question}</h1>
 
-          <h1>{q.question}</h1>
-
-          <div className="student-options">
+          <div className="quiz-options-clean">
             {options.map((opt, i) => {
-              const value = isTF ? i === 0 : i;
-              const isRight = q.answer === value;
-              const picked = answer === value;
-              const show = answer !== null;
+              const correctAnswer = normalizeAnswer(currentQuiz);
+              const isCorrect = i === correctAnswer;
+              const isPicked = picked === i;
 
               return (
                 <button
-                  key={`${opt}-${i}`}
-                  disabled={show}
-                  className={show && isRight ? "correct" : show && picked ? "wrong" : ""}
-                  onClick={() => {
-                    setAnswer(value);
-                    if (isRight) setCorrect((v) => v + 1);
-                  }}
+                  key={i}
+                  disabled={picked !== null}
+                  className={
+                    picked === null
+                      ? ""
+                      : isCorrect
+                      ? "right"
+                      : isPicked
+                      ? "wrong"
+                      : ""
+                  }
+                  onClick={() => chooseAnswer(i)}
                 >
-                  <b>{isTF ? (i === 0 ? "✓" : "✕") : ["A", "B", "C", "D"][i]}</b>
+                  <b>{isTrueFalse ? (i === 0 ? "✓" : "✕") : ["A", "B", "C", "D"][i]}</b>
                   {opt}
                 </button>
               );
             })}
           </div>
 
-          {answer !== null && (
-            <div className="answer-result">
-              {answer === q.answer ? "✅ Benar" : "❌ Salah"}
-
-              {question < questions.length - 1 ? (
-                <button
-                  onClick={() => {
-                    setQuestion((i) => i + 1);
-                    setAnswer(null);
-                  }}
-                >
-                  Lanjut
-                </button>
+          {picked !== null && (
+            <div className="answer-info">
+              {picked === normalizeAnswer(currentQuiz) ? (
+                <h2>✅ Jawaban benar</h2>
               ) : (
-                <button onClick={() => setMode("result")}>Skor</button>
+                <h2>❌ Jawaban salah</h2>
               )}
+
+              <p>
+                Jawaban yang benar:{" "}
+                <b>{options[normalizeAnswer(currentQuiz)]}</b>
+              </p>
+
+              <button onClick={nextQuestion}>
+                {quizIndex < questions.length - 1 ? "Soal Berikutnya" : "Lihat Skor"}
+              </button>
             </div>
           )}
         </section>
@@ -210,44 +227,32 @@ export default function StudentPlayer() {
     );
   }
 
-  const s = slides[slide];
-  const bg = s?.background || {
-    type: "css",
-    value: "linear-gradient(135deg,#0b1f46,#1d4ed8)",
-  };
-
   return (
-    <main className="student-page">
-      <section
-        className="student-slide ppt-like"
-        style={{
-          ...ratioStyle(data.slideSize || SLIDE_SIZES.wide),
-          ...(bg.type === "image"
-            ? { backgroundImage: `url(${bg.value})` }
-            : { background: bg.value }),
-        }}
-      >
-        <div className="student-meta">
-          <b>{student.name}</b>
-          <span>Slide {slide + 1}/{slides.length}</span>
-        </div>
+    <main className="student-clean">
+      <section className="student-box center">
+        <h1>Skor Kamu</h1>
+        <div className="score-clean">{score}</div>
+        <p>{correctCount} benar dari {questions.length} soal</p>
 
-        <h1>{s?.title || data.title}</h1>
-        <p>{s?.body || "Materi belum memiliki isi."}</p>
+        <button
+          onClick={() => {
+            setMode("slide");
+            setSlideIndex(0);
+            setQuizIndex(0);
+            setPicked(null);
+            setAnswers([]);
+          }}
+        >
+          Balik ke Awal Materi
+        </button>
 
-        <div className="student-controls">
-          <button disabled={slide === 0} onClick={() => setSlide((i) => i - 1)}>
-            ←
-          </button>
-
-          {slide < slides.length - 1 ? (
-            <button onClick={() => setSlide((i) => i + 1)}>→</button>
-          ) : (
-            <button onClick={() => setMode(questions.length ? "quiz" : "result")}>
-              {questions.length ? "Kuis" : "Selesai"}
-            </button>
-          )}
-        </div>
+        <button
+          onClick={() => {
+            window.location.href = `/play/${code}`;
+          }}
+        >
+          Home
+        </button>
       </section>
     </main>
   );

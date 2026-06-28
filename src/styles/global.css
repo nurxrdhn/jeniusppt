@@ -152,3 +152,147 @@
   border:1px solid #dbe2ea;
   color:#111;
 }
+
+.student-clean{
+  min-height:100vh;
+  background:#f3f7ff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  color:#10213f;
+}
+
+.student-box,
+.student-slide-clean{
+  width:min(900px,100%);
+  background:#fff;
+  border-radius:28px;
+  padding:34px;
+  box-shadow:0 20px 60px rgba(15,35,80,.14);
+}
+
+.student-box h1,
+.student-slide-clean h1{
+  margin:0 0 12px;
+  font-size:34px;
+}
+
+.student-box form{
+  display:grid;
+  gap:14px;
+  margin-top:24px;
+}
+
+.student-box input,
+.student-box select{
+  min-height:54px;
+  border-radius:16px;
+  border:1px solid #d7e0ef;
+  padding:0 16px;
+  font-weight:800;
+}
+
+.student-box button,
+.student-slide-clean button,
+.answer-info button{
+  min-height:52px;
+  border:0;
+  border-radius:16px;
+  background:#155dfc;
+  color:#fff;
+  font-weight:900;
+  padding:0 22px;
+  cursor:pointer;
+}
+
+.student-box button:disabled,
+.student-slide-clean button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+.student-top{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:24px;
+  color:#155dfc;
+}
+
+.student-slide-clean p{
+  font-size:22px;
+  line-height:1.7;
+  white-space:pre-line;
+}
+
+.student-nav{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:30px;
+}
+
+.quiz-options-clean{
+  display:grid;
+  gap:14px;
+  margin-top:24px;
+}
+
+.quiz-options-clean button{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-height:62px;
+  border-radius:18px;
+  border:2px solid #d7e0ef;
+  background:#fff;
+  color:#10213f;
+  font-size:17px;
+  font-weight:900;
+  text-align:left;
+  padding:0 18px;
+}
+
+.quiz-options-clean button b{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  background:#eef4ff;
+  display:grid;
+  place-items:center;
+  color:#155dfc;
+}
+
+.quiz-options-clean button.right{
+  border-color:#16a34a;
+  background:#ecfdf5;
+}
+
+.quiz-options-clean button.wrong{
+  border-color:#dc2626;
+  background:#fef2f2;
+}
+
+.answer-info{
+  margin-top:22px;
+  padding:20px;
+  border-radius:20px;
+  background:#f8fbff;
+}
+
+.score-clean{
+  width:150px;
+  height:150px;
+  border-radius:50%;
+  background:#155dfc;
+  color:white;
+  display:grid;
+  place-items:center;
+  font-size:52px;
+  font-weight:1000;
+  margin:24px auto;
+}
+
+.center{
+  text-align:center;
+}
