@@ -18,6 +18,7 @@ import Sidebar from "./components/layout/Sidebar";
 import Topbar from "./components/layout/Topbar";
 import StudentPlayer from "./components/student/StudentPlayer";
 import MaterialBuilder from "./components/materials/MaterialBuilder";
+import CodeImportModal from "./components/materials/CodeImportModal";
 import ShareModal from "./components/share/ShareModal";
 
 import { SLIDE_SIZES } from "./utils/slideSizes";
@@ -91,6 +92,7 @@ export default function App() {
   const [toast, setToast] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [shareMaterial, setShareMaterial] = useState(null);
+  const [showCodeImport, setShowCodeImport] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -122,6 +124,25 @@ export default function App() {
 
     setEditingId(item.id);
     notify("Materi dibuat.");
+  }
+
+  function createMaterialFromCode(payload) {
+    const item = {
+      ...blankMaterial(),
+      ...payload,
+      id: crypto.randomUUID(),
+      status: "Draft",
+      shareCode: `JP-${Math.random().toString(36).slice(2, 7).toUpperCase()}`,
+      activeSlide: 0,
+      activeQuestion: 0,
+    };
+
+    setState((old) => ({
+      ...old,
+      materials: [item, ...old.materials],
+    }));
+
+    setEditingId(item.id);
   }
 
   async function publishMaterial(material) {
@@ -247,7 +268,7 @@ export default function App() {
         <Topbar title={title} user={user} onCreate={createMaterial} />
 
         {page === "dashboard" && (
-          <Dashboard state={state} onCreate={createMaterial} user={user} />
+          <Dashboard state={state} onCreate={createMaterial} onImportCode={() => setShowCodeImport(true)} user={user} />
         )}
 
         {page === "materials" && (
@@ -274,11 +295,19 @@ export default function App() {
           notify={notify}
         />
       )}
+
+      {showCodeImport && (
+        <CodeImportModal
+          onClose={() => setShowCodeImport(false)}
+          onImport={createMaterialFromCode}
+          notify={notify}
+        />
+      )}
     </div>
   );
 }
 
-function Dashboard({ state, onCreate, user }) {
+function Dashboard({ state, onCreate, onImportCode, user }) {
   const published = state.materials.filter(
     (m) => m.status === "Published"
   ).length;
@@ -292,9 +321,14 @@ function Dashboard({ state, onCreate, user }) {
           <p>Slide. Quiz. Share. Analyze.</p>
         </div>
 
-        <button className="primary-button" onClick={onCreate}>
-          + Materi
-        </button>
+        <div className="welcome-actions">
+          <button className="primary-button" onClick={onCreate}>
+            + Materi
+          </button>
+          <button className="secondary-button" onClick={onImportCode}>
+            &lt;/&gt; Code
+          </button>
+        </div>
       </div>
 
       <div className="stats-grid">
