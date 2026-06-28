@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getPublishedMaterial } from "../../services/materialService";
+import { saveStudentEntry, saveStudentResult } from "../../services/studentService";
 
 export default function StudentPlayer() {
   const code = decodeURIComponent(window.location.pathname.split("/play/")[1] || "");
@@ -7,6 +8,8 @@ export default function StudentPlayer() {
   const [loading, setLoading] = useState(true);
 
   const [student, setStudent] = useState(null);
+  const [entryId, setEntryId] = useState(null);
+  const [resultSaved, setResultSaved] = useState(false);
   const [mode, setMode] = useState("form");
   const [slideIndex, setSlideIndex] = useState(0);
   const [quizIndex, setQuizIndex] = useState(0);
@@ -108,12 +111,23 @@ export default function StudentPlayer() {
             onSubmit={(e) => {
               e.preventDefault();
               const f = new FormData(e.currentTarget);
-              setStudent({
+              const studentData = {
                 name: f.get("name"),
                 gender: f.get("gender"),
                 className: f.get("className"),
-              });
+              };
+
+              setStudent(studentData);
               setMode("slide");
+
+              saveStudentEntry({
+                shareCode: code,
+                materialId: material.id,
+                materialTitle: material.title,
+                student: studentData,
+              })
+                .then((id) => setEntryId(id))
+                .catch((err) => console.error("Gagal simpan siswa:", err));
             }}
           >
             <input name="name" placeholder="Nama siswa" required />
@@ -225,6 +239,21 @@ export default function StudentPlayer() {
         </section>
       </main>
     );
+  }
+
+  if (!resultSaved && student) {
+    setResultSaved(true);
+    saveStudentResult({
+      entryId,
+      shareCode: code,
+      materialId: material.id,
+      materialTitle: material.title,
+      student,
+      answers,
+      score,
+      correctCount,
+      totalQuestions: questions.length,
+    }).catch((err) => console.error("Gagal simpan skor:", err));
   }
 
   return (
