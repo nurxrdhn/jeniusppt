@@ -1,5 +1,5 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "../firebase";
+import { db } from "../firebase/config";
 
 export async function saveStudentEntry({ shareCode, materialId, materialTitle, student }) {
   const ref = await addDoc(collection(db, "studentEntries"), {
