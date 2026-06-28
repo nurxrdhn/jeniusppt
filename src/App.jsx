@@ -265,7 +265,13 @@ export default function App() {
       />
 
       <main className="main-area">
-        <Topbar title={title} user={user} onCreate={createMaterial} />
+        <Topbar
+          title={title}
+          user={user}
+          onCreate={createMaterial}
+          onImportCode={() => setShowCodeImport(true)}
+          notify={notify}
+        />
 
         {page === "dashboard" && (
           <Dashboard state={state} onCreate={createMaterial} onImportCode={() => setShowCodeImport(true)} user={user} />
@@ -278,6 +284,8 @@ export default function App() {
             duplicateMaterial={duplicateMaterial}
             deleteMaterial={deleteMaterial}
             openShare={openShare}
+            onCreate={createMaterial}
+            onImportCode={() => setShowCodeImport(true)}
           />
         )}
 
@@ -354,18 +362,26 @@ function Materials({
   duplicateMaterial,
   deleteMaterial,
   openShare,
+  onCreate,
+  onImportCode,
 }) {
   return (
     <section className="page">
       <div className="page-head">
         <span className="eyebrow">Materi</span>
         <h1>Semua Materi</h1>
+        <div className="welcome-actions">
+          <button className="primary-button" onClick={onCreate}>+ Buat Materi</button>
+          <button className="secondary-button" onClick={onImportCode}>&lt;/&gt; Buat dari Kode</button>
+        </div>
       </div>
 
       {materials.length === 0 ? (
         <div className="empty-state">
           <h2>Belum ada materi</h2>
-          <p>+ Materi Baru</p>
+          <p>Buat manual atau generate dari kode.</p>
+          <button className="primary-button" onClick={onCreate}>+ Buat Materi</button>
+          <button className="secondary-button" onClick={onImportCode}>&lt;/&gt; Buat dari Kode</button>
         </div>
       ) : (
         <div className="material-grid">
@@ -432,11 +448,18 @@ function Participants() {
 }
 
 function ComingSoon({ title }) {
+  const texts = {
+    Workspace: "Tempat ringkasan materi, draft, dan publish.",
+    Analitik: "Ringkasan jumlah materi, slide, soal, dan publish.",
+    AI: "Gunakan tombol Buat dari Kode untuk generate PPT dan kuis otomatis.",
+    Setting: "Pengaturan akun dan workspace."
+  };
+
   return (
     <section className="page">
       <div className="empty-state">
         <h2>{title}</h2>
-        <p>Segera hadir.</p>
+        <p>{texts[title] || "Halaman aktif."}</p>
       </div>
     </section>
   );
