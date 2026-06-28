@@ -1,16 +1,17 @@
-# JeniusPPT v3 Part 2
+# JeniusPPT V4 Core
 
 Fitur:
-- Opening 3 slide
+- Opening 3 slide otomatis
 - Login Google Firebase
 - Dashboard guru
-- Materi CRUD lokal
-- Wizard: Informasi → PPT → Quiz → Preview → Publish
-- PPT Editor dasar
-- Background bawaan + upload lokal + URL
-- Quiz Builder PG + benar/salah
+- Builder: Info → Slide → Quiz → Preview → Publish
+- Ukuran slide: 16:9 1920x1080, 4:3, A4, Portrait
+- PPT editor dasar + background upload/URL/template
+- Quiz PG + Benar/Salah
+- Preview berurutan semua slide lalu semua soal
+- Share modal QR code + link bawah
 - Student Player `/play/:code`
-- Nilai akumulasi sesuai jumlah soal
+- Nilai akumulasi dinamis
 
 ```bash
 npm install
