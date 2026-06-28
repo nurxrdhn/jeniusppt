@@ -1,27 +1,77 @@
-import { useMemo, useState } from 'react';
-import { SLIDE_SIZES, ratioStyle } from '../../utils/slideSizes';
+import { useEffect, useState } from "react";
+import { SLIDE_SIZES, ratioStyle } from "../../utils/slideSizes";
+import { getPublishedMaterial } from "../../services/materialService";
 
 export default function StudentPlayer() {
-  const code = window.location.pathname.split('/play/')[1] || '';
+  const code = decodeURIComponent(window.location.pathname.split("/play/")[1] || "");
 
-  const data = useMemo(() => {
-    const saved = localStorage.getItem(`jeniusppt_package_${code}`);
-
-    if (!saved) return null;
-
-    const material = JSON.parse(saved);
-
-    if (material.shareCode !== code) return null;
-
-    return material;
-  }, [code]);
-
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [student, setStudent] = useState(null);
-  const [mode, setMode] = useState('slide');
+  const [mode, setMode] = useState("slide");
   const [slide, setSlide] = useState(0);
   const [question, setQuestion] = useState(0);
   const [answer, setAnswer] = useState(null);
   const [correct, setCorrect] = useState(0);
+
+  useEffect(() => {
+    let alive = true;
+
+    async function loadMaterial() {
+      setLoading(true);
+
+      try {
+        const firestoreData = await getPublishedMaterial(code);
+
+        if (firestoreData && firestoreData.shareCode === code) {
+          localStorage.setItem(`jeniusppt_package_${code}`, JSON.stringify(firestoreData));
+          if (alive) setData(firestoreData);
+          return;
+        }
+
+        const saved = localStorage.getItem(`jeniusppt_package_${code}`);
+        const localData = saved ? JSON.parse(saved) : null;
+
+        if (localData && localData.shareCode === code) {
+          if (alive) setData(localData);
+          return;
+        }
+
+        if (alive) setData(null);
+      } catch (err) {
+        console.error(err);
+
+        const saved = localStorage.getItem(`jeniusppt_package_${code}`);
+        const localData = saved ? JSON.parse(saved) : null;
+
+        if (localData && localData.shareCode === code) {
+          if (alive) setData(localData);
+        } else {
+          if (alive) setData(null);
+        }
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
+
+    loadMaterial();
+
+    return () => {
+      alive = false;
+    };
+  }, [code]);
+
+  if (loading) {
+    return (
+      <main className="student-page">
+        <section className="student-card center">
+          <span className="eyebrow">Loading</span>
+          <h1>Membuka materi...</h1>
+          <p>Mohon tunggu sebentar.</p>
+        </section>
+      </main>
+    );
+  }
 
   if (!data) {
     return (
@@ -48,9 +98,9 @@ export default function StudentPlayer() {
             e.preventDefault();
             const f = new FormData(e.currentTarget);
             setStudent({
-              name: f.get('name'),
-              gender: f.get('gender'),
-              className: f.get('className'),
+              name: f.get("name"),
+              gender: f.get("gender"),
+              className: f.get("className"),
             });
           }}
         >
@@ -73,7 +123,7 @@ export default function StudentPlayer() {
     );
   }
 
-  if (mode === 'result') {
+  if (mode === "result") {
     return (
       <main className="student-page">
         <section className="student-card center">
@@ -85,7 +135,7 @@ export default function StudentPlayer() {
     );
   }
 
-  if (mode === 'quiz') {
+  if (mode === "quiz") {
     const q = questions[question];
 
     if (!q) {
@@ -100,8 +150,8 @@ export default function StudentPlayer() {
       );
     }
 
-    const isTF = q.type === 'truefalse';
-    const options = isTF ? ['Benar', 'Salah'] : q.options || [];
+    const isTF = q.type === "truefalse";
+    const options = isTF ? ["Benar", "Salah"] : q.options || [];
 
     return (
       <main className="student-page">
@@ -122,15 +172,15 @@ export default function StudentPlayer() {
 
               return (
                 <button
-                  key={opt}
+                  key={`${opt}-${i}`}
                   disabled={show}
-                  className={show && isRight ? 'correct' : show && picked ? 'wrong' : ''}
+                  className={show && isRight ? "correct" : show && picked ? "wrong" : ""}
                   onClick={() => {
                     setAnswer(value);
                     if (isRight) setCorrect((v) => v + 1);
                   }}
                 >
-                  <b>{isTF ? (i === 0 ? '✓' : '✕') : ['A', 'B', 'C', 'D'][i]}</b>
+                  <b>{isTF ? (i === 0 ? "✓" : "✕") : ["A", "B", "C", "D"][i]}</b>
                   {opt}
                 </button>
               );
@@ -139,7 +189,7 @@ export default function StudentPlayer() {
 
           {answer !== null && (
             <div className="answer-result">
-              {answer === q.answer ? '✅ Benar' : '❌ Salah'}
+              {answer === q.answer ? "✅ Benar" : "❌ Salah"}
 
               {question < questions.length - 1 ? (
                 <button
@@ -151,7 +201,7 @@ export default function StudentPlayer() {
                   Lanjut
                 </button>
               ) : (
-                <button onClick={() => setMode('result')}>Skor</button>
+                <button onClick={() => setMode("result")}>Skor</button>
               )}
             </div>
           )}
@@ -162,8 +212,8 @@ export default function StudentPlayer() {
 
   const s = slides[slide];
   const bg = s?.background || {
-    type: 'css',
-    value: 'linear-gradient(135deg,#0b1f46,#1d4ed8)',
+    type: "css",
+    value: "linear-gradient(135deg,#0b1f46,#1d4ed8)",
   };
 
   return (
@@ -172,7 +222,7 @@ export default function StudentPlayer() {
         className="student-slide ppt-like"
         style={{
           ...ratioStyle(data.slideSize || SLIDE_SIZES.wide),
-          ...(bg.type === 'image'
+          ...(bg.type === "image"
             ? { backgroundImage: `url(${bg.value})` }
             : { background: bg.value }),
         }}
@@ -183,7 +233,7 @@ export default function StudentPlayer() {
         </div>
 
         <h1>{s?.title || data.title}</h1>
-        <p>{s?.body || 'Materi belum memiliki isi.'}</p>
+        <p>{s?.body || "Materi belum memiliki isi."}</p>
 
         <div className="student-controls">
           <button disabled={slide === 0} onClick={() => setSlide((i) => i - 1)}>
@@ -193,8 +243,8 @@ export default function StudentPlayer() {
           {slide < slides.length - 1 ? (
             <button onClick={() => setSlide((i) => i + 1)}>→</button>
           ) : (
-            <button onClick={() => setMode(questions.length ? 'quiz' : 'result')}>
-              {questions.length ? 'Kuis' : 'Selesai'}
+            <button onClick={() => setMode(questions.length ? "quiz" : "result")}>
+              {questions.length ? "Kuis" : "Selesai"}
             </button>
           )}
         </div>

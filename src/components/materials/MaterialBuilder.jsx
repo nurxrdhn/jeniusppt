@@ -1,7 +1,106 @@
-import { useState } from 'react';
-import { Eye, Share2 } from 'lucide-react';
-import PPTEditor from '../editor/PPTEditor';
-import QuizBuilder from '../quiz/QuizBuilder';
-import PreviewPlayer from '../preview/PreviewPlayer';
-const tabs=['Info','Slide','Quiz','Preview','Publish'];
-export default function MaterialBuilder({material,updateMaterial,publishMaterial,openShare,onBack}){const[tab,setTab]=useState('Info');function publish(){publishMaterial(material);openShare(material)}return <section className="page builder-page"><div className="builder-top"><button onClick={onBack}>← Kembali</button><div className="stepper">{tabs.map(t=><button key={t} className={tab===t?'active':''} onClick={()=>setTab(t)}>{t}</button>)}</div><button className="primary-button" onClick={publish}><Share2 size={17}/>Publish</button></div>{tab==='Info'&&<div className="info-form"><h1>Info Materi</h1><label>Judul</label><input value={material.title} onChange={e=>updateMaterial(material.id,{title:e.target.value})}/><label>Mapel</label><input value={material.subject} onChange={e=>updateMaterial(material.id,{subject:e.target.value})}/><label>Kelas</label><input value={material.className} onChange={e=>updateMaterial(material.id,{className:e.target.value})}/></div>}{tab==='Slide'&&<PPTEditor material={material} updateMaterial={updateMaterial}/>} {tab==='Quiz'&&<QuizBuilder material={material} updateMaterial={updateMaterial}/>} {tab==='Preview'&&<PreviewPlayer material={material} teacher/>} {tab==='Publish'&&<div className="publish-card"><h1>Bagikan</h1><p>QR dan link siap dipakai.</p><div className="share-box">/play/{material.shareCode}</div><a className="primary-button" target="_blank" href={`/play/${material.shareCode}`}><Eye size={17}/>Preview</a><button className="primary-button" onClick={publish}><Share2 size={17}/>QR & Link</button></div>}</section>}
+import { useState } from "react";
+import { Eye, Share2 } from "lucide-react";
+import PPTEditor from "../editor/PPTEditor";
+import QuizBuilder from "../quiz/QuizBuilder";
+import PreviewPlayer from "../preview/PreviewPlayer";
+
+const tabs = ["Info", "Slide", "Quiz", "Preview", "Publish"];
+
+export default function MaterialBuilder({
+  material,
+  updateMaterial,
+  openShare,
+  onBack,
+}) {
+  const [tab, setTab] = useState("Info");
+  const [busy, setBusy] = useState(false);
+
+  async function publish() {
+    if (busy) return;
+
+    try {
+      setBusy(true);
+      await openShare(material);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="page builder-page">
+      <div className="builder-top">
+        <button onClick={onBack}>← Kembali</button>
+
+        <div className="stepper">
+          {tabs.map((t) => (
+            <button
+              key={t}
+              className={tab === t ? "active" : ""}
+              onClick={() => setTab(t)}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+
+        <button className="primary-button" onClick={publish} disabled={busy}>
+          <Share2 size={17} />
+          {busy ? "Publishing..." : "Publish"}
+        </button>
+      </div>
+
+      {tab === "Info" && (
+        <div className="info-form">
+          <h1>Info Materi</h1>
+
+          <label>Judul</label>
+          <input
+            value={material.title}
+            onChange={(e) => updateMaterial(material.id, { title: e.target.value })}
+          />
+
+          <label>Mapel</label>
+          <input
+            value={material.subject}
+            onChange={(e) => updateMaterial(material.id, { subject: e.target.value })}
+          />
+
+          <label>Kelas</label>
+          <input
+            value={material.className}
+            onChange={(e) => updateMaterial(material.id, { className: e.target.value })}
+          />
+        </div>
+      )}
+
+      {tab === "Slide" && (
+        <PPTEditor material={material} updateMaterial={updateMaterial} />
+      )}
+
+      {tab === "Quiz" && (
+        <QuizBuilder material={material} updateMaterial={updateMaterial} />
+      )}
+
+      {tab === "Preview" && <PreviewPlayer material={material} teacher />}
+
+      {tab === "Publish" && (
+        <div className="publish-card">
+          <h1>Bagikan</h1>
+          <p>QR dan link siap dipakai.</p>
+
+          <div className="share-box">/play/{material.shareCode}</div>
+
+          <a className="primary-button" target="_blank" href={`/play/${material.shareCode}`}>
+            <Eye size={17} />
+            Preview
+          </a>
+
+          <button className="primary-button" onClick={publish} disabled={busy}>
+            <Share2 size={17} />
+            {busy ? "Publishing..." : "QR & Link"}
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
