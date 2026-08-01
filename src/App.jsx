@@ -24,6 +24,7 @@ import FileCenter from "./components/files/FileCenter";
 
 import { SLIDE_SIZES } from "./utils/slideSizes";
 import { publishMaterialToFirestore } from "./services/materialService";
+import { subscribeParticipants } from "./services/studentService";
 
 const STORAGE_KEY = "jeniusppt-v4";
 
@@ -68,12 +69,11 @@ const blankMaterial = () => ({
 
 function loadState() {
   try {
-    return (
-      JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-        materials: [],
-        participants: [],
-      }
-    );
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return {
+      materials: saved?.materials || [],
+      participants: saved?.participants || [],
+    };
   } catch {
     return {
       materials: [],
@@ -94,10 +94,22 @@ export default function App() {
   const [editingId, setEditingId] = useState(null);
   const [shareMaterial, setShareMaterial] = useState(null);
   const [showCodeImport, setShowCodeImport] = useState(false);
+  const [participantMaterialFilter, setParticipantMaterialFilter] = useState("");
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
+
+  useEffect(() => {
+    if (!user) return undefined;
+    return subscribeParticipants(
+      (participants) => setState((old) => ({ ...old, participants })),
+      (error) => {
+        console.error("Gagal membaca peserta:", error);
+        notify("Data peserta belum dapat dibaca dari Firebase.");
+      }
+    );
+  }, [user]);
 
   const editingMaterial = state.materials.find((m) => m.id === editingId);
 
@@ -314,16 +326,21 @@ export default function App() {
         {page === "materials" && (
           <Materials
             materials={state.materials}
+            participants={state.participants}
             editMaterial={(m) => setEditingId(m.id)}
             duplicateMaterial={duplicateMaterial}
             deleteMaterial={deleteMaterial}
             openShare={openShare}
             onCreate={createMaterial}
             onImportCode={() => setShowCodeImport(true)}
+            openParticipants={(material) => {
+              setParticipantMaterialFilter(material.id || material.shareCode);
+              setPage("participants");
+            }}
           />
         )}
 
-        {page === "participants" && <Participants state={state} />}
+        {page === "participants" && <Participants state={state} initialMaterial={participantMaterialFilter} clearInitialMaterial={() => setParticipantMaterialFilter("")} />}
 
         {page === "files" && <FileCenter materials={state.materials} onImport={createMaterialFromCode} notify={notify} />}
 
@@ -402,12 +419,14 @@ function Dashboard({ state, onCreate, onImportCode, user }) {
 
 function Materials({
   materials,
+  participants = [],
   editMaterial,
   duplicateMaterial,
   deleteMaterial,
   openShare,
   onCreate,
   onImportCode,
+  openParticipants,
 }) {
   return (
     <section className="page">
@@ -443,7 +462,7 @@ function Materials({
               <div className="material-meta">
                 <span>{m.slides.length} Slide</span>
                 <span>{m.questions.length} Soal</span>
-                <span>{m.shareCode}</span>
+                <span>{participants.filter((p) => (p.materialId === m.id || p.shareCode === m.shareCode) && p.status === "Selesai").length} Peserta</span>
               </div>
 
               <div className="card-actions">
@@ -467,6 +486,11 @@ function Materials({
                   Copy
                 </button>
 
+                <button className="participants-button" onClick={() => openParticipants(m)}>
+                  <Users size={16} />
+                  Peserta
+                </button>
+
                 <button className="danger" onClick={() => deleteMaterial(m)}>
                   <Trash2 size={16} />
                   Hapus
@@ -480,13 +504,50 @@ function Materials({
   );
 }
 
-function Participants({ state }) {
-  return (
-    <section className="page">
-      <div className="page-head"><span className="eyebrow">Kelas</span><h1>Peserta & Nilai</h1><p>Pantau aktivitas siswa dari materi yang dipublikasikan.</p></div>
-      <div className="data-panel"><div className="table-head"><b>Nama</b><b>Materi</b><b>Benar</b><b>Salah</b><b>Nilai</b></div>{state.participants.length ? state.participants.map((p,i)=><div className="table-row" key={p.id||i}><span>{p.name||"Siswa"}</span><span>{p.materialTitle||"-"}</span><span>{p.correct||0}</span><span>{p.wrong||0}</span><strong>{p.score||0}</strong></div>) : <div className="empty-inline">Belum ada peserta. Data akan muncul setelah siswa menyelesaikan kuis.</div>}</div>
-    </section>
-  );
+function Participants({ state, initialMaterial, clearInitialMaterial }) {
+  const [search,setSearch]=useState("");
+  const [material,setMaterial]=useState(initialMaterial || "");
+  const [className,setClassName]=useState("");
+  const [gender,setGender]=useState("");
+  const [status,setStatus]=useState("");
+  const [scoreRange,setScoreRange]=useState("");
+
+  useEffect(() => {
+    if (initialMaterial) setMaterial(initialMaterial);
+  }, [initialMaterial]);
+
+  const materialOptions=state.materials.map((m)=>({value:m.id||m.shareCode,label:m.title}));
+  const classes=[...new Set(state.participants.map((p)=>p.className).filter(Boolean))].sort();
+  const filtered=state.participants.filter((p)=>{
+    const keyword=search.trim().toLowerCase();
+    const matchSearch=!keyword || [p.studentName,p.materialTitle,p.className].some((v)=>String(v||"").toLowerCase().includes(keyword));
+    const matchMaterial=!material || p.materialId===material || p.shareCode===material;
+    const matchClass=!className || p.className===className;
+    const matchGender=!gender || p.gender===gender;
+    const matchStatus=!status || p.status===status;
+    const score=Number(p.score);
+    const matchScore=!scoreRange || (scoreRange==="high"&&score>=80) || (scoreRange==="medium"&&score>=60&&score<80) || (scoreRange==="low"&&score<60);
+    return matchSearch&&matchMaterial&&matchClass&&matchGender&&matchStatus&&matchScore;
+  });
+  const completed=filtered.filter((p)=>p.status==="Selesai");
+  const average=completed.length?Math.round(completed.reduce((n,p)=>n+Number(p.score||0),0)/completed.length):0;
+  const formatDate=(value)=>{const date=value?.toDate?.();return date?date.toLocaleString("id-ID",{dateStyle:"medium",timeStyle:"short"}):"-";};
+  function reset(){setSearch("");setMaterial("");setClassName("");setGender("");setStatus("");setScoreRange("");clearInitialMaterial?.();}
+
+  return <section className="page participants-page">
+    <div className="page-head"><span className="eyebrow">Data Kelas</span><h1>Peserta & Hasil</h1><p>Pantau identitas, progres, dan nilai peserta dari seluruh materi.</p></div>
+    <div className="participant-summary"><div><span>Total Data</span><b>{filtered.length}</b></div><div><span>Sudah Selesai</span><b>{completed.length}</b></div><div><span>Sedang Mengerjakan</span><b>{filtered.filter((p)=>p.status==="Mengerjakan").length}</b></div><div><span>Rata-rata Nilai</span><b>{average}</b></div></div>
+    <div className="participant-filters">
+      <label className="filter-search"><span>Cari peserta</span><input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Nama, materi, atau kelas..."/></label>
+      <label><span>Materi</span><select value={material} onChange={(e)=>setMaterial(e.target.value)}><option value="">Semua materi</option>{materialOptions.map((m)=><option key={m.value} value={m.value}>{m.label}</option>)}</select></label>
+      <label><span>Kelas</span><select value={className} onChange={(e)=>setClassName(e.target.value)}><option value="">Semua kelas</option>{classes.map((item)=><option key={item}>{item}</option>)}</select></label>
+      <label><span>Jenis Kelamin</span><select value={gender} onChange={(e)=>setGender(e.target.value)}><option value="">Semua</option><option>Laki-laki</option><option>Perempuan</option></select></label>
+      <label><span>Status</span><select value={status} onChange={(e)=>setStatus(e.target.value)}><option value="">Semua status</option><option>Mengerjakan</option><option>Selesai</option></select></label>
+      <label><span>Rentang Nilai</span><select value={scoreRange} onChange={(e)=>setScoreRange(e.target.value)}><option value="">Semua nilai</option><option value="high">80–100</option><option value="medium">60–79</option><option value="low">Di bawah 60</option></select></label>
+      <button className="reset-filter" onClick={reset}>Reset Filter</button>
+    </div>
+    <div className="data-panel participant-table"><div className="participant-table-head"><b>Peserta</b><b>Kelas</b><b>Materi</b><b>Status</b><b>Hasil</b><b>Waktu</b></div>{filtered.length?filtered.map((p,i)=><div className="participant-table-row" key={p.id||i}><span className="participant-name"><i>{(p.studentName||"S")[0].toUpperCase()}</i><span><b>{p.studentName||"Siswa"}</b><small>{p.gender||"-"}</small></span></span><span>{p.className||"-"}</span><span><b>{p.materialTitle||"-"}</b><small>{p.shareCode||""}</small></span><span><em className={p.status==="Selesai"?"status-done":"status-progress"}>{p.status}</em></span><span>{p.status==="Selesai"?<><b className="score-value">{p.score}</b><small>{p.correct} benar • {p.wrong} salah</small></>:<small>Belum selesai</small>}</span><span><small>{formatDate(p.activityAt)}</small></span></div>):<div className="empty-inline">Belum ada data yang sesuai dengan filter.</div>}</div>
+  </section>;
 }
 
 function Workspace({ state, editMaterial }) {
