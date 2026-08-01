@@ -15,6 +15,7 @@ export default function StudentPlayer() {
   const [quizIndex, setQuizIndex] = useState(0);
   const [picked, setPicked] = useState(null);
   const [answers, setAnswers] = useState([]);
+  const [formError, setFormError] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -59,6 +60,9 @@ export default function StudentPlayer() {
 
   const correctCount = answers.filter((a) => a.correct).length;
   const score = questions.length ? Math.round((correctCount / questions.length) * 100) : 0;
+  const now = Date.now();
+  const notStarted = material.availableFrom && now < new Date(material.availableFrom).getTime();
+  const hasEnded = material.availableUntil && now > new Date(material.availableUntil).getTime();
 
   function normalizeAnswer(q) {
     if (q.type === "truefalse") return q.answer === true || q.answer === "Benar" || q.answer === 0 ? 0 : 1;
@@ -100,7 +104,21 @@ export default function StudentPlayer() {
     }
   }
 
+  async function downloadCertificate() {
+    const { jsPDF } = await import("jspdf");
+    const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    pdf.setFillColor(255,247,237); pdf.rect(0,0,297,210,"F"); pdf.setDrawColor(249,115,22); pdf.setLineWidth(3); pdf.rect(9,9,279,192);
+    pdf.setTextColor(194,65,12); pdf.setFont("helvetica","bold"); pdf.setFontSize(18); pdf.text("JENIUSPPT",148.5,34,{align:"center"});
+    pdf.setTextColor(67,20,7); pdf.setFontSize(31); pdf.text("SERTIFIKAT PENYELESAIAN",148.5,57,{align:"center"});
+    pdf.setFont("helvetica","normal"); pdf.setFontSize(13); pdf.text("Diberikan kepada",148.5,78,{align:"center"});
+    pdf.setFont("helvetica","bold"); pdf.setFontSize(27); pdf.setTextColor(234,88,12); pdf.text(student.name,148.5,99,{align:"center"});
+    pdf.setFont("helvetica","normal"); pdf.setTextColor(67,20,7); pdf.setFontSize(13); pdf.text(`Telah menyelesaikan materi “${material.title}”`,148.5,119,{align:"center"}); pdf.text(`Kelas ${student.className} dengan nilai ${score}`,148.5,131,{align:"center"});
+    pdf.setFontSize(11); pdf.text(new Date().toLocaleDateString("id-ID",{dateStyle:"long"}),148.5,162,{align:"center"}); pdf.setFont("helvetica","bold"); pdf.text("JeniusPPT.online",148.5,180,{align:"center"});
+    pdf.save(`sertifikat-${student.name.replace(/[^a-z0-9]+/gi,"-").toLowerCase()}-${material.title.replace(/[^a-z0-9]+/gi,"-").toLowerCase()}.pdf`);
+  }
+
   if (mode === "form") {
+    if (notStarted || hasEnded) return <main className="student-clean"><section className="student-box"><h1>Materi belum tersedia</h1><p>{notStarted?`Materi dapat dibuka mulai ${new Date(material.availableFrom).toLocaleString("id-ID")}.`:`Batas pengerjaan berakhir pada ${new Date(material.availableUntil).toLocaleString("id-ID")}.`}</p></section></main>;
     return (
       <main className="student-clean">
         <section className="student-box">
@@ -116,6 +134,13 @@ export default function StudentPlayer() {
                 gender: f.get("gender"),
                 className: f.get("className"),
               };
+
+              const accessInput=String(f.get("accessCode")||"").trim();
+              if(material.accessCode && accessInput!==String(material.accessCode).trim()){setFormError("Kode akses tidak sesuai.");return;}
+              const attemptKey=`jeniusppt_attempt_${code}_${studentData.name.toLowerCase()}_${studentData.className.toLowerCase()}`;
+              const used=Number(localStorage.getItem(attemptKey)||0);
+              if(material.attemptLimit>0 && used>=material.attemptLimit){setFormError(`Batas ${material.attemptLimit} kali percobaan sudah tercapai.`);return;}
+              localStorage.setItem(attemptKey,String(used+1)); setFormError("");
 
               setStudent(studentData);
               setMode("slide");
@@ -140,6 +165,9 @@ export default function StudentPlayer() {
 
             <input name="className" placeholder="Nama kelas" required />
 
+            {material.accessCode && <input name="accessCode" placeholder="Kode akses materi" required />}
+            {formError && <div className="error-box">{formError}</div>}
+
             <button>Mulai Materi</button>
           </form>
         </section>
@@ -159,6 +187,15 @@ export default function StudentPlayer() {
           <small>Slide {slideIndex + 1} dari {slides.length}</small>
           <h1 style={{color:currentSlide?.titleColor || "#ffffff"}}>{currentSlide?.title || material.title}</h1>
           <p style={{color:currentSlide?.bodyColor || "#e4ecff"}}>{currentSlide?.body || currentSlide?.content || "Materi belum memiliki isi."}</p>
+
+          <div className="free-elements-layer preview-elements">
+            {(currentSlide?.elements || []).map((item) => (
+              <div key={item.id} className={`free-element ${item.type}`} style={{left:`${item.x}%`,top:`${item.y}%`,width:`${item.w}%`,height:`${item.h}%`,color:item.color,background:item.type === "shape" ? item.background : "transparent"}}>
+                {item.type === "text" && item.text}
+                {item.type === "image" && <img src={item.src} alt="Elemen slide" />}
+              </div>
+            ))}
+          </div>
 
           <div className="student-nav">
             <button disabled={slideIndex === 0} onClick={() => setSlideIndex(slideIndex - 1)}>
@@ -262,6 +299,8 @@ export default function StudentPlayer() {
         <h1>Skor Kamu</h1>
         <div className="score-clean">{score}</div>
         <p>{correctCount} benar dari {questions.length} soal</p>
+
+        {material.certificateEnabled!==false && score >= (material.passingScore??75) && <button className="certificate-button" onClick={downloadCertificate}>Download Sertifikat PDF</button>}
 
         <button
           onClick={() => {

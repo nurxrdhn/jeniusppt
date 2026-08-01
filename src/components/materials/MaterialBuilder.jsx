@@ -70,6 +70,16 @@ export default function MaterialBuilder({
             value={material.className}
             onChange={(e) => updateMaterial(material.id, { className: e.target.value })}
           />
+
+          <div className="settings-divider"><h2>Akses & Sertifikat</h2><p>Atur siapa yang dapat mengerjakan materi dan kapan materi tersedia.</p></div>
+          <div className="settings-grid">
+            <label><span>Kode Akses</span><input value={material.accessCode||""} onChange={(e)=>updateMaterial(material.id,{accessCode:e.target.value})} placeholder="Opsional, contoh: KELAS11"/></label>
+            <label><span>Batas Percobaan</span><input type="number" min="0" value={material.attemptLimit||0} onChange={(e)=>updateMaterial(material.id,{attemptLimit:Number(e.target.value)})}/><small>Isi 0 untuk tanpa batas.</small></label>
+            <label><span>Mulai Tersedia</span><input type="datetime-local" value={material.availableFrom||""} onChange={(e)=>updateMaterial(material.id,{availableFrom:e.target.value})}/></label>
+            <label><span>Berakhir</span><input type="datetime-local" value={material.availableUntil||""} onChange={(e)=>updateMaterial(material.id,{availableUntil:e.target.value})}/></label>
+            <label className="toggle-setting"><input type="checkbox" checked={material.certificateEnabled!==false} onChange={(e)=>updateMaterial(material.id,{certificateEnabled:e.target.checked})}/><span>Aktifkan sertifikat otomatis</span></label>
+            <label><span>Nilai Minimum Sertifikat</span><input type="number" min="0" max="100" value={material.passingScore??75} onChange={(e)=>updateMaterial(material.id,{passingScore:Number(e.target.value)})}/></label>
+          </div>
         </div>
       )}
 
