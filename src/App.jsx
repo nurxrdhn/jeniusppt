@@ -7,6 +7,8 @@ import {
   Copy,
   Edit3,
   Eye,
+  FileSpreadsheet,
+  FileText,
   FolderOpen,
   Share2,
   Trash2,
@@ -25,6 +27,7 @@ import FileCenter from "./components/files/FileCenter";
 import { SLIDE_SIZES } from "./utils/slideSizes";
 import { publishMaterialToFirestore } from "./services/materialService";
 import { subscribeParticipants } from "./services/studentService";
+import { exportParticipantsExcel, exportParticipantsPdf } from "./utils/participantReport";
 
 const STORAGE_KEY = "jeniusppt-v4";
 
@@ -531,11 +534,14 @@ function Participants({ state, initialMaterial, clearInitialMaterial }) {
   });
   const completed=filtered.filter((p)=>p.status==="Selesai");
   const average=completed.length?Math.round(completed.reduce((n,p)=>n+Number(p.score||0),0)/completed.length):0;
+  const selectedMaterialName=materialOptions.find((item)=>item.value===material)?.label;
+  const reportTitle=selectedMaterialName ? `Materi: ${selectedMaterialName}` : "Semua Materi";
   const formatDate=(value)=>{const date=value?.toDate?.();return date?date.toLocaleString("id-ID",{dateStyle:"medium",timeStyle:"short"}):"-";};
   function reset(){setSearch("");setMaterial("");setClassName("");setGender("");setStatus("");setScoreRange("");clearInitialMaterial?.();}
+  async function downloadReport(type){try{if(type==="excel")await exportParticipantsExcel(filtered,reportTitle);else await exportParticipantsPdf(filtered,reportTitle);}catch(error){alert(error.message||"Laporan gagal dibuat.");}}
 
   return <section className="page participants-page">
-    <div className="page-head"><span className="eyebrow">Data Kelas</span><h1>Peserta & Hasil</h1><p>Pantau identitas, progres, dan nilai peserta dari seluruh materi.</p></div>
+    <div className="page-head participant-page-head"><div><span className="eyebrow">Data Kelas</span><h1>Peserta & Hasil</h1><p>Pantau identitas, progres, dan nilai peserta dari seluruh materi.</p></div><div className="report-actions"><button onClick={()=>downloadReport("excel")}><FileSpreadsheet size={17}/>Export Excel</button><button onClick={()=>downloadReport("pdf")}><FileText size={17}/>Export PDF</button></div></div>
     <div className="participant-summary"><div><span>Total Data</span><b>{filtered.length}</b></div><div><span>Sudah Selesai</span><b>{completed.length}</b></div><div><span>Sedang Mengerjakan</span><b>{filtered.filter((p)=>p.status==="Mengerjakan").length}</b></div><div><span>Rata-rata Nilai</span><b>{average}</b></div></div>
     <div className="participant-filters">
       <label className="filter-search"><span>Cari peserta</span><input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Nama, materi, atau kelas..."/></label>
