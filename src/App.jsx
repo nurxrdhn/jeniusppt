@@ -365,9 +365,9 @@ function Dashboard({ state, onCreate, onImportCode, user }) {
     <section className="page">
       <div className="welcome-card">
         <div>
-          <span className="eyebrow">V4 Core</span>
+          <span className="eyebrow">Jenius Workspace</span>
           <h1>Halo, {user?.name?.split(" ")[0] || "Guru"} 👋</h1>
-          <p>Slide. Quiz. Share. Analyze.</p>
+          <p>Wujudkan pembelajaran yang lebih hidup dalam satu ruang kerja.</p>
         </div>
 
         <div className="welcome-actions">
@@ -382,16 +382,16 @@ function Dashboard({ state, onCreate, onImportCode, user }) {
 
       <div className="stats-grid">
         <Stat icon={<BookOpen />} label="Materi" value={state.materials.length} />
-        <Stat icon={<Archive />} label="Published" value={published} />
+        <Stat icon={<Archive />} label="Dipublikasikan" value={published} />
         <Stat icon={<Users />} label="Peserta" value={state.participants.length} />
         <Stat icon={<FolderOpen />} label="Workspace" value="2" />
       </div>
 
       <div className="feature-grid">
-        <Feature title="PPT Size" desc="16:9, 4:3, A4, Portrait." />
-        <Feature title="Preview" desc="Slide → Soal → Hasil." />
-        <Feature title="QR Share" desc="QR bersih + link." />
-        <Feature title="Quiz" desc="PG dan B/S." />
+        <Feature title="Ukuran Fleksibel" desc="Tersedia format 16:9, 4:3, A4, dan portrait." />
+        <Feature title="Pratinjau Langsung" desc="Periksa slide, soal, dan hasil sebelum dibagikan." />
+        <Feature title="Bagikan dengan QR" desc="Siswa dapat masuk melalui QR maupun tautan." />
+        <Feature title="Kuis Interaktif" desc="Dukung pilihan ganda serta benar atau salah." />
       </div>
     </section>
   );
