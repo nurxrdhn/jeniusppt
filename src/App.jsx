@@ -236,7 +236,10 @@ export default function App() {
         <Sidebar
           user={user}
           page="materials"
-          setPage={setPage}
+          setPage={(nextPage) => {
+            setEditingId(null);
+            setPage(nextPage);
+          }}
           onLogout={() => setUser(null)}
         />
 
