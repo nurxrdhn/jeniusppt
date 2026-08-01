@@ -1,4 +1,6 @@
-# JeniusPPT V4 Core
+# JeniusPPT Modern Orange
+
+Versi baru menggunakan logo resmi JP, tema oranye responsif, pusat impor dan ekspor PPTX/DOCX/PDF, workspace, peserta, analitik, generator kode, pengaturan, dan jalur unduhan Android.
 
 Fitur:
 - Opening 3 slide otomatis
@@ -17,3 +19,11 @@ Fitur:
 npm install
 npm run dev
 ```
+
+Untuk memeriksa build sekaligus mengirim pembaruan ke GitHub agar Vercel melakukan deployment, jalankan satu perintah berikut dari Git Bash:
+
+```bash
+bash deploy-vercel.sh
+```
+
+Masukkan hasil build Android bernama `jeniusppt.apk` ke folder `public/downloads/`. Setelah dikirim ke GitHub, tombol Download APK pada website otomatis mengunduh berkas tersebut.

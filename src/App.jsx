@@ -20,6 +20,7 @@ import StudentPlayer from "./components/student/StudentPlayer";
 import MaterialBuilder from "./components/materials/MaterialBuilder";
 import CodeImportModal from "./components/materials/CodeImportModal";
 import ShareModal from "./components/share/ShareModal";
+import FileCenter from "./components/files/FileCenter";
 
 import { SLIDE_SIZES } from "./utils/slideSizes";
 import { publishMaterialToFirestore } from "./services/materialService";
@@ -42,7 +43,7 @@ const blankMaterial = () => ({
       body: "Mulai mengetik...",
       background: {
         type: "css",
-        value: "linear-gradient(135deg,#0b1f46,#1d4ed8)",
+        value: "linear-gradient(135deg,#7c2d12,#f97316)",
       },
     },
   ],
@@ -274,6 +275,8 @@ export default function App() {
       ? "Materi"
       : page === "participants"
       ? "Peserta"
+      : page === "files"
+      ? "Impor & Ekspor"
       : "JeniusPPT";
 
   return (
@@ -317,9 +320,19 @@ export default function App() {
           />
         )}
 
-        {page === "participants" && <Participants />}
+        {page === "participants" && <Participants state={state} />}
 
-        {!["dashboard", "materials", "participants"].includes(page) && (
+        {page === "files" && <FileCenter materials={state.materials} onImport={createMaterialFromCode} notify={notify} />}
+
+        {page === "workspace" && <Workspace state={state} editMaterial={(m) => setEditingId(m.id)} />}
+
+        {page === "analytics" && <Analytics state={state} />}
+
+        {page === "ai" && <AIAssistant onImportCode={() => setShowCodeImport(true)} />}
+
+        {page === "settings" && <SettingsPage user={user} notify={notify} />}
+
+        {!["dashboard", "materials", "participants", "files", "workspace", "analytics", "ai", "settings"].includes(page) && (
           <ComingSoon title={title} />
         )}
       </main>
@@ -464,15 +477,34 @@ function Materials({
   );
 }
 
-function Participants() {
+function Participants({ state }) {
   return (
     <section className="page">
-      <div className="empty-state">
-        <h2>Realtime Part 2</h2>
-        <p>Nama • Slide • Benar • Salah • Nilai</p>
-      </div>
+      <div className="page-head"><span className="eyebrow">Kelas</span><h1>Peserta & Nilai</h1><p>Pantau aktivitas siswa dari materi yang dipublikasikan.</p></div>
+      <div className="data-panel"><div className="table-head"><b>Nama</b><b>Materi</b><b>Benar</b><b>Salah</b><b>Nilai</b></div>{state.participants.length ? state.participants.map((p,i)=><div className="table-row" key={p.id||i}><span>{p.name||"Siswa"}</span><span>{p.materialTitle||"-"}</span><span>{p.correct||0}</span><span>{p.wrong||0}</span><strong>{p.score||0}</strong></div>) : <div className="empty-inline">Belum ada peserta. Data akan muncul setelah siswa menyelesaikan kuis.</div>}</div>
     </section>
   );
+}
+
+function Workspace({ state, editMaterial }) {
+  const drafts = state.materials.filter((m) => m.status !== "Published");
+  return <section className="page"><div className="page-head"><span className="eyebrow">Workspace</span><h1>Ruang Kerja Guru</h1><p>Lanjutkan draft dan susun materi terbaru.</p></div><div className="workspace-list">{drafts.length ? drafts.map((m)=><button key={m.id} className="workspace-item" onClick={()=>editMaterial(m)}><div><b>{m.title}</b><p>{m.subject} • {m.className}</p></div><span>{m.slides.length} slide →</span></button>) : <div className="empty-state"><h2>Semua pekerjaan selesai</h2><p>Belum ada draft materi.</p></div>}</div></section>;
+}
+
+function Analytics({ state }) {
+  const totalSlides=state.materials.reduce((n,m)=>n+m.slides.length,0), totalQuiz=state.materials.reduce((n,m)=>n+m.questions.length,0), published=state.materials.filter(m=>m.status==="Published").length;
+  const data=[["Materi",state.materials.length],["Slide",totalSlides],["Kuis",totalQuiz],["Terbit",published]], max=Math.max(...data.map(([,v])=>v),1);
+  return <section className="page"><div className="page-head"><span className="eyebrow">Insight</span><h1>Analitik Konten</h1><p>Ringkasan produktivitas workspace secara langsung.</p></div><div className="analytics-card">{data.map(([label,value])=><div className="metric-row" key={label}><span>{label}</span><div><i style={{width:`${Math.max(value/max*100,2)}%`}} /></div><b>{value}</b></div>)}</div></section>;
+}
+
+function AIAssistant({ onImportCode }) {
+  return <section className="page"><div className="page-head"><span className="eyebrow">Jenius AI</span><h1>Buat Materi Lebih Cepat</h1><p>Gunakan struktur JSON untuk menghasilkan slide dan kuis sekaligus.</p></div><div className="ai-panel"><div><h2>Generator Materi</h2><p>Siapkan judul, isi slide, serta soal dengan format terstruktur. Hasil tetap bisa diedit sebelum dipublikasikan.</p><button className="primary-button" onClick={onImportCode}>Buka Generator Kode</button></div><pre>{`{\n  "title": "Topik Pembelajaran",\n  "slides": [...],\n  "questions": [...]\n}`}</pre></div></section>;
+}
+
+function SettingsPage({ user, notify }) {
+  const [school,setSchool]=useState(localStorage.getItem("jeniusppt_school")||"");
+  function save(){localStorage.setItem("jeniusppt_school",school);notify("Pengaturan disimpan.");}
+  return <section className="page"><div className="page-head"><span className="eyebrow">Preferensi</span><h1>Pengaturan</h1></div><div className="info-form"><label>Nama Guru</label><input value={user?.name||""} disabled/><label>Email</label><input value={user?.email||""} disabled/><label>Nama Sekolah</label><input value={school} onChange={(e)=>setSchool(e.target.value)} placeholder="Masukkan nama sekolah"/><button className="primary-button" onClick={save}>Simpan Pengaturan</button></div></section>;
 }
 
 function ComingSoon({ title }) {
