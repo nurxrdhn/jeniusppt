@@ -150,15 +150,15 @@ export default function StudentPlayer() {
   if (mode === "slide") {
     return (
       <main className="student-clean">
-        <section className="student-slide-clean">
+        <section key={`student-slide-${slideIndex}`} className={`student-slide-clean transition-${currentSlide?.transition || "fade"}`} style={{animationDuration:`${currentSlide?.duration || 700}ms`,...(currentSlide?.background?.type === "image" ? {backgroundImage:`url(${currentSlide.background.value})`} : {background:currentSlide?.background?.value}),textAlign:currentSlide?.textAlign || "left"}}>
           <div className="student-top">
             <b>{student.name}</b>
             <span>{student.className}</span>
           </div>
 
           <small>Slide {slideIndex + 1} dari {slides.length}</small>
-          <h1>{currentSlide?.title || material.title}</h1>
-          <p>{currentSlide?.body || currentSlide?.content || "Materi belum memiliki isi."}</p>
+          <h1 style={{color:currentSlide?.titleColor || "#ffffff"}}>{currentSlide?.title || material.title}</h1>
+          <p style={{color:currentSlide?.bodyColor || "#e4ecff"}}>{currentSlide?.body || currentSlide?.content || "Materi belum memiliki isi."}</p>
 
           <div className="student-nav">
             <button disabled={slideIndex === 0} onClick={() => setSlideIndex(slideIndex - 1)}>

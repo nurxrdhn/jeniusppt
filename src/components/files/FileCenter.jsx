@@ -12,6 +12,8 @@ const saveBlob = (blob, name) => {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 const safeName = (value) => (value || "materi-jeniusppt").replace(/[^a-z0-9-_]+/gi, "-").toLowerCase();
+const colorFromBackground = (background, fallback="FFF7ED") => { const matches=String(background?.value||"").match(/#[0-9a-f]{6}/gi); return matches?.[0]?.slice(1).toUpperCase() || fallback; };
+const pptColor = (value, fallback) => String(value||fallback).replace("#","").toUpperCase();
 const stripXml = (xml) => xml.replace(/<a:br\s*\/>/g, "\n").replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").trim();
 
 async function readOffice(file) {
@@ -45,7 +47,7 @@ async function readPdf(file) {
 
 export async function exportPptx(material) {
   const pptx = new PptxGenJS(); pptx.layout = "LAYOUT_WIDE"; pptx.author = "JeniusPPT"; pptx.subject = material.subject;
-  material.slides.forEach((item) => { const slide=pptx.addSlide(); slide.background={color:"FFF7ED"}; slide.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.333,h:.18,fill:{color:"F97316"},line:{color:"F97316"}}); slide.addText(item.title,{x:.7,y:.65,w:11.9,h:.7,fontFace:"Aptos Display",fontSize:28,bold:true,color:"7C2D12"}); slide.addText(item.body,{x:.7,y:1.65,w:11.9,h:4.8,fontFace:"Aptos",fontSize:18,color:"431407",breakLine:false,margin:.12}); slide.addText("JeniusPPT.online",{x:9.8,y:7,w:2.8,h:.25,fontSize:9,color:"C2410C",align:"right"}); });
+  material.slides.forEach((item) => { const slide=pptx.addSlide(); const base=colorFromBackground(item.background); slide.background={color:base}; slide.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.333,h:.16,fill:{color:"F97316",transparency:12},line:{color:"F97316",transparency:100}}); slide.addText(item.title,{x:.7,y:.65,w:11.9,h:.7,fontFace:"Aptos Display",fontSize:28,bold:true,color:pptColor(item.titleColor,"FFFFFF"),align:item.textAlign||"left"}); slide.addText(item.body,{x:.7,y:1.65,w:11.9,h:4.8,fontFace:"Aptos",fontSize:18,color:pptColor(item.bodyColor,"FFF7ED"),breakLine:false,margin:.12,align:item.textAlign||"left"}); slide.addText("JeniusPPT.online",{x:9.8,y:7,w:2.8,h:.25,fontSize:9,color:pptColor(item.bodyColor,"FFF7ED"),transparency:28,align:"right"}); });
   await pptx.writeFile({fileName:`${safeName(material.title)}.pptx`});
 }
 export async function exportDocx(material) {
