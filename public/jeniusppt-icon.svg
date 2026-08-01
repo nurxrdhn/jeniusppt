@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Logo JP">
   <defs><linearGradient id="o" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff841f"/><stop offset="1" stop-color="#ef4d00"/></linearGradient></defs>
-  <path fill="url(#o)" d="M136 42h218c74 0 124 48 124 119v32c0 72-50 121-124 121H237v156H136z"/>
-  <path fill="#fff" d="M64 42h122v316c0 77-47 118-113 118-19 0-35-3-49-9V358c9 4 18 6 26 6 10 0 14-7 14-22z"/>
+  <path fill="url(#o)" stroke="#d94300" stroke-width="5" d="M136 42h218c74 0 124 48 124 119v32c0 72-50 121-124 121H237v156H136z"/>
+  <path fill="#fff" stroke="#f05a0b" stroke-width="8" stroke-linejoin="round" d="M64 42h122v316c0 77-47 118-113 118-19 0-35-3-49-9V358c9 4 18 6 26 6 10 0 14-7 14-22z"/>
   <rect x="218" y="103" width="194" height="122" rx="28" fill="#fff"/>
   <circle cx="270" cy="164" r="28" fill="#ff6812"/><path d="M270 136v28h28" fill="none" stroke="#fff" stroke-width="7"/>
   <path d="M323 148h52M323 178h52" stroke="#ff6812" stroke-width="13" stroke-linecap="round"/>
