@@ -4,6 +4,8 @@ import JSZip from "jszip";
 import PptxGenJS from "pptxgenjs";
 import { Document, Packer, Paragraph, HeadingLevel } from "docx";
 import { jsPDF } from "jspdf";
+import { renderSlideToDataUrl } from "../../utils/slideRenderer";
+import { isYouTubeUrl, normalizeVideoUrl } from "../../utils/mediaUrl";
 
 const saveBlob = (blob, name) => {
   const url = URL.createObjectURL(blob);
@@ -46,8 +48,8 @@ async function readPdf(file) {
 }
 
 export async function exportPptx(material) {
-  const pptx = new PptxGenJS(); pptx.layout = "LAYOUT_WIDE"; pptx.author = "JeniusPPT"; pptx.subject = material.subject;
-  material.slides.forEach((item) => { const slide=pptx.addSlide(); const base=colorFromBackground(item.background); slide.background={color:base}; slide.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.333,h:.16,fill:{color:"F97316",transparency:12},line:{color:"F97316",transparency:100}}); slide.addText(item.title,{x:.7,y:.65,w:11.9,h:.7,fontFace:"Aptos Display",fontSize:28,bold:true,color:pptColor(item.titleColor,"FFFFFF"),align:item.textAlign||"left"}); slide.addText(item.body,{x:.7,y:1.65,w:11.9,h:4.8,fontFace:"Aptos",fontSize:18,color:pptColor(item.bodyColor,"FFF7ED"),breakLine:false,margin:.12,align:item.textAlign||"left"}); (item.elements||[]).forEach((element)=>{const x=element.x/100*13.333,y=element.y/100*7.5,w=element.w/100*13.333,h=element.h/100*7.5;if(element.type==="text")slide.addText(element.text||"",{x,y,w,h,fontFace:"Aptos",fontSize:16,bold:true,color:pptColor(element.color,"FFFFFF"),margin:.05,fit:"shrink"});if(element.type==="shape")slide.addShape(pptx.ShapeType.roundRect,{x,y,w,h,rectRadius:.08,fill:{color:pptColor(element.background,"F97316")},line:{color:pptColor(element.background,"F97316")}});if(element.type==="image"&&element.src)slide.addImage({data:element.src,x,y,w,h,sizing:"contain"});}); slide.addText("JeniusPPT.online",{x:9.8,y:7,w:2.8,h:.25,fontSize:9,color:pptColor(item.bodyColor,"FFF7ED"),transparency:28,align:"right"}); });
+  const pptx = new PptxGenJS(); const size=material.slideSize||{width:13.333,height:7.5}; pptx.defineLayout({name:"JENIUS_CUSTOM",width:size.width,height:size.height});pptx.layout="JENIUS_CUSTOM";pptx.author="JeniusPPT";pptx.subject=material.subject;
+  for (const item of material.slides || []) { const image=await renderSlideToDataUrl(item,size);const slide=pptx.addSlide();slide.addImage({data:image,x:0,y:0,w:size.width,h:size.height});for(const element of item.elements||[]){if(element.type==="video"&&isYouTubeUrl(element.src)){slide.addMedia({type:"online",link:normalizeVideoUrl(element.src),x:element.x/100*size.width,y:element.y/100*size.height,w:element.w/100*size.width,h:element.h/100*size.height});}} }
   await pptx.writeFile({fileName:`${safeName(material.title)}.pptx`});
 }
 export async function exportDocx(material) {
@@ -55,9 +57,9 @@ export async function exportDocx(material) {
   material.slides.forEach((s,i)=>children.push(new Paragraph({text:`${i+1}. ${s.title}`,heading:HeadingLevel.HEADING_1}),new Paragraph(s.body)));
   saveBlob(await Packer.toBlob(new Document({sections:[{children}]})),`${safeName(material.title)}.docx`);
 }
-export function exportPdf(material) {
-  const pdf=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
-  material.slides.forEach((s,i)=>{if(i)pdf.addPage();pdf.setFillColor(255,247,237);pdf.rect(0,0,297,210,"F");pdf.setFillColor(249,115,22);pdf.rect(0,0,297,5,"F");pdf.setTextColor(124,45,18);pdf.setFontSize(25);pdf.text(s.title,18,27,{maxWidth:260});pdf.setTextColor(67,20,7);pdf.setFontSize(14);pdf.text(pdf.splitTextToSize(s.body,255),18,52);pdf.setFontSize(9);pdf.setTextColor(194,65,12);pdf.text("JeniusPPT.online",278,200,{align:"right"});});
+export async function exportPdf(material) {
+  const size=material.slideSize||{width:13.333,height:7.5};const width=297,height=width*(size.height/size.width);const orientation=width>=height?"landscape":"portrait";const pdf=new jsPDF({orientation,unit:"mm",format:[width,height]});
+  for(let i=0;i<(material.slides||[]).length;i++){if(i)pdf.addPage([width,height],orientation);const image=await renderSlideToDataUrl(material.slides[i],size);pdf.addImage(image,"PNG",0,0,width,height,undefined,"FAST");}
   pdf.save(`${safeName(material.title)}.pdf`);
 }
 
