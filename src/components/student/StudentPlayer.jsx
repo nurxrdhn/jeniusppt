@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getPublishedMaterial } from "../../services/materialService";
 import { saveStudentEntry, saveStudentResult } from "../../services/studentService";
+import MediaPlayer from "../ui/MediaPlayer";
 
 export default function StudentPlayer() {
   const code = decodeURIComponent(window.location.pathname.split("/play/")[1] || "");
@@ -193,8 +194,7 @@ export default function StudentPlayer() {
               <div key={item.id} className={`free-element ${item.type}`} style={{left:`${item.x}%`,top:`${item.y}%`,width:`${item.w}%`,height:`${item.h}%`,color:item.color,background:item.type === "shape" ? item.background : "transparent"}}>
                 {item.type === "text" && item.text}
                 {item.type === "image" && <img src={item.src} alt="Elemen slide" />}
-                {item.type === "video" && (item.src?.includes("youtube.com/embed") ? <iframe src={item.src} title="Video slide" allowFullScreen /> : <video src={item.src} controls />)}
-                {item.type === "audio" && <audio src={item.src} controls />}
+                {(item.type === "video" || item.type === "audio") && <MediaPlayer item={item} />}
               </div>
             ))}
           </div>
