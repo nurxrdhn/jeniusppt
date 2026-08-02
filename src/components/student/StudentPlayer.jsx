@@ -170,9 +170,15 @@ export default function StudentPlayer() {
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(67, 20, 7);
     pdf.setFontSize(13);
-    pdf.text(`Telah menyelesaikan materi “${material.title}”`, 148.5, 119, {
-      align: "center",
-    });
+    pdf.text(
+      material.certificateDescription ||
+        `Telah menyelesaikan materi “${material.title}”`,
+      148.5,
+      119,
+      {
+        align: "center",
+      },
+    );
     pdf.text(`Kelas ${student.className} dengan nilai ${score}`, 148.5, 131, {
       align: "center",
     });
@@ -185,9 +191,16 @@ export default function StudentPlayer() {
       { align: "center" },
     );
     pdf.setFont("helvetica", "bold");
-    pdf.text(material.certificateIssuer || "JeniusPPT.online", 148.5, 182, {
-      align: "center",
-    });
+    pdf.text(
+      material.certificateSigner ||
+        material.certificateIssuer ||
+        "Guru / Pengajar",
+      148.5,
+      182,
+      {
+        align: "center",
+      },
+    );
     pdf.save(
       `sertifikat-${student.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-${material.title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.pdf`,
     );

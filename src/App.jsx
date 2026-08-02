@@ -23,6 +23,9 @@ import CodeImportModal from "./components/materials/CodeImportModal";
 import ShareModal from "./components/share/ShareModal";
 import FileCenter from "./components/files/FileCenter";
 import { JeniusDialog, JeniusToast } from "./components/ui/JeniusNotice";
+import ProductTour from "./components/ui/ProductTour";
+import { translateVisiblePage } from "./services/translationService";
+import { auth } from "./firebase/config";
 import {
   SubscriptionPage,
   TemplateRecommendations,
@@ -112,6 +115,9 @@ export default function App() {
   const [state, setState] = useState(loadState);
   const [toast, setToast] = useState(null);
   const [dialog, setDialog] = useState(null);
+  const [showTour, setShowTour] = useState(
+    () => !localStorage.getItem("jeniusppt-tour-done"),
+  );
   const [editingId, setEditingId] = useState(null);
   const [shareMaterial, setShareMaterial] = useState(null);
   const [showCodeImport, setShowCodeImport] = useState(false);
@@ -589,6 +595,7 @@ export default function App() {
             onImportCode={() => setShowCodeImport(true)}
             user={user}
             onUseTemplate={useEducationTemplate}
+            onNavigate={setPage}
           />
         )}
 
@@ -633,10 +640,20 @@ export default function App() {
         {page === "analytics" && <Analytics state={state} />}
 
         {page === "ai" && (
-          <AIAssistant onImportCode={() => setShowCodeImport(true)} />
+          <AIAssistant onGenerated={createMaterialFromCode} notify={notify} />
         )}
 
-        {page === "settings" && <SettingsPage user={user} notify={notify} />}
+        {page === "settings" && (
+          <SettingsPage
+            user={user}
+            notify={notify}
+            notifications={state.notifications || []}
+            setNotifications={(notifications) =>
+              setState((old) => ({ ...old, notifications }))
+            }
+            restartTour={() => setShowTour(true)}
+          />
+        )}
 
         {page === "subscription" && (
           <SubscriptionPage
@@ -690,11 +707,26 @@ export default function App() {
           notify={notify}
         />
       )}
+      {showTour && (
+        <ProductTour
+          onDone={() => {
+            localStorage.setItem("jeniusppt-tour-done", "1");
+            setShowTour(false);
+          }}
+        />
+      )}
     </div>
   );
 }
 
-function Dashboard({ state, onCreate, onImportCode, user, onUseTemplate }) {
+function Dashboard({
+  state,
+  onCreate,
+  onImportCode,
+  user,
+  onUseTemplate,
+  onNavigate,
+}) {
   const published = state.materials.filter(
     (m) => m.status === "Published",
   ).length;
@@ -720,18 +752,38 @@ function Dashboard({ state, onCreate, onImportCode, user, onUseTemplate }) {
 
       <div className="stats-grid">
         <Stat
+          onClick={() => onNavigate("materials")}
           icon={<BookOpen />}
           label="Materi"
           value={state.materials.length}
         />
-        <Stat icon={<Archive />} label="Dipublikasikan" value={published} />
         <Stat
+          onClick={() => onNavigate("materials")}
+          icon={<Archive />}
+          label="Dipublikasikan"
+          value={published}
+        />
+        <Stat
+          onClick={() => onNavigate("participants")}
           icon={<Users />}
           label="Peserta"
           value={state.participants.length}
         />
-        <Stat icon={<FolderOpen />} label="Workspace" value="2" />
+        <Stat
+          onClick={() => onNavigate("workspace")}
+          icon={<FolderOpen />}
+          label="Workspace"
+          value="2"
+        />
       </div>
+      <button className="dashboard-ai" onClick={() => onNavigate("ai")}>
+        <span>JP AI</span>
+        <div>
+          <b>Buat PPT dengan Jenius AI</b>
+          <p>Susun materi, desain slide, dan kuis dari satu instruksi.</p>
+        </div>
+        <strong>Mulai →</strong>
+      </button>
 
       <div className="feature-grid">
         <Feature
@@ -1267,25 +1319,83 @@ function Analytics({ state }) {
   );
 }
 
-function AIAssistant({ onImportCode }) {
+function AIAssistant({ onGenerated, notify }) {
+  const [prompt, setPrompt] = useState("");
+  const [level, setLevel] = useState("SMA");
+  const [slideCount, setSlideCount] = useState(8);
+  const [loading, setLoading] = useState(false);
+  async function generate() {
+    if (!prompt.trim())
+      return notify("Tuliskan topik materi terlebih dahulu.", "warning");
+    setLoading(true);
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      const response = await fetch("/api/generate-ppt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token || ""}`,
+        },
+        body: JSON.stringify({ prompt, level, slides: slideCount }),
+      });
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || "AI gagal membuat materi.");
+      onGenerated(data);
+      notify("Materi AI berhasil dibuat dan siap diedit.");
+    } catch (error) {
+      notify(error.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <section className="page">
       <div className="page-head">
         <span className="eyebrow">Jenius AI</span>
         <h1>Buat Materi Lebih Cepat</h1>
         <p>
-          Gunakan struktur JSON untuk menghasilkan slide dan kuis sekaligus.
+          Jelaskan topik, jenjang, dan jumlah slide. Jenius AI menyusun materi
+          dan kuis yang dapat diedit.
         </p>
       </div>
       <div className="ai-panel">
         <div>
-          <h2>Generator Materi</h2>
-          <p>
-            Siapkan judul, isi slide, serta soal dengan format terstruktur.
-            Hasil tetap bisa diedit sebelum dipublikasikan.
-          </p>
-          <button className="primary-button" onClick={onImportCode}>
-            Buka Generator Kode
+          <h2>Instruksi Presentasi</h2>
+          <label>
+            Topik dan tujuan
+            <textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Contoh: Sistem tata surya untuk kelas 6 SD, gunakan analogi sederhana dan aktivitas refleksi."
+            />
+          </label>
+          <div className="ai-options">
+            <label>
+              Jenjang
+              <select value={level} onChange={(e) => setLevel(e.target.value)}>
+                {["SD", "SMP", "SMA", "SMK", "D3", "S1"].map((x) => (
+                  <option key={x}>{x}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Jumlah slide
+              <input
+                type="number"
+                min="4"
+                max="20"
+                value={slideCount}
+                onChange={(e) => setSlideCount(e.target.value)}
+              />
+            </label>
+          </div>
+          <button
+            className="primary-button"
+            disabled={loading}
+            onClick={generate}
+          >
+            {loading ? "AI sedang menyusun..." : "Buat PPT dengan AI"}
           </button>
         </div>
         <pre>{`{\n  "title": "Topik Pembelajaran",\n  "slides": [...],\n  "questions": [...]\n}`}</pre>
@@ -1294,10 +1404,82 @@ function AIAssistant({ onImportCode }) {
   );
 }
 
-function SettingsPage({ user, notify }) {
+function SettingsPage({
+  user,
+  notify,
+  notifications,
+  setNotifications,
+  restartTour,
+}) {
   const [school, setSchool] = useState(
     localStorage.getItem("jeniusppt_school") || "",
   );
+  const [language, setLanguage] = useState(
+    localStorage.getItem("jeniusppt-language") || "id",
+  );
+  const [languages, setLanguages] = useState([
+    ["id", "Bahasa Indonesia"],
+    ["en", "English"],
+    ["ar", "العربية"],
+    ["zh-CN", "中文"],
+    ["ja", "日本語"],
+    ["ko", "한국어"],
+    ["fr", "Français"],
+    ["de", "Deutsch"],
+    ["es", "Español"],
+    ["pt", "Português"],
+    ["hi", "हिन्दी"],
+    ["th", "ไทย"],
+    ["vi", "Tiếng Việt"],
+    ["ru", "Русский"],
+  ]);
+  useEffect(() => {
+    auth.currentUser
+      ?.getIdToken()
+      .then((token) =>
+        fetch("/api/translate", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      )
+      .then((response) => (response?.ok ? response.json() : null))
+      .then(
+        (data) =>
+          data?.languages?.length &&
+          setLanguages(
+            data.languages.map((item) => [item.language, item.name]),
+          ),
+      )
+      .catch(() => {});
+  }, []);
+  async function changeLanguage(value) {
+    setLanguage(value);
+    localStorage.setItem("jeniusppt-language", value);
+    try {
+      await translateVisiblePage(value);
+      notify("Bahasa tampilan diperbarui.");
+    } catch (error) {
+      notify(error.message, "error");
+    }
+  }
+  async function clearAppData() {
+    if ("caches" in window)
+      await Promise.all((await caches.keys()).map((key) => caches.delete(key)));
+    document.cookie
+      .split(";")
+      .forEach(
+        (cookie) =>
+          (document.cookie = cookie
+            .replace(/^ +/, "")
+            .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`)),
+      );
+    Object.keys(localStorage)
+      .filter((key) => key.startsWith("jeniusppt"))
+      .forEach((key) => localStorage.removeItem(key));
+    notify(
+      "Cache, cookie aplikasi, dan preferensi lokal dibersihkan.",
+      "warning",
+    );
+  }
   function save() {
     localStorage.setItem("jeniusppt_school", school);
     notify("Pengaturan disimpan.");
@@ -1319,8 +1501,62 @@ function SettingsPage({ user, notify }) {
           onChange={(e) => setSchool(e.target.value)}
           placeholder="Masukkan nama sekolah"
         />
+        <label>Bahasa Aplikasi</label>
+        <select
+          value={language}
+          onChange={(e) => changeLanguage(e.target.value)}
+        >
+          {languages.map(([code, label]) => (
+            <option key={code} value={code}>
+              {label}
+            </option>
+          ))}
+        </select>
         <button className="primary-button" onClick={save}>
           Simpan Pengaturan
+        </button>
+      </div>
+      <div className="settings-history">
+        <div className="section-title">
+          <div>
+            <span className="eyebrow">Aktivitas</span>
+            <h2>Riwayat JeniusPPT</h2>
+            <p>Notifikasi dan aktivitas penting akun.</p>
+          </div>
+          <button onClick={() => setNotifications([])}>Hapus Semua</button>
+        </div>
+        <div className="history-list">
+          {notifications.length ? (
+            notifications.map((item) => (
+              <article key={item.id}>
+                <span>{item.icon}</span>
+                <div>
+                  <b>{item.title}</b>
+                  <p>{item.message}</p>
+                  <small>
+                    {new Date(item.createdAt).toLocaleString("id-ID")}
+                  </small>
+                </div>
+                <button
+                  onClick={() =>
+                    setNotifications(
+                      notifications.filter((x) => x.id !== item.id),
+                    )
+                  }
+                >
+                  Hapus
+                </button>
+              </article>
+            ))
+          ) : (
+            <p>Belum ada riwayat.</p>
+          )}
+        </div>
+      </div>
+      <div className="settings-tools">
+        <button onClick={restartTour}>Mulai Ulang Tour Guide</button>
+        <button className="danger" onClick={clearAppData}>
+          Bersihkan Cookie & Cache Aplikasi
         </button>
       </div>
     </section>
@@ -1345,13 +1581,13 @@ function ComingSoon({ title }) {
   );
 }
 
-function Stat({ icon, label, value }) {
+function Stat({ icon, label, value, onClick }) {
   return (
-    <div className="stat-card">
+    <button className="stat-card stat-link" onClick={onClick}>
       <div>{icon}</div>
       <p>{label}</p>
       <h2>{value}</h2>
-    </div>
+    </button>
   );
 }
 

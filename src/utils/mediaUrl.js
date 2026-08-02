@@ -2,7 +2,8 @@ export function getYouTubeId(value = "") {
   try {
     const url = new URL(String(value).trim());
     const host = url.hostname.replace(/^www\./, "");
-    if (host === "youtu.be") return url.pathname.split("/").filter(Boolean)[0] || "";
+    if (host === "youtu.be")
+      return url.pathname.split("/").filter(Boolean)[0] || "";
     if (host.endsWith("youtube.com")) {
       if (url.pathname === "/watch") return url.searchParams.get("v") || "";
       const parts = url.pathname.split("/").filter(Boolean);

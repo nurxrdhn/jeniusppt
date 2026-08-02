@@ -185,6 +185,31 @@ export default function MaterialBuilder({
                   />
                 </label>
                 <label>
+                  <span>Nama Penandatangan</span>
+                  <input
+                    value={material.certificateSigner || "Guru / Pengajar"}
+                    onChange={(e) =>
+                      updateMaterial(material.id, {
+                        certificateSigner: e.target.value,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Deskripsi Sertifikat</span>
+                  <input
+                    value={
+                      material.certificateDescription ||
+                      "Telah menyelesaikan materi dan evaluasi pembelajaran"
+                    }
+                    onChange={(e) =>
+                      updateMaterial(material.id, {
+                        certificateDescription: e.target.value,
+                      })
+                    }
+                  />
+                </label>
+                <label>
                   <span>Warna Sertifikat</span>
                   <input
                     type="color"

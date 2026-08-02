@@ -1,3 +1,89 @@
-import { ArrowUpDown, BarChart3, BookOpen, Crown, FolderOpen, Home, LogOut, Settings, Sparkles, Trash2, Users, X } from "lucide-react";
-const menu=[["dashboard",Home,"Dashboard"],["workspace",FolderOpen,"Workspace"],["materials",BookOpen,"Materi"],["files",ArrowUpDown,"Impor & Ekspor"],["participants",Users,"Peserta"],["analytics",BarChart3,"Analitik"],["subscription",Crown,"Langganan"],["trash",Trash2,"Tempat Sampah"],["ai",Sparkles,"AI"],["settings",Settings,"Pengaturan"]];
-export default function Sidebar({page,setPage,user,onLogout,open,onClose}){function navigate(key){setPage(key);if(window.innerWidth<=860)onClose?.()}return <><button className={`sidebar-backdrop ${open?"show":""}`} onClick={onClose} aria-label="Tutup menu"/><aside className={`sidebar ${open?"sidebar-open":"sidebar-closed"}`}><button className="sidebar-close" onClick={onClose}><X size={20}/></button><div className="sidebar-brand logo-only"><div className="brand-icon-shell"><img className="brand-logo" src="/jeniusppt-icon.svg" alt="Logo JP"/></div></div><nav className="side-menu">{menu.map(([key,Icon,label])=><button key={key} className={page===key?"active":""} onClick={()=>navigate(key)}><Icon size={18}/><span>{label}</span></button>)}</nav><div className="sidebar-user">{user?.photoURL?<img src={user.photoURL} alt={user.name}/>:<div className="avatar-letter">{user?.name?.[0]||"G"}</div>}<div><b>{user?.name||"Guru"}</b><p>{user?.email||"guru@jeniusppt.online"}</p></div></div><button className="logout-button" onClick={onLogout}><LogOut size={18}/>Keluar</button></aside></>}
+import {
+  ArrowUpDown,
+  BarChart3,
+  BookOpen,
+  Crown,
+  FolderOpen,
+  Home,
+  LogOut,
+  Settings,
+  Sparkles,
+  Trash2,
+  Users,
+  X,
+} from "lucide-react";
+const menu = [
+  ["dashboard", Home, "Dashboard"],
+  ["workspace", FolderOpen, "Workspace"],
+  ["materials", BookOpen, "Materi"],
+  ["files", ArrowUpDown, "Impor & Ekspor"],
+  ["participants", Users, "Peserta"],
+  ["analytics", BarChart3, "Analitik"],
+  ["subscription", Crown, "Langganan"],
+  ["trash", Trash2, "Tempat Sampah"],
+  ["ai", Sparkles, "AI"],
+  ["settings", Settings, "Pengaturan"],
+];
+export default function Sidebar({
+  page,
+  setPage,
+  user,
+  onLogout,
+  open,
+  onClose,
+}) {
+  function navigate(key) {
+    setPage(key);
+    if (window.innerWidth <= 860) onClose?.();
+  }
+  return (
+    <>
+      <button
+        className={`sidebar-backdrop ${open ? "show" : ""}`}
+        onClick={onClose}
+        aria-label="Tutup menu"
+      />
+      <aside className={`sidebar ${open ? "sidebar-open" : "sidebar-closed"}`}>
+        <button className="sidebar-close" onClick={onClose}>
+          <X size={20} />
+        </button>
+        <div className="sidebar-brand logo-only">
+          <div className="brand-icon-shell">
+            <img
+              className="brand-logo"
+              src="/jeniusppt-icon.svg"
+              alt="Logo JP"
+            />
+          </div>
+        </div>
+        <nav className="side-menu">
+          {menu.map(([key, Icon, label]) => (
+            <button
+              key={key}
+              className={page === key ? "active" : ""}
+              onClick={() => navigate(key)}
+            >
+              <Icon size={18} />
+              <span>{label}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="sidebar-user">
+          {user?.photoURL ? (
+            <img src={user.photoURL} alt={user.name} />
+          ) : (
+            <div className="avatar-letter">{user?.name?.[0] || "G"}</div>
+          )}
+          <div>
+            <b>{user?.name || "Guru"}</b>
+            <p>{user?.email || "guru@jeniusppt.online"}</p>
+          </div>
+        </div>
+        <button className="logout-button" onClick={onLogout}>
+          <LogOut size={18} />
+          Keluar
+        </button>
+      </aside>
+    </>
+  );
+}

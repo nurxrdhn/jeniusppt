@@ -87,10 +87,14 @@ export default function CodeImportModal({ onClose, onImport, notify }) {
       <section className="code-modal">
         <header>
           <div>
-            <span className="eyebrow"><Code2 size={15} /> Import Code</span>
+            <span className="eyebrow">
+              <Code2 size={15} /> Import Code
+            </span>
             <h2>Buat dari Kode</h2>
           </div>
-          <button onClick={onClose}><X size={22} /></button>
+          <button onClick={onClose}>
+            <X size={22} />
+          </button>
         </header>
 
         <form onSubmit={submit}>

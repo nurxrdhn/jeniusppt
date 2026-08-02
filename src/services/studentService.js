@@ -1,7 +1,17 @@
-import { addDoc, collection, onSnapshot, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "../firebase/config";
 
-export async function saveStudentEntry({ shareCode, materialId, materialTitle, student }) {
+export async function saveStudentEntry({
+  shareCode,
+  materialId,
+  materialTitle,
+  student,
+}) {
   const ref = await addDoc(collection(db, "studentEntries"), {
     shareCode,
     materialId: materialId || "",
@@ -48,7 +58,11 @@ export function subscribeParticipants(callback, onError) {
   let results = [];
 
   const emit = () => {
-    const resultByEntry = new Map(results.filter((item) => item.entryId).map((item) => [item.entryId, item]));
+    const resultByEntry = new Map(
+      results
+        .filter((item) => item.entryId)
+        .map((item) => [item.entryId, item]),
+    );
     const merged = entries.map((entry) => {
       const result = resultByEntry.get(entry.id);
       const total = result?.totalQuestions || 0;
@@ -90,15 +104,23 @@ export function subscribeParticipants(callback, onError) {
     callback(merged);
   };
 
-  const stopEntries = onSnapshot(collection(db, "studentEntries"), (snapshot) => {
-    entries = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    emit();
-  }, onError);
+  const stopEntries = onSnapshot(
+    collection(db, "studentEntries"),
+    (snapshot) => {
+      entries = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      emit();
+    },
+    onError,
+  );
 
-  const stopResults = onSnapshot(collection(db, "studentResults"), (snapshot) => {
-    results = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    emit();
-  }, onError);
+  const stopResults = onSnapshot(
+    collection(db, "studentResults"),
+    (snapshot) => {
+      results = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      emit();
+    },
+    onError,
+  );
 
   return () => {
     stopEntries();

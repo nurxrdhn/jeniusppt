@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Link, Upload, Video, Volume2 } from "lucide-react";
+import { Link, Mic, Square, Upload, Video, Volume2 } from "lucide-react";
 import { normalizeVideoUrl } from "../../utils/mediaUrl";
 
 export default function MediaManager({ material, updateMaterial }) {
@@ -8,7 +8,10 @@ export default function MediaManager({ material, updateMaterial }) {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [recording, setRecording] = useState(false);
   const input = useRef(null);
+  const recorder = useRef(null);
+  const chunks = useRef([]);
 
   function add(src, fileName, mediaType = type) {
     const slides = (material.slides || []).map((slide, index) =>
@@ -70,6 +73,37 @@ export default function MediaManager({ material, updateMaterial }) {
       );
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function toggleRecording() {
+    if (recording) return recorder.current?.stop();
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      chunks.current = [];
+      const mediaRecorder = new MediaRecorder(stream);
+      recorder.current = mediaRecorder;
+      mediaRecorder.ondataavailable = (event) =>
+        event.data.size && chunks.current.push(event.data);
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks.current, {
+          type: mediaRecorder.mimeType || "audio/webm",
+        });
+        add(
+          URL.createObjectURL(blob),
+          `voice-note-${Date.now()}.webm`,
+          "audio",
+        );
+        stream.getTracks().forEach((track) => track.stop());
+        setRecording(false);
+        setMessage("Voice note selesai dan dapat langsung diputar.");
+      };
+      mediaRecorder.start();
+      setRecording(true);
+      setMessage("Sedang merekam. Tekan Stop jika sudah selesai.");
+    } catch (error) {
+      console.error(error);
+      setMessage("Izin mikrofon ditolak. Aktifkan izin mikrofon pada browser.");
     }
   }
 
@@ -150,6 +184,15 @@ export default function MediaManager({ material, updateMaterial }) {
           {loading
             ? "Menyiapkan media..."
             : "Pilih Video, Audio, atau Voice Note dari Folder"}
+        </button>
+        <button
+          className={`voice-record ${recording ? "recording" : ""}`}
+          onClick={toggleRecording}
+        >
+          {recording ? <Square size={18} /> : <Mic size={18} />}
+          {recording
+            ? "Stop dan Masukkan Voice Note"
+            : "Rekam Voice Note Langsung"}
         </button>
         <input
           ref={input}
