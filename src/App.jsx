@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import {
   Archive,
   BookOpen,
-  Check,
   Copy,
   Edit3,
   Eye,
@@ -23,6 +22,7 @@ import MaterialBuilder from "./components/materials/MaterialBuilder";
 import CodeImportModal from "./components/materials/CodeImportModal";
 import ShareModal from "./components/share/ShareModal";
 import FileCenter from "./components/files/FileCenter";
+import { JeniusDialog, JeniusToast } from "./components/ui/JeniusNotice";
 import {
   SubscriptionPage,
   TemplateRecommendations,
@@ -112,7 +112,8 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [page, setPage] = useState("dashboard");
   const [state, setState] = useState(loadState);
-  const [toast, setToast] = useState("");
+  const [toast, setToast] = useState(null);
+  const [dialog, setDialog] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [shareMaterial, setShareMaterial] = useState(null);
   const [showCodeImport, setShowCodeImport] = useState(false);
@@ -174,16 +175,31 @@ export default function App() {
       (participants) => setState((old) => ({ ...old, participants })),
       (error) => {
         console.error("Gagal membaca peserta:", error);
-        notify("Data peserta belum dapat dibaca dari Firebase.");
+        notify("Data peserta belum dapat dibaca dari Firebase.", "error");
       },
     );
   }, [user]);
 
   const editingMaterial = state.materials.find((m) => m.id === editingId);
 
-  function notify(message) {
-    setToast(message);
-    setTimeout(() => setToast(""), 2200);
+  function notify(message, type = "success", title) {
+    const notice = {
+      id: crypto.randomUUID(),
+      title:
+        title ||
+        (type === "error"
+          ? "Belum berhasil"
+          : type === "warning"
+            ? "Perlu diperhatikan"
+            : "Berhasil"),
+      message,
+      type,
+    };
+    setToast(notice);
+    setTimeout(
+      () => setToast((current) => (current?.id === notice.id ? null : current)),
+      3600,
+    );
   }
 
   function addNotification(title, message, icon = "🔔", uniqueKey) {
@@ -289,7 +305,10 @@ export default function App() {
       );
     } catch (err) {
       console.error(err);
-      notify("Link lokal siap. Firebase gagal, cek koneksi/config.");
+      notify(
+        "Link lokal siap. Firebase gagal, cek koneksi atau konfigurasi.",
+        "warning",
+      );
     }
 
     return updated;
@@ -323,7 +342,7 @@ export default function App() {
       return online;
     } catch (err) {
       console.error(err);
-      notify("Publikasi daring gagal. Link belum dapat dibuka di HP.");
+      notify("Publikasi daring gagal. Link belum dapat dibuka di HP.", "error");
       return null;
     }
   }
@@ -351,54 +370,73 @@ export default function App() {
   }
 
   function deleteMaterial(material) {
-    const permanent = window.confirm(
-      "Klik OK untuk hapus permanen. Klik Batal untuk memindahkan ke Tempat Sampah selama 30 hari.",
-    );
-    setState((old) => ({
-      ...old,
-      materials: old.materials.filter((m) => m.id !== material.id),
-      trash: permanent
-        ? old.trash
-        : [
-            { ...material, deletedAt: new Date().toISOString() },
-            ...(old.trash || []),
-          ],
-    }));
-    notify(
-      permanent
-        ? "Materi dihapus permanen."
-        : "Materi dipindahkan ke Tempat Sampah.",
-    );
-    addNotification(
-      permanent ? "Materi dihapus permanen" : "Materi masuk Tempat Sampah",
-      material.title,
-      permanent ? "🗑️" : "♻️",
-    );
+    const remove = (permanent) => {
+      setState((old) => ({
+        ...old,
+        materials: old.materials.filter((m) => m.id !== material.id),
+        trash: permanent
+          ? old.trash
+          : [
+              { ...material, deletedAt: new Date().toISOString() },
+              ...(old.trash || []),
+            ],
+      }));
+      notify(
+        permanent
+          ? "Materi dihapus permanen."
+          : "Materi disimpan di Tempat Sampah selama 30 hari.",
+        permanent ? "warning" : "success",
+      );
+      addNotification(
+        permanent ? "Materi dihapus permanen" : "Materi masuk Tempat Sampah",
+        material.title,
+        permanent ? "🗑️" : "♻️",
+      );
+    };
+    setDialog({
+      title: "Hapus materi ini?",
+      message: `Pilih cara menghapus “${material.title}”. Materi di Tempat Sampah masih dapat dipulihkan selama 30 hari.`,
+      icon: "trash",
+      danger: true,
+      confirmLabel: "Hapus permanen",
+      secondaryLabel: "Ke Tempat Sampah",
+      onConfirm: () => remove(true),
+      onSecondary: () => remove(false),
+    });
   }
   function restoreMaterial(material) {
-    if (!window.confirm(`Pulihkan materi “${material.title}”?`)) return;
-    const { deletedAt, ...restored } = material;
-    setState((old) => ({
-      ...old,
-      trash: old.trash.filter((item) => item.id !== material.id),
-      materials: [restored, ...old.materials],
-    }));
-    notify("Materi berhasil dipulihkan.");
-    addNotification("Materi dipulihkan", material.title, "✅");
+    setDialog({
+      title: "Pulihkan materi?",
+      message: `“${material.title}” akan dikembalikan ke daftar Materi.`,
+      confirmLabel: "Pulihkan",
+      onConfirm: () => {
+        const { deletedAt, ...restored } = material;
+        setState((old) => ({
+          ...old,
+          trash: old.trash.filter((item) => item.id !== material.id),
+          materials: [restored, ...old.materials],
+        }));
+        notify("Materi berhasil dikembalikan ke daftar.");
+        addNotification("Materi dipulihkan", material.title, "✅");
+      },
+    });
   }
   function permanentDelete(material) {
-    if (
-      !window.confirm(
-        `Hapus permanen “${material.title}”? Data tidak dapat dipulihkan.`,
-      )
-    )
-      return;
-    setState((old) => ({
-      ...old,
-      trash: old.trash.filter((item) => item.id !== material.id),
-    }));
-    notify("Materi dihapus permanen.");
-    addNotification("Materi dihapus permanen", material.title, "🗑️");
+    setDialog({
+      title: "Hapus selamanya?",
+      message: `“${material.title}” akan dihapus permanen dan tidak dapat dipulihkan.`,
+      icon: "trash",
+      danger: true,
+      confirmLabel: "Ya, hapus",
+      onConfirm: () => {
+        setState((old) => ({
+          ...old,
+          trash: old.trash.filter((item) => item.id !== material.id),
+        }));
+        notify("Materi dihapus permanen.", "warning");
+        addNotification("Materi dihapus permanen", material.title, "🗑️");
+      },
+    });
   }
   function useEducationTemplate(template) {
     const background = `linear-gradient(135deg,${template.colors[0]},${template.colors[1]})`;
@@ -467,12 +505,8 @@ export default function App() {
         />
 
         <main className="main-area">
-          {toast && (
-            <div className="toast">
-              <Check size={18} />
-              {toast}
-            </div>
-          )}
+          <JeniusToast notice={toast} onClose={() => setToast(null)} />
+          <JeniusDialog dialog={dialog} onClose={() => setDialog(null)} />
 
           <MaterialBuilder
             material={editingMaterial}
@@ -511,12 +545,8 @@ export default function App() {
 
   return (
     <div className={`app-shell theme-${theme} device-${viewMode}`}>
-      {toast && (
-        <div className="toast">
-          <Check size={18} />
-          {toast}
-        </div>
-      )}
+      <JeniusToast notice={toast} onClose={() => setToast(null)} />
+      <JeniusDialog dialog={dialog} onClose={() => setDialog(null)} />
 
       <Sidebar
         user={user}
@@ -582,6 +612,7 @@ export default function App() {
             state={state}
             initialMaterial={participantMaterialFilter}
             clearInitialMaterial={() => setParticipantMaterialFilter("")}
+            notify={notify}
           />
         )}
 
@@ -833,7 +864,12 @@ function Materials({
   );
 }
 
-function Participants({ state, initialMaterial, clearInitialMaterial }) {
+function Participants({
+  state,
+  initialMaterial,
+  clearInitialMaterial,
+  notify,
+}) {
   const [search, setSearch] = useState("");
   const [material, setMaterial] = useState(initialMaterial || "");
   const [className, setClassName] = useState("");
@@ -918,7 +954,7 @@ function Participants({ state, initialMaterial, clearInitialMaterial }) {
         await exportParticipantsExcel(filtered, reportTitle);
       else await exportParticipantsPdf(filtered, reportTitle);
     } catch (error) {
-      alert(error.message || "Laporan gagal dibuat.");
+      notify(error.message || "Laporan gagal dibuat.", "error");
     }
   }
 
