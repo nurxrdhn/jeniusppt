@@ -1,0 +1,24 @@
+html[data-theme="dark"]{color-scheme:dark}
+html[data-theme="dark"] body{background:#120b08;color:#f8eee8}
+html[data-theme="dark"] .app-shell,html[data-theme="dark"] .main-area,html[data-theme="dark"] .page{background:#120b08}
+html[data-theme="dark"] .sidebar,html[data-theme="dark"] .topbar,html[data-theme="dark"] .stat-card,html[data-theme="dark"] .feature-card,html[data-theme="dark"] .material-card,html[data-theme="dark"] .tool-card,html[data-theme="dark"] .info-form,html[data-theme="dark"] .publish-card,html[data-theme="dark"] .slide-list,html[data-theme="dark"] .question-list,html[data-theme="dark"] .properties-panel,html[data-theme="dark"] .slide-stage,html[data-theme="dark"] .quiz-stage,html[data-theme="dark"] .preview-stage,html[data-theme="dark"] .preview-timeline,html[data-theme="dark"] .media-form,html[data-theme="dark"] .recommendation-grid article,html[data-theme="dark"] .pricing-grid article,html[data-theme="dark"] .trash-list article,html[data-theme="dark"] .notification-panel,html[data-theme="dark"] .notification-panel header,html[data-theme="dark"] .word-toolbar{background:#211510!important;border-color:#4a2c20!important;color:#f8eee8}
+html[data-theme="dark"] h1,html[data-theme="dark"] h2,html[data-theme="dark"] h3,html[data-theme="dark"] b{color:#fff7ed}
+html[data-theme="dark"] p,html[data-theme="dark"] small,html[data-theme="dark"] label{color:#d5b9aa}
+html[data-theme="dark"] input,html[data-theme="dark"] textarea,html[data-theme="dark"] select,html[data-theme="dark"] .topbar-search,html[data-theme="dark"] .stepper,html[data-theme="dark"] .word-toolbar button{background:#2e1d16!important;border-color:#5f3929!important;color:#fff7ed!important}
+html[data-theme="dark"] .side-menu button{color:#ead5c9}html[data-theme="dark"] .side-menu button.active,html[data-theme="dark"] .side-menu button:hover{background:#4a200f;color:#fb923c}
+html[data-theme="dark"] .sidebar-user,html[data-theme="dark"] .icon-button,html[data-theme="dark"] .hamburger-button{background:#321c13;color:#fb923c}
+.display-controls{display:flex;gap:7px}.display-controls .icon-button{display:grid;place-items:center}
+html[data-view="mobile"] body{background:#2b211d}
+html[data-view="mobile"] .device-mobile{width:min(430px,100%);min-height:100vh;margin:0 auto;box-shadow:0 0 80px rgba(0,0,0,.28);position:relative;display:block;overflow-x:hidden}
+html[data-view="mobile"] .device-mobile .sidebar{position:fixed!important;left:50%;top:0;z-index:1001;width:min(290px,85vw)!important;height:100vh;transform:translateX(-220%);opacity:1!important;padding:18px!important}
+html[data-view="mobile"] .device-mobile .sidebar.sidebar-open{transform:translateX(calc(-50% - 70px))}
+html[data-view="mobile"] .device-mobile .sidebar-close{display:grid}
+html[data-view="mobile"] .device-mobile .topbar{display:grid;grid-template-columns:auto 1fr auto auto;height:auto;padding:11px 13px}
+html[data-view="mobile"] .device-mobile .topbar-search{grid-column:1/-1;grid-row:2;width:100%;order:initial}
+html[data-view="mobile"] .device-mobile .topbar-code,html[data-view="mobile"] .device-mobile .top-profile{display:none}
+html[data-view="mobile"] .device-mobile .topbar-create{min-width:44px;width:44px;padding:0;font-size:0}
+html[data-view="mobile"] .device-mobile .page{padding:14px}
+html[data-view="mobile"] .device-mobile .stats-grid,html[data-view="mobile"] .device-mobile .recommendation-grid{grid-template-columns:1fr 1fr}
+html[data-view="mobile"] .device-mobile .material-grid,html[data-view="mobile"] .device-mobile .pricing-grid,html[data-view="mobile"] .device-mobile .preview-player,html[data-view="mobile"] .device-mobile .ppt-editor,html[data-view="mobile"] .device-mobile .quiz-editor{grid-template-columns:1fr}
+html[data-view="desktop"] .device-desktop{min-width:1100px}
+@media(max-width:600px){.display-controls{gap:4px}.display-controls .icon-button{width:40px;height:40px}}
