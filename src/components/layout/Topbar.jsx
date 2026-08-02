@@ -4,11 +4,9 @@ import {
   CheckCheck,
   Code2,
   Menu,
-  Monitor,
   Moon,
   Plus,
   Search,
-  Smartphone,
   Sun,
   X,
 } from "lucide-react";
@@ -22,8 +20,6 @@ export default function Topbar({
   markAllRead,
   theme,
   onTheme,
-  viewMode,
-  onViewMode,
 }) {
   const [open, setOpen] = React.useState(false);
   const unread = notifications.filter((item) => !item.read).length;
@@ -94,19 +90,6 @@ export default function Topbar({
           }
         >
           {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
-        <button
-          className="icon-button"
-          onClick={() =>
-            onViewMode(viewMode === "mobile" ? "desktop" : "mobile")
-          }
-          title={viewMode === "mobile" ? "Tampilan desktop" : "Tampilan mobile"}
-        >
-          {viewMode === "mobile" ? (
-            <Monitor size={18} />
-          ) : (
-            <Smartphone size={18} />
-          )}
         </button>
       </div>
       <button className="secondary-button topbar-code" onClick={onImportCode}>

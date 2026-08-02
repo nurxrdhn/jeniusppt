@@ -102,9 +102,7 @@ function loadState() {
 export default function App() {
   document.documentElement.dataset.theme =
     localStorage.getItem("jeniusppt-theme") || "light";
-  document.documentElement.dataset.view =
-    localStorage.getItem("jeniusppt-view") ||
-    (window.innerWidth <= 860 ? "mobile" : "desktop");
+  document.documentElement.dataset.view = "auto";
   if (window.location.pathname.startsWith("/play/")) {
     return <StudentPlayer />;
   }
@@ -123,21 +121,27 @@ export default function App() {
   const [theme, setTheme] = useState(
     () => localStorage.getItem("jeniusppt-theme") || "light",
   );
-  const [viewMode, setViewMode] = useState(
-    () =>
-      localStorage.getItem("jeniusppt-view") ||
-      (window.innerWidth <= 860 ? "mobile" : "desktop"),
-  );
+  const [viewMode] = useState("auto");
 
   useEffect(() => {
     localStorage.setItem("jeniusppt-theme", theme);
     document.documentElement.dataset.theme = theme;
   }, [theme]);
   useEffect(() => {
-    localStorage.setItem("jeniusppt-view", viewMode);
+    localStorage.removeItem("jeniusppt-view");
     document.documentElement.dataset.view = viewMode;
-    setSidebarOpen(viewMode !== "mobile");
+    setSidebarOpen(window.innerWidth > 860);
   }, [viewMode]);
+
+  useEffect(() => {
+    const syncDevice = () => setSidebarOpen(window.innerWidth > 860);
+    window.addEventListener("resize", syncDevice);
+    window.addEventListener("orientationchange", syncDevice);
+    return () => {
+      window.removeEventListener("resize", syncDevice);
+      window.removeEventListener("orientationchange", syncDevice);
+    };
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -576,8 +580,6 @@ export default function App() {
           }
           theme={theme}
           onTheme={setTheme}
-          viewMode={viewMode}
-          onViewMode={setViewMode}
         />
 
         {page === "dashboard" && (

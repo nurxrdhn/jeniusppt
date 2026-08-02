@@ -59,9 +59,11 @@ export function JeniusDialog({ dialog, onClose }) {
         <h2 id="jp-dialog-title">{dialog.title}</h2>
         <p>{dialog.message}</p>
         <div className="jp-dialog-actions">
-          <button className="jp-dialog-cancel" onClick={onClose}>
-            {dialog.cancelLabel || "Batal"}
-          </button>
+          {dialog.showCancel && (
+            <button className="jp-dialog-cancel" onClick={onClose}>
+              {dialog.cancelLabel || "Batal"}
+            </button>
+          )}
           {dialog.secondaryLabel && (
             <button
               className="jp-dialog-secondary"
