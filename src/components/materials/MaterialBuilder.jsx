@@ -57,29 +57,187 @@ export default function MaterialBuilder({
           <label>Judul</label>
           <input
             value={material.title}
-            onChange={(e) => updateMaterial(material.id, { title: e.target.value })}
+            onChange={(e) =>
+              updateMaterial(material.id, { title: e.target.value })
+            }
           />
 
           <label>Mapel</label>
           <input
             value={material.subject}
-            onChange={(e) => updateMaterial(material.id, { subject: e.target.value })}
+            onChange={(e) =>
+              updateMaterial(material.id, { subject: e.target.value })
+            }
           />
 
           <label>Kelas</label>
           <input
             value={material.className}
-            onChange={(e) => updateMaterial(material.id, { className: e.target.value })}
+            onChange={(e) =>
+              updateMaterial(material.id, { className: e.target.value })
+            }
           />
 
-          <div className="settings-divider"><h2>Akses & Sertifikat</h2><p>Atur siapa yang dapat mengerjakan materi dan kapan materi tersedia.</p></div>
+          <div className="settings-divider">
+            <h2>Akses & Sertifikat</h2>
+            <p>
+              Atur siapa yang dapat mengerjakan materi dan kapan materi
+              tersedia.
+            </p>
+          </div>
           <div className="settings-grid">
-            <label><span>Kode Akses</span><input value={material.accessCode||""} onChange={(e)=>updateMaterial(material.id,{accessCode:e.target.value})} placeholder="Opsional, contoh: KELAS11"/></label>
-            <label><span>Batas Percobaan</span><input type="number" min="0" value={material.attemptLimit||0} onChange={(e)=>updateMaterial(material.id,{attemptLimit:Number(e.target.value)})}/><small>Isi 0 untuk tanpa batas.</small></label>
-            <label><span>Mulai Tersedia</span><input type="datetime-local" value={material.availableFrom||""} onChange={(e)=>updateMaterial(material.id,{availableFrom:e.target.value})}/></label>
-            <label><span>Berakhir</span><input type="datetime-local" value={material.availableUntil||""} onChange={(e)=>updateMaterial(material.id,{availableUntil:e.target.value})}/></label>
-            <label className="toggle-setting"><input type="checkbox" checked={Boolean(material.certificateEnabled)} onChange={(e)=>updateMaterial(material.id,{certificateEnabled:e.target.checked})}/><span>Aktifkan sertifikat</span></label>
-            {material.certificateEnabled&&<><label><span>Nilai Minimum Sertifikat</span><input type="number" min="0" max="100" value={material.passingScore??75} onChange={(e)=>updateMaterial(material.id,{passingScore:Number(e.target.value)})}/></label><label><span>Judul Sertifikat</span><input value={material.certificateTitle||"SERTIFIKAT PENYELESAIAN"} onChange={(e)=>updateMaterial(material.id,{certificateTitle:e.target.value})}/></label><label><span>Nama Penerbit</span><input value={material.certificateIssuer||"JeniusPPT.online"} onChange={(e)=>updateMaterial(material.id,{certificateIssuer:e.target.value})}/></label><label><span>Warna Sertifikat</span><input type="color" value={material.certificateColor||"#f97316"} onChange={(e)=>updateMaterial(material.id,{certificateColor:e.target.value})}/></label><label><span>Pesan Nilai di Atas Minimum</span><input value={material.successMessage||"Lulus dengan hasil sangat baik"} onChange={(e)=>updateMaterial(material.id,{successMessage:e.target.value})}/></label><label><span>Pesan Nilai Pas Minimum</span><input value={material.equalMessage||"Lulus sesuai nilai minimum"} onChange={(e)=>updateMaterial(material.id,{equalMessage:e.target.value})}/></label><label><span>Pesan Nilai di Bawah Minimum</span><input value={material.failMessage||"Belum memenuhi nilai minimum"} onChange={(e)=>updateMaterial(material.id,{failMessage:e.target.value})}/></label></>}
+            <label>
+              <span>Kode Akses</span>
+              <input
+                value={material.accessCode || ""}
+                onChange={(e) =>
+                  updateMaterial(material.id, { accessCode: e.target.value })
+                }
+                placeholder="Opsional, contoh: KELAS11"
+              />
+            </label>
+            <label>
+              <span>Batas Percobaan</span>
+              <input
+                type="number"
+                min="0"
+                value={material.attemptLimit || 0}
+                onChange={(e) =>
+                  updateMaterial(material.id, {
+                    attemptLimit: Number(e.target.value),
+                  })
+                }
+              />
+              <small>Isi 0 untuk tanpa batas.</small>
+            </label>
+            <label>
+              <span>Mulai Tersedia</span>
+              <input
+                type="datetime-local"
+                value={material.availableFrom || ""}
+                onChange={(e) =>
+                  updateMaterial(material.id, { availableFrom: e.target.value })
+                }
+              />
+            </label>
+            <label>
+              <span>Berakhir</span>
+              <input
+                type="datetime-local"
+                value={material.availableUntil || ""}
+                onChange={(e) =>
+                  updateMaterial(material.id, {
+                    availableUntil: e.target.value,
+                  })
+                }
+              />
+            </label>
+            <label className="toggle-setting">
+              <input
+                type="checkbox"
+                checked={Boolean(material.certificateEnabled)}
+                onChange={(e) =>
+                  updateMaterial(material.id, {
+                    certificateEnabled: e.target.checked,
+                  })
+                }
+              />
+              <span>Aktifkan sertifikat</span>
+            </label>
+            {material.certificateEnabled && (
+              <>
+                <label>
+                  <span>Nilai Minimum Sertifikat</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={material.passingScore ?? 75}
+                    onChange={(e) =>
+                      updateMaterial(material.id, {
+                        passingScore: Number(e.target.value),
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Judul Sertifikat</span>
+                  <input
+                    value={
+                      material.certificateTitle || "SERTIFIKAT PENYELESAIAN"
+                    }
+                    onChange={(e) =>
+                      updateMaterial(material.id, {
+                        certificateTitle: e.target.value,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Nama Penerbit</span>
+                  <input
+                    value={material.certificateIssuer || "JeniusPPT.online"}
+                    onChange={(e) =>
+                      updateMaterial(material.id, {
+                        certificateIssuer: e.target.value,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Warna Sertifikat</span>
+                  <input
+                    type="color"
+                    value={material.certificateColor || "#f97316"}
+                    onChange={(e) =>
+                      updateMaterial(material.id, {
+                        certificateColor: e.target.value,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Pesan Nilai di Atas Minimum</span>
+                  <input
+                    value={
+                      material.successMessage ||
+                      "Lulus dengan hasil sangat baik"
+                    }
+                    onChange={(e) =>
+                      updateMaterial(material.id, {
+                        successMessage: e.target.value,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Pesan Nilai Pas Minimum</span>
+                  <input
+                    value={
+                      material.equalMessage || "Lulus sesuai nilai minimum"
+                    }
+                    onChange={(e) =>
+                      updateMaterial(material.id, {
+                        equalMessage: e.target.value,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Pesan Nilai di Bawah Minimum</span>
+                  <input
+                    value={
+                      material.failMessage || "Belum memenuhi nilai minimum"
+                    }
+                    onChange={(e) =>
+                      updateMaterial(material.id, {
+                        failMessage: e.target.value,
+                      })
+                    }
+                  />
+                </label>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -92,7 +250,9 @@ export default function MaterialBuilder({
         <QuizBuilder material={material} updateMaterial={updateMaterial} />
       )}
 
-      {tab === "Media" && <MediaManager material={material} updateMaterial={updateMaterial} />}
+      {tab === "Media" && (
+        <MediaManager material={material} updateMaterial={updateMaterial} />
+      )}
 
       {tab === "Preview" && <PreviewPlayer material={material} teacher />}
 
@@ -103,7 +263,11 @@ export default function MaterialBuilder({
 
           <div className="share-box">/play/{material.shareCode}</div>
 
-          <a className="primary-button" target="_blank" href={`/play/${material.shareCode}`}>
+          <a
+            className="primary-button"
+            target="_blank"
+            href={`/play/${material.shareCode}`}
+          >
             <Eye size={17} />
             Preview
           </a>

@@ -1,5 +1,6 @@
 import { QRCodeSVG } from "qrcode.react";
-import { Copy, Download, ExternalLink, Mail, Send, Share2, X } from "lucide-react";
+import { Copy, Download, ExternalLink, Share2, X } from "lucide-react";
+import BrandIcon from "../ui/BrandIcon";
 
 export default function ShareModal({ material, onClose, notify }) {
   const link = `${window.location.origin}/play/${material.shareCode}`;
@@ -14,9 +15,23 @@ export default function ShareModal({ material, onClose, notify }) {
     window.open(link, "_blank", "noopener,noreferrer");
   }
 
-  const shareText=`Pelajari “${material.title}” melalui JeniusPPT`;
-  function openShareUrl(url){window.open(url,"_blank","noopener,noreferrer")}
-  async function nativeShare(){if(navigator.share){await navigator.share({title:material.title,text:shareText,url:link});notify?.("Pilihan aplikasi berbagi dibuka.");}else{await copyLink();notify?.("Browser tidak mendukung berbagi langsung. Link sudah disalin.");}}
+  const shareText = `Pelajari “${material.title}” melalui JeniusPPT`;
+  function openShareUrl(url) {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+  async function nativeShare() {
+    if (navigator.share) {
+      await navigator.share({
+        title: material.title,
+        text: shareText,
+        url: link,
+      });
+      notify?.("Pilihan aplikasi berbagi dibuka.");
+    } else {
+      await copyLink();
+      notify?.("Browser tidak mendukung berbagi langsung. Link sudah disalin.");
+    }
+  }
 
   function downloadQR() {
     const svg = document.querySelector("#share-qr svg");
@@ -59,7 +74,12 @@ export default function ShareModal({ material, onClose, notify }) {
           </button>
         </div>
 
-        {isLocalLink && <p className="error-box">Link localhost hanya dapat dibuka di laptop ini. Buka website Vercel, lalu publikasikan ulang untuk memperoleh link HP.</p>}
+        {isLocalLink && (
+          <p className="error-box">
+            Link localhost hanya dapat dibuka di laptop ini. Buka website
+            Vercel, lalu publikasikan ulang untuk memperoleh link HP.
+          </p>
+        )}
 
         <label>QR Code</label>
 
@@ -92,12 +112,59 @@ export default function ShareModal({ material, onClose, notify }) {
 
         <label>Kirim Langsung</label>
         <div className="social-share-grid">
-          <button onClick={nativeShare}><Share2 size={17}/>Medsos / Aplikasi</button>
-          <button onClick={()=>openShareUrl(`https://wa.me/?text=${encodeURIComponent(`${shareText}\n${link}`)}`)}><Send size={17}/>WhatsApp</button>
-          <button onClick={()=>openShareUrl(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`)}>Facebook</button>
-          <button onClick={()=>openShareUrl(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(shareText)}`)}>Telegram</button>
-          <button onClick={()=>openShareUrl(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(link)}`)}>X</button>
-          <button onClick={()=>openShareUrl(`https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(material.title)}&body=${encodeURIComponent(`${shareText}\n\n${link}`)}`)}><Mail size={17}/>Gmail</button>
+          <button onClick={nativeShare}>
+            <Share2 size={17} />
+            Medsos / Aplikasi
+          </button>
+          <button
+            onClick={() =>
+              openShareUrl(
+                `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${link}`)}`,
+              )
+            }
+          >
+            <BrandIcon name="whatsapp" />
+            WhatsApp
+          </button>
+          <button
+            onClick={() =>
+              openShareUrl(
+                `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`,
+              )
+            }
+          >
+            <BrandIcon name="facebook" />
+            Facebook
+          </button>
+          <button
+            onClick={() =>
+              openShareUrl(
+                `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(shareText)}`,
+              )
+            }
+          >
+            <BrandIcon name="telegram" />
+            Telegram
+          </button>
+          <button
+            onClick={() =>
+              openShareUrl(
+                `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(link)}`,
+              )
+            }
+          >
+            <BrandIcon name="x" />X
+          </button>
+          <button
+            onClick={() =>
+              openShareUrl(
+                `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(material.title)}&body=${encodeURIComponent(`${shareText}\n\n${link}`)}`,
+              )
+            }
+          >
+            <BrandIcon name="gmail" />
+            Gmail
+          </button>
         </div>
       </section>
     </div>
