@@ -3,6 +3,7 @@ import { Copy, Download, ExternalLink, X } from "lucide-react";
 
 export default function ShareModal({ material, onClose, notify }) {
   const link = `${window.location.origin}/play/${material.shareCode}`;
+  const isLocalLink = /localhost|127\.0\.0\.1/.test(window.location.hostname);
 
   async function copyLink() {
     await navigator.clipboard.writeText(link);
@@ -53,6 +54,8 @@ export default function ShareModal({ material, onClose, notify }) {
             Salin
           </button>
         </div>
+
+        {isLocalLink && <p className="error-box">Link localhost hanya dapat dibuka di laptop ini. Buka website Vercel, lalu publikasikan ulang untuk memperoleh link HP.</p>}
 
         <label>QR Code</label>
 

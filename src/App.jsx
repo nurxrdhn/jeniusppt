@@ -209,31 +209,32 @@ export default function App() {
     return updated;
   }
 
-  function openShare(material) {
+  async function openShare(material) {
     const instant = {
       ...material,
       status: "Published",
       publishedAtLocal: new Date().toISOString(),
     };
 
-    localStorage.setItem(
-      `jeniusppt_package_${instant.shareCode}`,
-      JSON.stringify(instant)
-    );
-
-    updateMaterial(instant.id, {
-      status: "Published",
-      publishedAtLocal: instant.publishedAtLocal,
-    });
-
-    setShareMaterial(instant);
-    notify("QR dan link siswa siap.");
-    addNotification("Tautan dibagikan",`QR dan tautan ${instant.title} siap digunakan.`,"🔗");
-
-    publishMaterialToFirestore(instant).catch((err) => {
+    try {
+      await publishMaterialToFirestore(instant);
+      localStorage.setItem(
+        `jeniusppt_package_${instant.shareCode}`,
+        JSON.stringify(instant)
+      );
+      updateMaterial(instant.id, {
+        status: "Published",
+        publishedAtLocal: instant.publishedAtLocal,
+      });
+      setShareMaterial(instant);
+      notify("QR dan link siswa siap dibuka di HP.");
+      addNotification("Tautan dibagikan",`QR dan tautan ${instant.title} siap digunakan.`,"🔗");
+      return instant;
+    } catch (err) {
       console.error(err);
-      notify("Firebase gagal. Cek koneksi/config.");
-    });
+      notify("Publikasi daring gagal. Link belum dapat dibuka di HP.");
+      return null;
+    }
   }
 
   function duplicateMaterial(material) {
