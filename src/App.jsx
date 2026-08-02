@@ -23,6 +23,7 @@ import MaterialBuilder from "./components/materials/MaterialBuilder";
 import CodeImportModal from "./components/materials/CodeImportModal";
 import ShareModal from "./components/share/ShareModal";
 import FileCenter from "./components/files/FileCenter";
+import { SubscriptionPage, TemplateRecommendations, TrashPage } from "./components/dashboard/FeaturePages";
 
 import { SLIDE_SIZES } from "./utils/slideSizes";
 import { publishMaterialToFirestore } from "./services/materialService";
@@ -76,11 +77,17 @@ function loadState() {
     return {
       materials: saved?.materials || [],
       participants: saved?.participants || [],
+      trash: saved?.trash || [],
+      notifications: saved?.notifications || [],
+      activePlan: saved?.activePlan || "Free",
     };
   } catch {
     return {
       materials: [],
       participants: [],
+      trash: [],
+      notifications: [],
+      activePlan: "Free",
     };
   }
 }
@@ -98,10 +105,18 @@ export default function App() {
   const [shareMaterial, setShareMaterial] = useState(null);
   const [showCodeImport, setShowCodeImport] = useState(false);
   const [participantMaterialFilter, setParticipantMaterialFilter] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
+
+  useEffect(() => {
+    const expired=(state.trash||[]).filter((item)=>Date.now()-new Date(item.deletedAt).getTime()>=30*86400000);
+    const warning=(state.trash||[]).filter((item)=>{const age=Date.now()-new Date(item.deletedAt).getTime();return age>=29*86400000&&age<30*86400000});
+    if(expired.length)setState((old)=>({...old,trash:old.trash.filter((item)=>!expired.some((expiredItem)=>expiredItem.id===item.id))}));
+    warning.forEach((item)=>addNotification("Materi akan dihapus besok",`${item.title} akan dihapus permanen dalam 1 hari.`,"⚠️",`trash-warning-${item.id}`));
+  }, []);
 
   useEffect(() => {
     if (!user) return undefined;
@@ -120,6 +135,8 @@ export default function App() {
     setToast(message);
     setTimeout(() => setToast(""), 2200);
   }
+
+  function addNotification(title,message,icon="🔔",uniqueKey){setState((old)=>{if(uniqueKey&&old.notifications?.some((item)=>item.uniqueKey===uniqueKey))return old;return{...old,notifications:[{id:crypto.randomUUID(),title,message,icon,read:false,createdAt:new Date().toISOString(),uniqueKey},...(old.notifications||[])].slice(0,100)}})}
 
   function updateMaterial(id, patch) {
     setState((old) => ({
@@ -140,6 +157,7 @@ export default function App() {
 
     setEditingId(item.id);
     notify("Materi dibuat.");
+    addNotification("Materi baru dibuat",`${item.title} siap diedit.`,"📝");
   }
 
   function createMaterialFromCode(payload) {
@@ -159,6 +177,7 @@ export default function App() {
     }));
 
     setEditingId(item.id);
+    addNotification("Materi berhasil diimpor",`${item.title} dibuat dari kode atau dokumen.`,"📥");
   }
 
   async function publishMaterial(material) {
@@ -181,6 +200,7 @@ export default function App() {
     try {
       await publishMaterialToFirestore(updated);
       notify("Materi berhasil dipublish.");
+      addNotification("Materi dipublikasikan",`${updated.title} sudah dapat diakses siswa.`,"🚀");
     } catch (err) {
       console.error(err);
       notify("Link lokal siap. Firebase gagal, cek koneksi/config.");
@@ -208,6 +228,7 @@ export default function App() {
 
     setShareMaterial(instant);
     notify("QR dan link siswa siap.");
+    addNotification("Tautan dibagikan",`QR dan tautan ${instant.title} siap digunakan.`,"🔗");
 
     publishMaterialToFirestore(instant).catch((err) => {
       console.error(err);
@@ -230,16 +251,13 @@ export default function App() {
     }));
 
     notify("Disalin.");
+    addNotification("Materi diduplikasi",`${copied.title} berhasil dibuat.`,"📑");
   }
 
-  function deleteMaterial(material) {
-    setState((old) => ({
-      ...old,
-      materials: old.materials.filter((m) => m.id !== material.id),
-    }));
-
-    notify("Dihapus.");
-  }
+  function deleteMaterial(material) {const permanent=window.confirm("Klik OK untuk hapus permanen. Klik Batal untuk memindahkan ke Tempat Sampah selama 30 hari.");setState((old)=>({...old,materials:old.materials.filter((m)=>m.id!==material.id),trash:permanent?old.trash:[{...material,deletedAt:new Date().toISOString()},...(old.trash||[])]}));notify(permanent?"Materi dihapus permanen.":"Materi dipindahkan ke Tempat Sampah.");addNotification(permanent?"Materi dihapus permanen":"Materi masuk Tempat Sampah",material.title,permanent?"🗑️":"♻️")}
+  function restoreMaterial(material){if(!window.confirm(`Pulihkan materi “${material.title}”?`))return;const{deletedAt,...restored}=material;setState((old)=>({...old,trash:old.trash.filter((item)=>item.id!==material.id),materials:[restored,...old.materials]}));notify("Materi berhasil dipulihkan.");addNotification("Materi dipulihkan",material.title,"✅")}
+  function permanentDelete(material){if(!window.confirm(`Hapus permanen “${material.title}”? Data tidak dapat dipulihkan.`))return;setState((old)=>({...old,trash:old.trash.filter((item)=>item.id!==material.id)}));notify("Materi dihapus permanen.");addNotification("Materi dihapus permanen",material.title,"🗑️")}
+  function useEducationTemplate(template){const background=`linear-gradient(135deg,${template.colors[0]},${template.colors[1]})`;const item={...blankMaterial(),title:template.title,subject:template.subject,className:template.level,status:"Draft",slides:[{title:template.title,body:template.desc,background:{type:"css",value:background},titleColor:"#ffffff",bodyColor:"#f8fafc",transition:"morph",duration:900},{title:"Tujuan Pembelajaran",body:"Tuliskan tujuan pembelajaran yang ingin dicapai.",background:{type:"css",value:background},titleColor:"#ffffff",bodyColor:"#f8fafc",transition:"morph",duration:900},{title:"Materi Utama",body:"Kembangkan isi materi sesuai kebutuhan kelas.",background:{type:"css",value:background},titleColor:"#ffffff",bodyColor:"#f8fafc",transition:"morph",duration:900}]};setState((old)=>({...old,materials:[item,...old.materials]}));setEditingId(item.id);addNotification("Template digunakan",`${template.title} ditambahkan ke materi.`,"🎨")}
 
   if (!user) {
     return <OpeningLogin onLogin={setUser} />;
@@ -256,6 +274,8 @@ export default function App() {
             setPage(nextPage);
           }}
           onLogout={() => setUser(null)}
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
         />
 
         <main className="main-area">
@@ -295,6 +315,10 @@ export default function App() {
       ? "Peserta"
       : page === "files"
       ? "Impor & Ekspor"
+      : page === "subscription"
+      ? "Langganan"
+      : page === "trash"
+      ? "Tempat Sampah"
       : "JeniusPPT";
 
   return (
@@ -311,6 +335,8 @@ export default function App() {
         page={page}
         setPage={setPage}
         onLogout={() => setUser(null)}
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
       <main className="main-area">
@@ -319,11 +345,13 @@ export default function App() {
           user={user}
           onCreate={createMaterial}
           onImportCode={() => setShowCodeImport(true)}
-          notify={notify}
+          onMenu={() => setSidebarOpen((open) => !open)}
+          notifications={state.notifications || []}
+          markAllRead={() => setState((old) => ({...old,notifications:(old.notifications||[]).map((item)=>({...item,read:true}))}))}
         />
 
         {page === "dashboard" && (
-          <Dashboard state={state} onCreate={createMaterial} onImportCode={() => setShowCodeImport(true)} user={user} />
+          <Dashboard state={state} onCreate={createMaterial} onImportCode={() => setShowCodeImport(true)} user={user} onUseTemplate={useEducationTemplate} />
         )}
 
         {page === "materials" && (
@@ -355,7 +383,11 @@ export default function App() {
 
         {page === "settings" && <SettingsPage user={user} notify={notify} />}
 
-        {!["dashboard", "materials", "participants", "files", "workspace", "analytics", "ai", "settings"].includes(page) && (
+        {page === "subscription" && <SubscriptionPage activePlan={state.activePlan} onChoose={(plan)=>{setState((old)=>({...old,activePlan:plan.name}));notify(`Paket ${plan.name} dipilih.`);addNotification("Paket langganan diperbarui",`${plan.name} • Rp${plan.price}`,"👑")}} />}
+
+        {page === "trash" && <TrashPage items={state.trash||[]} onRestore={restoreMaterial} onDelete={permanentDelete} />}
+
+        {!["dashboard", "materials", "participants", "files", "workspace", "analytics", "ai", "settings", "subscription", "trash"].includes(page) && (
           <ComingSoon title={title} />
         )}
       </main>
@@ -379,7 +411,7 @@ export default function App() {
   );
 }
 
-function Dashboard({ state, onCreate, onImportCode, user }) {
+function Dashboard({ state, onCreate, onImportCode, user, onUseTemplate }) {
   const published = state.materials.filter(
     (m) => m.status === "Published"
   ).length;
@@ -416,6 +448,7 @@ function Dashboard({ state, onCreate, onImportCode, user }) {
         <Feature title="Bagikan dengan QR" desc="Siswa dapat masuk melalui QR maupun tautan." />
         <Feature title="Kuis Interaktif" desc="Dukung pilihan ganda serta benar atau salah." />
       </div>
+      <TemplateRecommendations onUse={onUseTemplate} />
     </section>
   );
 }

@@ -19,9 +19,11 @@ export const slideTemplates = [
 ];
 
 export default function BackgroundPicker({onPick,onTemplate,onApplyAll}){
-  const ref=useRef(null); const [url,setUrl]=useState(""); const [category,setCategory]=useState("Semua"); const [selected,setSelected]=useState(slideTemplates[0]);
+  const ref=useRef(null); const mediaRef=useRef(null); const [url,setUrl]=useState(""); const [mediaUrl,setMediaUrl]=useState(""); const [mediaType,setMediaType]=useState("video"); const [category,setCategory]=useState("Semua"); const [selected,setSelected]=useState(slideTemplates[0]);
   const categories=["Semua",...new Set(slideTemplates.map((item)=>item.category))];
   const shown=category==="Semua"?slideTemplates:slideTemplates.filter((item)=>item.category===category);
   function upload(event){const file=event.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>onPick({type:"image",value:reader.result});reader.readAsDataURL(file);}
+  function sendMedia(src,type=mediaType,fileName){window.dispatchEvent(new CustomEvent("jeniusppt:add-media",{detail:{type,src,fileName}}))}
+  function uploadMedia(event){const file=event.target.files?.[0];if(!file)return;const type=file.type.startsWith("video/")?"video":"audio";const reader=new FileReader();reader.onload=()=>sendMedia(reader.result,type,file.name);reader.readAsDataURL(file);event.target.value=""}
   return <div className="bg-panel"><h3>Template Slide</h3><div className="template-categories">{categories.map((item)=><button key={item} className={category===item?"active":""} onClick={()=>setCategory(item)}>{item}</button>)}</div><div className="template-grid">{shown.map((template)=><button key={template.name} className={selected.name===template.name?"selected":""} title={template.name} onClick={()=>{setSelected(template);onTemplate(template)}}><span style={{background:template.background}}><i style={{color:template.titleColor}}>Aa</i></span><b>{template.name}</b><small>{template.category}</small></button>)}</div><button className="apply-all-template" onClick={()=>onApplyAll(selected)}>Terapkan “{selected.name}” ke Semua Slide</button><h3 className="custom-bg-title">Latar Kustom</h3><button className="upload-bg" onClick={()=>ref.current.click()}>Upload Gambar</button><input ref={ref} type="file" accept="image/*" hidden onChange={upload}/><div className="url-row"><input value={url} onChange={(e)=>setUrl(e.target.value)} placeholder="Tempel URL gambar"/><button onClick={()=>url.trim()&&onPick({type:"image",value:url.trim()})}>Pakai</button></div></div>;
 }

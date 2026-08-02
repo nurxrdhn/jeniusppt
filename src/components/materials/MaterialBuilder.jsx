@@ -3,8 +3,9 @@ import { Eye, Share2 } from "lucide-react";
 import PPTEditor from "../editor/PPTEditor";
 import QuizBuilder from "../quiz/QuizBuilder";
 import PreviewPlayer from "../preview/PreviewPlayer";
+import MediaManager from "../editor/MediaManager";
 
-const tabs = ["Info", "Slide", "Quiz", "Preview", "Publish"];
+const tabs = ["Info", "Slide", "Media", "Quiz", "Preview", "Publish"];
 
 export default function MaterialBuilder({
   material,
@@ -90,6 +91,8 @@ export default function MaterialBuilder({
       {tab === "Quiz" && (
         <QuizBuilder material={material} updateMaterial={updateMaterial} />
       )}
+
+      {tab === "Media" && <MediaManager material={material} updateMaterial={updateMaterial} />}
 
       {tab === "Preview" && <PreviewPlayer material={material} teacher />}
 

@@ -1,12 +1,12 @@
-import { useRef, useState } from "react";
-import { Copy, ImagePlus, Plus, Shapes, Trash2, Type } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Copy, ImagePlus, Plus, Shapes, Trash2, Type, Video, Volume2 } from "lucide-react";
 import { SLIDE_SIZES, ratioStyle } from "../../utils/slideSizes";
 import BackgroundPicker from "./BackgroundPicker";
 const defaultBg={type:"css",value:"linear-gradient(135deg,#ff7a25,#e94d08)"};
 const animations=[{value:"none",label:"Tanpa Animasi"},{value:"fade",label:"Fade"},{value:"slide-right",label:"Slide Kanan"},{value:"slide-up",label:"Slide Atas"},{value:"zoom",label:"Zoom"},{value:"flip",label:"Flip"},{value:"float",label:"Float"},{value:"morph",label:"Morph"}];
 export default function PPTEditor({material,updateMaterial}){
   const slides=material.slides||[]; const activeIndex=material.activeSlide||0; const active=slides[activeIndex]||slides[0]; const slideSize=material.slideSize||SLIDE_SIZES.wide;
-  const [selectedElement,setSelectedElement]=useState(null); const imageRef=useRef(null);
+  const [selectedElement,setSelectedElement]=useState(null); const imageRef=useRef(null); const videoRef=useRef(null); const audioRef=useRef(null);
   function setSlides(next){updateMaterial(material.id,{slides:next})}
   function updateSlide(patch){setSlides(slides.map((slide,index)=>index===activeIndex?{...slide,...patch}:slide))}
   function addSlide(){const next=[...slides,{title:"Slide Baru",body:"Mulai mengetik...",background:defaultBg,transition:"fade",duration:700,titleColor:"#ffffff",bodyColor:"#fff7ed",textAlign:"left",elements:[]}];setSlides(next);updateMaterial(material.id,{activeSlide:next.length-1})}
@@ -19,6 +19,10 @@ export default function PPTEditor({material,updateMaterial}){
   function applyTemplateAll(template){setSlides(slides.map((slide)=>({...slide,...templatePatch(template)})))}
   function addElement(type,extra={}){const item={id:crypto.randomUUID(),type,x:12,y:28,w:type==="text"?34:20,h:type==="text"?12:22,text:type==="text"?"Teks tambahan":"",color:"#ffffff",background:type==="shape"?"#fb923c":"transparent",...extra};updateSlide({elements:[...(active.elements||[]),item]});setSelectedElement(item.id)}
   function uploadElement(event){const file=event.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>addElement("image",{src:reader.result,w:28,h:30});reader.readAsDataURL(file);event.target.value=""}
+  function normalizeVideoUrl(url){const match=String(url).match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/]+)/);return match?`https://www.youtube.com/embed/${match[1]}`:url}
+  function addMediaLink(type){const url=window.prompt(`Tempel link ${type === "video" ? "video atau YouTube" : "audio"}:`);if(!url)return;addElement(type,{src:type==="video"?normalizeVideoUrl(url):url,w:type==="video"?42:38,h:type==="video"?34:12})}
+  function uploadMedia(event,type){const file=event.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>addElement(type,{src:reader.result,w:type==="video"?42:38,h:type==="video"?34:12,fileName:file.name});reader.readAsDataURL(file);event.target.value=""}
+  useEffect(()=>{const handler=(event)=>{const{type,src,fileName}=event.detail||{};if(type&&src)addElement(type,{src:type==="video"?normalizeVideoUrl(src):src,w:type==="video"?42:38,h:type==="video"?34:12,fileName})};window.addEventListener("jeniusppt:add-media",handler);return()=>window.removeEventListener("jeniusppt:add-media",handler)});
   function updateElement(id,patch){updateSlide({elements:(active.elements||[]).map((item)=>item.id===id?{...item,...patch}:item)})}
   function deleteElement(){if(!selectedElement)return;updateSlide({elements:(active.elements||[]).filter((item)=>item.id!==selectedElement)});setSelectedElement(null)}
   const selected=(active?.elements||[]).find((item)=>item.id===selectedElement); const bg=active?.background||defaultBg;
@@ -28,5 +32,5 @@ export default function PPTEditor({material,updateMaterial}){
 
 function ElementLayer({elements,selected,select,update}){
   function startDrag(event,item){event.preventDefault();event.stopPropagation();select(item.id);const canvas=event.currentTarget.parentElement.getBoundingClientRect();const startX=event.clientX,startY=event.clientY,originX=item.x,originY=item.y;const move=(e)=>update(item.id,{x:Math.max(0,Math.min(100-item.w,originX+((e.clientX-startX)/canvas.width)*100)),y:Math.max(0,Math.min(100-item.h,originY+((e.clientY-startY)/canvas.height)*100))});const stop=()=>{window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",stop)};window.addEventListener("pointermove",move);window.addEventListener("pointerup",stop)}
-  return <div className="free-elements-layer">{elements.map((item)=><div key={item.id} onPointerDown={(event)=>startDrag(event,item)} className={`free-element ${item.type} ${selected===item.id?"selected":""}`} style={{left:`${item.x}%`,top:`${item.y}%`,width:`${item.w}%`,height:`${item.h}%`,color:item.color,background:item.type==="shape"?item.background:"transparent"}}>{item.type==="text"&&item.text}{item.type==="image"&&<img src={item.src} alt="Elemen slide"/>}</div>)}</div>;
+  return <div className="free-elements-layer">{elements.map((item)=><div key={item.id} onPointerDown={(event)=>startDrag(event,item)} className={`free-element ${item.type} ${selected===item.id?"selected":""}`} style={{left:`${item.x}%`,top:`${item.y}%`,width:`${item.w}%`,height:`${item.h}%`,color:item.color,background:item.type==="shape"?item.background:"transparent"}}>{item.type==="text"&&item.text}{item.type==="image"&&<img src={item.src} alt="Elemen slide"/>}{item.type==="video"&&(item.src?.includes("youtube.com/embed")?<iframe src={item.src} title="Video slide" allowFullScreen/>:<video src={item.src} controls/>)}{item.type==="audio"&&<audio src={item.src} controls/>}</div>)}</div>;
 }
