@@ -1352,11 +1352,11 @@ function AIAssistant({ onGenerated, notify }) {
   return (
     <section className="page">
       <div className="page-head">
-        <span className="eyebrow">Jenius AI · Gemini</span>
+        <span className="eyebrow">Jenius AI</span>
         <h1>Buat Materi Lebih Cepat</h1>
         <p>
           Jelaskan topik, jenjang, dan jumlah slide. Jenius AI menyusun materi
-          dan kuis yang dapat diedit menggunakan Gemini.
+          dan kuis yang dapat diedit.
         </p>
       </div>
       <div className="ai-panel">
