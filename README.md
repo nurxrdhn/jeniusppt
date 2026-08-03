@@ -27,3 +27,18 @@ bash deploy-vercel.sh
 ```
 
 Masukkan hasil build Android bernama `jeniusppt.apk` ke folder `public/downloads/`. Setelah dikirim ke GitHub, tombol Download APK pada website otomatis mengunduh berkas tersebut.
+
+## Jenius AI dan penerjemahan gratis
+
+Generator presentasi dan penerjemahan menggunakan Gemini melalui fungsi server
+Vercel. Tambahkan variabel berikut melalui pengaturan Environment Variables di
+Vercel. Jangan memasukkan kunci API ke kode atau GitHub.
+
+```text
+GEMINI_API_KEY=isi_kunci_dari_Google_AI_Studio
+GEMINI_MODEL=gemini-2.5-flash
+FIREBASE_WEB_API_KEY=api_key_web_Firebase
+```
+
+`GEMINI_MODEL` bersifat opsional. Daftar bahasa tersimpan di aplikasi sehingga
+membuka menu bahasa tidak memakai kuota Gemini.

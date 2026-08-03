@@ -1,27 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
-  <title id="title">Logo animasi JeniusPPT</title>
-  <desc id="desc">Monogram j dan P dengan simbol ide dan presentasi</desc>
-  <style>
-    .idea{transform-box:fill-box;transform-origin:center;animation:idea 2.4s ease-in-out infinite}
-    .play{transform-box:fill-box;transform-origin:center;animation:play 2.4s ease-in-out infinite}
-    @keyframes idea{0%,100%{opacity:.82;transform:scale(.94)}50%{opacity:1;transform:scale(1)}}
-    @keyframes play{0%,55%,100%{transform:translateX(0)}70%{transform:translateX(3px)}}
-    @media (prefers-reduced-motion:reduce){.idea,.play{animation:none}}
-  </style>
-  <rect width="512" height="512" rx="104" fill="#ff641e"/>
-  <g class="idea" fill="#fff">
-    <rect x="151" y="62" width="22" height="48" rx="11"/>
-    <rect x="105" y="82" width="22" height="46" rx="11" transform="rotate(-45 116 105)"/>
-    <rect x="197" y="82" width="22" height="46" rx="11" transform="rotate(45 208 105)"/>
-    <circle cx="162" cy="154" r="34"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1506" height="391" viewBox="0 0 1506 391" role="img" aria-label="Animated Jeniusppt.online logo">
+  <defs>
+    <filter id="softShadow" x="-10%" y="-30%" width="120%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#9a3412" flood-opacity=".18"/>
+    </filter>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="logoClip"><rect width="1506" height="393" rx="8"/></clipPath>
+  </defs>
+
+  <g filter="url(#softShadow)" transform-origin="753px 196.5px">
+    <animate attributeName="opacity" values="0;1;1;1;0" keyTimes="0;.13;.84;.95;1" dur="3s" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="translate" values="0 22;0 0;0 0;0 0;0 0" keyTimes="0;.18;.84;.95;1" dur="3s" repeatCount="indefinite"/>
+    <image href="jeniusppt-logo-transparent.png" width="1506" height="391" preserveAspectRatio="xMidYMid meet"/>
   </g>
-  <path fill="#fff" d="M130 211h64v137c0 72-42 111-116 111H58v-62h18c36 0 54-17 54-52V211Z"/>
-  <path fill="#fff" fill-rule="evenodd" d="M246 128h106a102 102 0 1 1 0 204h-42v127h-64V128Zm106 58a44 44 0 1 0 0 88 44 44 0 0 0 0-88Z"/>
-  <g fill="#fff">
-    <rect x="321" y="215" width="27" height="8" rx="4"/>
-    <rect x="321" y="232" width="27" height="8" rx="4"/>
-    <rect x="321" y="249" width="27" height="8" rx="4"/>
-    <circle cx="380" cy="236" r="25"/>
+
+  <g clip-path="url(#logoClip)" opacity="0">
+    <rect x="-260" y="-80" width="145" height="560" fill="url(#shine)" transform="skewX(-18)">
+      <animate attributeName="x" values="-260;-260;1710;1710" keyTimes="0;.35;.68;1" dur="3s" repeatCount="indefinite"/>
+    </rect>
+    <animate attributeName="opacity" values="0;0;.38;.38;0" keyTimes="0;.34;.42;.68;.7" dur="3s" repeatCount="indefinite"/>
   </g>
-  <path class="play" fill="#ff641e" d="M374 223.5 393 236l-19 12.5v-25Z"/>
 </svg>

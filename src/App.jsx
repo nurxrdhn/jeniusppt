@@ -9,7 +9,11 @@ import {
   FileSpreadsheet,
   FileText,
   FolderOpen,
+  Heart,
+  MessageSquareHeart,
+  Send,
   Share2,
+  Star,
   Trash2,
   Users,
 } from "lucide-react";
@@ -549,6 +553,8 @@ export default function App() {
             ? "Impor & Ekspor"
             : page === "subscription"
               ? "Langganan"
+              : page === "feedback"
+                ? "Saran & Kritik"
               : page === "trash"
                 ? "Tempat Sampah"
                 : "JeniusPPT";
@@ -643,6 +649,10 @@ export default function App() {
           <AIAssistant onGenerated={createMaterialFromCode} notify={notify} />
         )}
 
+        {page === "feedback" && (
+          <FeedbackPage user={user} notify={notify} />
+        )}
+
         {page === "settings" && (
           <SettingsPage
             user={user}
@@ -686,6 +696,7 @@ export default function App() {
           "workspace",
           "analytics",
           "ai",
+          "feedback",
           "settings",
           "subscription",
           "trash",
@@ -1352,11 +1363,11 @@ function AIAssistant({ onGenerated, notify }) {
   return (
     <section className="page">
       <div className="page-head">
-        <span className="eyebrow">Jenius AI</span>
+        <span className="eyebrow">Jenius AI · Gemini</span>
         <h1>Buat Materi Lebih Cepat</h1>
         <p>
           Jelaskan topik, jenjang, dan jumlah slide. Jenius AI menyusun materi
-          dan kuis yang dapat diedit.
+          dan kuis yang dapat diedit menggunakan Gemini.
         </p>
       </div>
       <div className="ai-panel">
@@ -1558,6 +1569,185 @@ function SettingsPage({
         <button className="danger" onClick={clearAppData}>
           Bersihkan Cookie & Cache Aplikasi
         </button>
+      </div>
+    </section>
+  );
+}
+
+function FeedbackPage({ user, notify }) {
+  const [rating, setRating] = useState(0);
+  const [hoveredRating, setHoveredRating] = useState(0);
+  const [category, setCategory] = useState("Saran fitur");
+  const [comment, setComment] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const ratingLabels = [
+    "",
+    "Perlu banyak perbaikan",
+    "Masih kurang",
+    "Cukup baik",
+    "Sangat baik",
+    "Luar biasa",
+  ];
+
+  async function submitFeedback(event) {
+    event.preventDefault();
+    if (!rating) {
+      notify("Pilih penilaian dari 1 sampai 5 terlebih dahulu.", "warning");
+      return;
+    }
+    if (comment.trim().length < 10) {
+      notify("Tuliskan komentar minimal 10 karakter.", "warning");
+      return;
+    }
+
+    setSending(true);
+    try {
+      const response = await fetch(
+        "https://formsubmit.co/ajax/jeniusppt@gmail.com",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            _subject: `[JeniusPPT] ${category} • ${rating}/5`,
+            _template: "table",
+            nama: user?.name || "Pengguna JeniusPPT",
+            email_pengirim: user?.email || "Tidak tersedia",
+            kategori: category,
+            penilaian: `${rating} dari 5 • ${ratingLabels[rating]}`,
+            komentar: comment.trim(),
+            waktu: new Date().toLocaleString("id-ID"),
+          }),
+        },
+      );
+      if (!response.ok) throw new Error("Pengiriman ditolak layanan email.");
+      const result = await response.json();
+      if (result.success === false || result.success === "false") {
+        throw new Error(result.message || "Saran belum dapat dikirim.");
+      }
+      setRating(0);
+      setComment("");
+      setCategory("Saran fitur");
+      notify("Terima kasih. Saran dan kritik sudah dikirim ke JeniusPPT.");
+    } catch (error) {
+      notify(
+        error.message || "Saran belum dapat dikirim. Periksa koneksi internet.",
+        "error",
+      );
+    } finally {
+      setSending(false);
+    }
+  }
+
+  const activeRating = hoveredRating || rating;
+
+  return (
+    <section className="page feedback-page">
+      <div className="page-head">
+        <span className="eyebrow">Bantu Kami Berkembang</span>
+        <h1>Saran &amp; Kritik</h1>
+        <p>
+          Ceritakan pengalaman Anda agar JeniusPPT menjadi lebih nyaman,
+          berguna, dan sesuai kebutuhan pembelajaran.
+        </p>
+      </div>
+
+      <div className="feedback-layout">
+        <aside className="feedback-intro">
+          <div className="feedback-intro-icon">
+            <MessageSquareHeart size={30} />
+          </div>
+          <span>Masukan Anda berarti</span>
+          <h2>Kita bangun JeniusPPT bersama.</h2>
+          <p>
+            Setiap masukan akan dikirim langsung ke tim melalui
+            jeniusppt@gmail.com.
+          </p>
+          <div className="feedback-promise">
+            <Heart size={18} fill="currentColor" />
+            <span>Terima kasih telah ikut menyempurnakan JeniusPPT.</span>
+          </div>
+        </aside>
+
+        <form className="feedback-form" onSubmit={submitFeedback}>
+          <div className="feedback-field">
+            <label>Bagaimana pengalaman Anda?</label>
+            <div
+              className="rating-scale"
+              onMouseLeave={() => setHoveredRating(0)}
+            >
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  type="button"
+                  key={value}
+                  className={value <= activeRating ? "selected" : ""}
+                  onClick={() => setRating(value)}
+                  onMouseEnter={() => setHoveredRating(value)}
+                  aria-label={`Beri nilai ${value} dari 5`}
+                  aria-pressed={rating === value}
+                >
+                  <Star size={25} fill="currentColor" />
+                  <small>{value}</small>
+                </button>
+              ))}
+            </div>
+            <div className="rating-caption" aria-live="polite">
+              {activeRating
+                ? `${activeRating}/5 • ${ratingLabels[activeRating]}`
+                : "Pilih nilai 1 sampai 5"}
+            </div>
+          </div>
+
+          <div className="feedback-field">
+            <label htmlFor="feedback-category">Jenis masukan</label>
+            <select
+              id="feedback-category"
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+            >
+              <option>Saran fitur</option>
+              <option>Kritik tampilan</option>
+              <option>Laporan kendala</option>
+              <option>Apresiasi</option>
+              <option>Lainnya</option>
+            </select>
+          </div>
+
+          <div className="feedback-field">
+            <label htmlFor="feedback-comment">Komentar</label>
+            <textarea
+              id="feedback-comment"
+              rows="7"
+              maxLength="1500"
+              value={comment}
+              onChange={(event) => setComment(event.target.value)}
+              placeholder="Ceritakan bagian yang sudah baik atau yang perlu diperbaiki..."
+            />
+            <small className="character-count">
+              {comment.length}/1500 karakter
+            </small>
+          </div>
+
+          <div className="feedback-sender">
+            <div>
+              <span>Dikirim sebagai</span>
+              <b>{user?.name || "Pengguna JeniusPPT"}</b>
+              <small>{user?.email || "Email tidak tersedia"}</small>
+            </div>
+          </div>
+
+          <button
+            className="primary-button feedback-submit"
+            type="submit"
+            disabled={sending}
+          >
+            <Send size={18} />
+            {sending ? "Mengirim..." : "Kirim Masukan"}
+          </button>
+        </form>
       </div>
     </section>
   );

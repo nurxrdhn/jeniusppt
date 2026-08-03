@@ -75,7 +75,7 @@ html[data-theme="dark"] .hamburger-button {
 html[data-theme="dark"] .sidebar-brand .brand-logo,
 html[data-theme="dark"] .login-brand-mobile img,
 html[data-theme="dark"] .tour-visual img[src*="jeniusppt-mark-orange"] {
-  filter: brightness(0) invert(1);
+  filter: brightness(0) invert(1) !important;
 }
 .display-controls {
   display: flex;

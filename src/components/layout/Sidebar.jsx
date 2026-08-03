@@ -6,6 +6,7 @@ import {
   FolderOpen,
   Home,
   LogOut,
+  MessageSquareHeart,
   Settings,
   Sparkles,
   Trash2,
@@ -22,6 +23,7 @@ const menu = [
   ["subscription", Crown, "Langganan"],
   ["trash", Trash2, "Tempat Sampah"],
   ["ai", Sparkles, "AI"],
+  ["feedback", MessageSquareHeart, "Saran & Kritik"],
   ["settings", Settings, "Pengaturan"],
 ];
 export default function Sidebar({
