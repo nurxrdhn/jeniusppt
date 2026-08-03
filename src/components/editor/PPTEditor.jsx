@@ -3,10 +3,13 @@ import {
   Copy,
   ImagePlus,
   Plus,
+  Redo2,
+  Save,
   Shapes,
   Sticker,
   Trash2,
   Type,
+  Undo2,
   Video,
   Volume2,
 } from "lucide-react";
@@ -56,12 +59,105 @@ export default function PPTEditor({ material, updateMaterial }) {
   const [selectedElement, setSelectedElement] = useState(null);
   const [textTarget, setTextTarget] = useState("title");
   const [showStickers, setShowStickers] = useState(false);
+  const [historyStatus, setHistoryStatus] = useState({
+    canUndo: false,
+    canRedo: false,
+  });
+  const [savedAt, setSavedAt] = useState(material.lastSavedAt || null);
   const imageRef = useRef(null);
   const stickerRef = useRef(null);
   const videoRef = useRef(null);
   const audioRef = useRef(null);
+  const historyRef = useRef([JSON.stringify(slides)]);
+  const historyIndexRef = useRef(0);
+  const lastCommitRef = useRef(0);
+
+  useEffect(() => {
+    historyRef.current = [JSON.stringify(material.slides || [])];
+    historyIndexRef.current = 0;
+    lastCommitRef.current = 0;
+    setHistoryStatus({ canUndo: false, canRedo: false });
+    setSavedAt(material.lastSavedAt || null);
+  }, [material.id]);
+
+  useEffect(() => {
+    function shortcuts(event) {
+      if (!(event.ctrlKey || event.metaKey)) return;
+      const key = event.key.toLowerCase();
+      if (key === "s") {
+        event.preventDefault();
+        saveNow();
+      } else if (key === "z" && event.shiftKey) {
+        event.preventDefault();
+        redo();
+      } else if (key === "z") {
+        event.preventDefault();
+        undo();
+      } else if (key === "y") {
+        event.preventDefault();
+        redo();
+      }
+    }
+    window.addEventListener("keydown", shortcuts);
+    return () => window.removeEventListener("keydown", shortcuts);
+  });
+
+  function syncHistoryStatus() {
+    setHistoryStatus({
+      canUndo: historyIndexRef.current > 0,
+      canRedo: historyIndexRef.current < historyRef.current.length - 1,
+    });
+  }
+
   function setSlides(next) {
+    const serialized = JSON.stringify(next);
+    const currentSerialized = historyRef.current[historyIndexRef.current];
+    if (serialized !== currentSerialized) {
+      const now = Date.now();
+      const rapidChange = now - lastCommitRef.current < 650;
+      if (rapidChange && historyIndexRef.current > 0) {
+        historyRef.current[historyIndexRef.current] = serialized;
+      } else {
+        historyRef.current = historyRef.current.slice(
+          0,
+          historyIndexRef.current + 1,
+        );
+        historyRef.current.push(serialized);
+        if (historyRef.current.length > 80) historyRef.current.shift();
+        historyIndexRef.current = historyRef.current.length - 1;
+      }
+      lastCommitRef.current = now;
+      syncHistoryStatus();
+    }
     updateMaterial(material.id, { slides: next });
+  }
+
+  function applyHistory(index) {
+    const nextSlides = JSON.parse(historyRef.current[index]);
+    historyIndexRef.current = index;
+    lastCommitRef.current = 0;
+    updateMaterial(material.id, {
+      slides: nextSlides,
+      activeSlide: Math.min(activeIndex, Math.max(0, nextSlides.length - 1)),
+    });
+    setSelectedElement(null);
+    syncHistoryStatus();
+  }
+
+  function undo() {
+    if (historyIndexRef.current <= 0) return;
+    applyHistory(historyIndexRef.current - 1);
+  }
+
+  function redo() {
+    if (historyIndexRef.current >= historyRef.current.length - 1) return;
+    applyHistory(historyIndexRef.current + 1);
+  }
+
+  function saveNow() {
+    const timestamp = new Date().toISOString();
+    updateMaterial(material.id, { lastSavedAt: timestamp });
+    setSavedAt(timestamp);
   }
   function updateSlide(patch) {
     setSlides(
@@ -322,27 +418,38 @@ export default function PPTEditor({ material, updateMaterial }) {
   }
   return (
     <div className="ppt-editor">
-      <aside className="slide-list">
-        <div className="panel-head">
-          <h3>Slide</h3>
-          <small>{slides.length} halaman</small>
-        </div>
-        {slides.map((slide, index) => (
-          <button
-            key={index}
-            className={index === activeIndex ? "active" : ""}
-            onClick={() => {
-              updateMaterial(material.id, { activeSlide: index });
-              setSelectedElement(null);
-            }}
-          >
-            <span>{index + 1}</span>
-            <b>{slide.title || "Untitled"}</b>
-          </button>
-        ))}
-      </aside>
       <main className="slide-stage">
         <div className="editor-toolbar">
+          <div className="history-controls">
+            <button onClick={saveNow} title="Simpan (Ctrl+S)">
+              <Save size={16} />
+              Simpan
+            </button>
+            <button
+              onClick={undo}
+              disabled={!historyStatus.canUndo}
+              title="Undo (Ctrl+Z)"
+            >
+              <Undo2 size={16} />
+              Undo
+            </button>
+            <button
+              onClick={redo}
+              disabled={!historyStatus.canRedo}
+              title="Redo (Ctrl+Y)"
+            >
+              <Redo2 size={16} />
+              Redo
+            </button>
+          </div>
+          <span className="editor-save-time">
+            {savedAt
+              ? `Disimpan ${new Date(savedAt).toLocaleTimeString("id-ID", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}`
+              : "Penyimpanan otomatis aktif"}
+          </span>
           <button onClick={copySlide}>
             <Copy size={16} />
             Copy
@@ -505,13 +612,46 @@ export default function PPTEditor({ material, updateMaterial }) {
             />
           </div>
         </section>
-        <div className="add-slide-dock">
-          <button onClick={addSlide}>
-            <Plus size={18} />
-            Tambah Slide
-          </button>
-          <span>Slide baru ditambahkan setelah halaman terakhir.</span>
-        </div>
+        <section className="slide-strip" aria-label="Daftar slide">
+          <div className="slide-strip-head">
+            <div>
+              <b>Slide</b>
+              <small>{slides.length} halaman</small>
+            </div>
+            <button onClick={addSlide}>
+              <Plus size={17} />
+              Tambah Slide
+            </button>
+          </div>
+          <div className="slide-strip-scroll">
+            {slides.map((slide, index) => (
+              <button
+                key={index}
+                className={index === activeIndex ? "active" : ""}
+                onClick={() => {
+                  updateMaterial(material.id, { activeSlide: index });
+                  setSelectedElement(null);
+                }}
+              >
+                <span>{index + 1}</span>
+                <div
+                  className="slide-strip-thumb"
+                  style={{
+                    ...ratioStyle(slideSize),
+                    background: slide.background?.value || defaultBg.value,
+                  }}
+                >
+                  <b>{slide.title || "Tanpa Judul"}</b>
+                  <small>{(slide.body || "").slice(0, 48)}</small>
+                </div>
+              </button>
+            ))}
+            <button className="slide-strip-add" onClick={addSlide}>
+              <Plus size={22} />
+              <b>Slide Baru</b>
+            </button>
+          </div>
+        </section>
       </main>
       <aside className="properties-panel">
         <h3>Pengaturan Slide</h3>
