@@ -71,6 +71,12 @@ html[data-theme="dark"] .hamburger-button {
   background: #321c13;
   color: #fb923c;
 }
+
+html[data-theme="dark"] .sidebar-brand .brand-logo,
+html[data-theme="dark"] .login-brand-mobile img,
+html[data-theme="dark"] .tour-visual img[src*="jeniusppt-mark-orange"] {
+  filter: brightness(0) invert(1);
+}
 .display-controls {
   display: flex;
   gap: 7px;

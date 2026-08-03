@@ -51,7 +51,7 @@ export default function Sidebar({
           <div className="brand-icon-shell">
             <img
               className="brand-logo"
-              src="/jeniusppt-icon.svg"
+              src="/jeniusppt-mark-orange.svg"
               alt="Logo JP"
             />
           </div>

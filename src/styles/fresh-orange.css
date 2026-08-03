@@ -95,7 +95,7 @@ body {
   width: 72px;
   height: 72px;
   display: block;
-  filter: drop-shadow(0 8px 12px rgba(105, 28, 0, 0.2));
+  filter: none;
 }
 .brand-icon-shell {
   width: 62px;
@@ -106,7 +106,7 @@ body {
   width: 58px;
   height: 58px;
   display: block;
-  filter: drop-shadow(0 6px 9px rgba(105, 28, 0, 0.14));
+  filter: none;
 }
 .brand-row.logo-only {
   justify-content: flex-start;
@@ -130,7 +130,7 @@ body {
 .login-brand-mobile img {
   width: 64px !important;
   height: 64px !important;
-  filter: drop-shadow(0 7px 10px rgba(105, 28, 0, 0.15));
+  filter: none;
 }
 .opening-copy {
   position: relative;

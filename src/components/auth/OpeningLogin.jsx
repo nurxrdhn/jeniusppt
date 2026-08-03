@@ -44,7 +44,7 @@ export default function OpeningLogin({ onLogin }) {
             <div className="opening-logo-shell">
               <img
                 className="opening-logo"
-                src="/jeniusppt-icon.svg"
+                src="/jeniusppt-mark-white.svg"
                 alt="Logo JP"
               />
             </div>
@@ -74,7 +74,7 @@ export default function OpeningLogin({ onLogin }) {
         </div>
         <div className="login-card">
           <div className="login-brand-mobile">
-            <img src="/jeniusppt-icon.svg" alt="Logo JP" />
+            <img src="/jeniusppt-mark-orange.svg" alt="Logo JP" />
           </div>
           <span className="eyebrow">Khusus Guru</span>
           <h2>Selamat Datang</h2>

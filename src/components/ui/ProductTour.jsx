@@ -37,7 +37,7 @@ export default function ProductTour({ onDone }) {
           {index + 1} / {steps.length}
         </span>
         <div className="tour-visual">
-          <img src="/jeniusppt-icon.svg" alt="JP" />
+          <img src="/jeniusppt-mark-orange.svg" alt="JP" />
         </div>
         <h2>{steps[index][0]}</h2>
         <p>{steps[index][1]}</p>
