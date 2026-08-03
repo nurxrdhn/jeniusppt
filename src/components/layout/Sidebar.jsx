@@ -7,6 +7,7 @@ import {
   Home,
   LogOut,
   MessageSquareHeart,
+  PanelsTopLeft,
   Settings,
   Sparkles,
   Trash2,
@@ -23,6 +24,7 @@ const menu = [
   ["subscription", Crown, "Langganan"],
   ["trash", Trash2, "Tempat Sampah"],
   ["ai", Sparkles, "AI"],
+  ["productivity", PanelsTopLeft, "Pusat Produktivitas"],
   ["feedback", MessageSquareHeart, "Saran & Kritik"],
   ["settings", Settings, "Pengaturan"],
 ];

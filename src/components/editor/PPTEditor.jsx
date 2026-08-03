@@ -325,9 +325,7 @@ export default function PPTEditor({ material, updateMaterial }) {
       <aside className="slide-list">
         <div className="panel-head">
           <h3>Slide</h3>
-          <button onClick={addSlide}>
-            <Plus size={16} />
-          </button>
+          <small>{slides.length} halaman</small>
         </div>
         {slides.map((slide, index) => (
           <button
@@ -345,10 +343,6 @@ export default function PPTEditor({ material, updateMaterial }) {
       </aside>
       <main className="slide-stage">
         <div className="editor-toolbar">
-          <button onClick={addSlide}>
-            <Plus size={16} />
-            Slide
-          </button>
           <button onClick={copySlide}>
             <Copy size={16} />
             Copy
@@ -511,6 +505,13 @@ export default function PPTEditor({ material, updateMaterial }) {
             />
           </div>
         </section>
+        <div className="add-slide-dock">
+          <button onClick={addSlide}>
+            <Plus size={18} />
+            Tambah Slide
+          </button>
+          <span>Slide baru ditambahkan setelah halaman terakhir.</span>
+        </div>
       </main>
       <aside className="properties-panel">
         <h3>Pengaturan Slide</h3>

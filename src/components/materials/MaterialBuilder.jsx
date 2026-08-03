@@ -32,6 +32,10 @@ export default function MaterialBuilder({
       <div className="builder-top">
         <button onClick={onBack}>← Kembali</button>
 
+        <span className="autosave-status">
+          <i /> Tersimpan otomatis
+        </span>
+
         <div className="stepper">
           {tabs.map((t) => (
             <button

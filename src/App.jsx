@@ -28,6 +28,7 @@ import ShareModal from "./components/share/ShareModal";
 import FileCenter from "./components/files/FileCenter";
 import { JeniusDialog, JeniusToast } from "./components/ui/JeniusNotice";
 import ProductTour from "./components/ui/ProductTour";
+import ProductivityHub from "./components/dashboard/ProductivityHub";
 import { translateVisiblePage } from "./services/translationService";
 import { auth } from "./firebase/config";
 import {
@@ -155,6 +156,38 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }, [state]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        const data = { ...state, participants: [] };
+        const serialized = JSON.stringify(data);
+        if (serialized.length > 1500000) return;
+        const history = JSON.parse(
+          localStorage.getItem("jeniusppt-version-history") || "[]",
+        );
+        if (history[0]?.serialized === serialized) return;
+        localStorage.setItem(
+          "jeniusppt-version-history",
+          JSON.stringify(
+            [
+              {
+                id: crypto.randomUUID(),
+                createdAt: new Date().toISOString(),
+                label: "Simpan otomatis",
+                data,
+                serialized,
+              },
+              ...history,
+            ].slice(0, 8),
+          ),
+        );
+      } catch {
+        // Penyimpanan utama tetap berjalan jika ruang riwayat browser penuh.
+      }
+    }, 8000);
+    return () => clearTimeout(timer);
   }, [state]);
 
   useEffect(() => {
@@ -555,6 +588,8 @@ export default function App() {
               ? "Langganan"
               : page === "feedback"
                 ? "Saran & Kritik"
+                : page === "productivity"
+                  ? "Pusat Produktivitas"
               : page === "trash"
                 ? "Tempat Sampah"
                 : "JeniusPPT";
@@ -653,6 +688,16 @@ export default function App() {
           <FeedbackPage user={user} notify={notify} />
         )}
 
+        {page === "productivity" && (
+          <ProductivityHub
+            state={state}
+            setState={setState}
+            user={user}
+            notify={notify}
+            onNavigate={setPage}
+          />
+        )}
+
         {page === "settings" && (
           <SettingsPage
             user={user}
@@ -697,6 +742,7 @@ export default function App() {
           "analytics",
           "ai",
           "feedback",
+          "productivity",
           "settings",
           "subscription",
           "trash",
@@ -1631,6 +1677,29 @@ function FeedbackPage({ user, notify }) {
       setRating(0);
       setComment("");
       setCategory("Saran fitur");
+      try {
+        const history = JSON.parse(
+          localStorage.getItem("jeniusppt-feedback-history") || "[]",
+        );
+        localStorage.setItem(
+          "jeniusppt-feedback-history",
+          JSON.stringify(
+            [
+              {
+                id: crypto.randomUUID(),
+                rating,
+                category,
+                comment: comment.trim(),
+                createdAt: new Date().toISOString(),
+                sender: user?.email || "",
+              },
+              ...history,
+            ].slice(0, 100),
+          ),
+        );
+      } catch {
+        // Pengiriman email tetap dianggap berhasil jika riwayat lokal penuh.
+      }
       notify("Terima kasih. Saran dan kritik sudah dikirim ke JeniusPPT.");
     } catch (error) {
       notify(
