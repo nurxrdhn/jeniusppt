@@ -108,8 +108,10 @@ function loadState() {
 }
 
 export default function App() {
-  document.documentElement.dataset.theme =
-    localStorage.getItem("jeniusppt-theme") || "light";
+  const savedTheme = localStorage.getItem("jeniusppt-theme") || "light";
+  document.documentElement.dataset.theme = savedTheme === "device"
+    ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+    : savedTheme;
   document.documentElement.dataset.view = "auto";
   if (window.location.pathname.startsWith("/play/")) {
     return <StudentPlayer />;
@@ -133,11 +135,27 @@ export default function App() {
     () => localStorage.getItem("jeniusppt-theme") || "light",
   );
   const [viewMode] = useState("auto");
+  const [accent, setAccent] = useState(
+    () => localStorage.getItem("jeniusppt-accent") || "#ff641e",
+  );
 
   useEffect(() => {
     localStorage.setItem("jeniusppt-theme", theme);
-    document.documentElement.dataset.theme = theme;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const applyTheme = () => {
+      document.documentElement.dataset.theme = theme === "device"
+        ? (media.matches ? "dark" : "light")
+        : theme;
+    };
+    applyTheme();
+    media.addEventListener?.("change", applyTheme);
+    return () => media.removeEventListener?.("change", applyTheme);
   }, [theme]);
+  useEffect(() => {
+    localStorage.setItem("jeniusppt-accent", accent);
+    document.documentElement.style.setProperty("--fresh-orange", accent);
+    document.documentElement.style.setProperty("--accent", accent);
+  }, [accent]);
   useEffect(() => {
     localStorage.removeItem("jeniusppt-view");
     document.documentElement.dataset.view = viewMode;
@@ -627,6 +645,8 @@ export default function App() {
           }
           theme={theme}
           onTheme={setTheme}
+          accent={accent}
+          onAccent={setAccent}
         />
 
         {page === "dashboard" && (

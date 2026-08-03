@@ -7,11 +7,13 @@ import {
   Save,
   Shapes,
   Sticker,
+  Settings2,
   Trash2,
   Type,
   Undo2,
   Video,
   Volume2,
+  X,
 } from "lucide-react";
 import { SLIDE_SIZES, ratioStyle } from "../../utils/slideSizes";
 import BackgroundPicker from "./BackgroundPicker";
@@ -59,6 +61,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   const [selectedElement, setSelectedElement] = useState(null);
   const [textTarget, setTextTarget] = useState("title");
   const [showStickers, setShowStickers] = useState(false);
+  const [mobileSheet, setMobileSheet] = useState(null);
   const [historyStatus, setHistoryStatus] = useState({
     canUndo: false,
     canRedo: false,
@@ -382,6 +385,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   const bg = active?.background || defaultBg;
   const canvasStyle = {
     ...ratioStyle(slideSize),
+    "--slide-ratio": `${slideSize.width} / ${slideSize.height}`,
     ...(bg.type === "image"
       ? { backgroundImage: `url(${bg.value})` }
       : { background: bg.value }),
@@ -450,6 +454,21 @@ export default function PPTEditor({ material, updateMaterial }) {
                 })}`
               : "Penyimpanan otomatis aktif"}
           </span>
+          <div className="mobile-editor-actions" aria-label="Alat editor HP">
+            <button onClick={() => setMobileSheet("add")}>
+              <Plus size={17} />
+              Tambah
+            </button>
+            <button onClick={() => setMobileSheet("text")}>
+              <Type size={17} />
+              Teks
+            </button>
+            <button onClick={() => setMobileSheet("settings")}>
+              <Settings2 size={17} />
+              Atur
+            </button>
+          </div>
+          <div className="desktop-editor-tools">
           <button onClick={copySlide}>
             <Copy size={16} />
             Copy
@@ -503,14 +522,35 @@ export default function PPTEditor({ material, updateMaterial }) {
             ))}
           </select>
           <button onClick={swapOrientation}>Putar</button>
+          </div>
         </div>
-        <TextToolbar
-          target={textTarget}
-          onTarget={setTextTarget}
-          style={currentTextStyle}
-          onChange={updateTextStyle}
-          hasSelectedText={selected?.type === "text"}
-        />
+        <div className={`mobile-sheet text-sheet ${mobileSheet === "text" ? "open" : ""}`}>
+          <div className="mobile-sheet-head">
+            <b>Format Teks</b>
+            <button onClick={() => setMobileSheet(null)} aria-label="Tutup format teks"><X size={20} /></button>
+          </div>
+          <TextToolbar
+            target={textTarget}
+            onTarget={setTextTarget}
+            style={currentTextStyle}
+            onChange={updateTextStyle}
+            hasSelectedText={selected?.type === "text"}
+          />
+        </div>
+        <div className={`mobile-sheet add-sheet ${mobileSheet === "add" ? "open" : ""}`}>
+          <div className="mobile-sheet-head">
+            <b>Tambahkan ke Slide</b>
+            <button onClick={() => setMobileSheet(null)} aria-label="Tutup alat tambah"><X size={20} /></button>
+          </div>
+          <div className="mobile-add-grid">
+            <button onClick={() => { addSlide(); setMobileSheet(null); }}><Plus size={19} />Slide</button>
+            <button onClick={() => { copySlide(); setMobileSheet(null); }}><Copy size={19} />Salin</button>
+            <button onClick={() => { addElement("text"); setMobileSheet("text"); }}><Type size={19} />Teks</button>
+            <button onClick={() => { addElement("shape"); setMobileSheet(null); }}><Shapes size={19} />Bentuk</button>
+            <button onClick={() => imageRef.current?.click()}><ImagePlus size={19} />Gambar</button>
+            <button onClick={() => { setShowStickers(true); setMobileSheet(null); }}><Sticker size={19} />Stiker</button>
+          </div>
+        </div>
         {showStickers && (
           <div className="sticker-palette">
             {builtInStickers.map((item) => (
@@ -653,7 +693,11 @@ export default function PPTEditor({ material, updateMaterial }) {
           </div>
         </section>
       </main>
-      <aside className="properties-panel">
+      <aside className={`properties-panel mobile-sheet settings-sheet ${mobileSheet === "settings" ? "open" : ""}`}>
+        <div className="mobile-sheet-head">
+          <b>Pengaturan Slide</b>
+          <button onClick={() => setMobileSheet(null)} aria-label="Tutup pengaturan"><X size={20} /></button>
+        </div>
         <h3>Pengaturan Slide</h3>
         <label>Ukuran</label>
         <select
@@ -763,6 +807,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           onApplyAll={applyTemplateAll}
         />
       </aside>
+      {mobileSheet && <button className="mobile-sheet-backdrop" onClick={() => setMobileSheet(null)} aria-label="Tutup panel" />}
     </div>
   );
 }

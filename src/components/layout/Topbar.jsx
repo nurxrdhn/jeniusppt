@@ -5,6 +5,7 @@ import {
   Code2,
   Menu,
   Moon,
+  Palette,
   Plus,
   Search,
   Sun,
@@ -20,8 +21,16 @@ export default function Topbar({
   markAllRead,
   theme,
   onTheme,
+  accent,
+  onAccent,
 }) {
   const [open, setOpen] = React.useState(false);
+  const [customizeOpen, setCustomizeOpen] = React.useState(false);
+  const accents = [
+    ["#ff641e", "Oranye"], ["#2563eb", "Biru"], ["#0f766e", "Toska"],
+    ["#16a34a", "Hijau"], ["#ca8a04", "Emas"], ["#ea580c", "Jingga"],
+    ["#7c3aed", "Ungu"], ["#db2777", "Merah muda"], ["#475569", "Abu-abu"],
+  ];
   const unread = notifications.filter((item) => !item.read).length;
   return (
     <header className="topbar">
@@ -84,12 +93,10 @@ export default function Topbar({
       <div className="display-controls">
         <button
           className="icon-button"
-          onClick={() => onTheme(theme === "dark" ? "light" : "dark")}
-          title={
-            theme === "dark" ? "Gunakan tema terang" : "Gunakan tema gelap"
-          }
+          onClick={() => setCustomizeOpen(true)}
+          title="Kustomisasi tampilan"
         >
-          {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          <Palette size={18} />
         </button>
       </div>
       <button className="secondary-button topbar-code" onClick={onImportCode}>
@@ -107,6 +114,32 @@ export default function Topbar({
           <div>{user?.name?.[0] || "G"}</div>
         )}
       </div>
+      {customizeOpen && (
+        <div className="customize-backdrop" onMouseDown={() => setCustomizeOpen(false)}>
+          <aside className="customize-panel" onMouseDown={(event) => event.stopPropagation()}>
+            <header>
+              <div><span>Tampilan</span><h2>Kustomisasi JeniusPPT</h2></div>
+              <button onClick={() => setCustomizeOpen(false)} aria-label="Tutup"><X size={20} /></button>
+            </header>
+            <p>Pilih tema dan warna yang paling nyaman untuk mata Anda.</p>
+            <div className="theme-segment" role="group" aria-label="Pilihan tema">
+              <button className={theme === "light" ? "active" : ""} onClick={() => onTheme("light")}><Sun size={18} />Terang</button>
+              <button className={theme === "dark" ? "active" : ""} onClick={() => onTheme("dark")}><Moon size={18} />Gelap</button>
+              <button className={theme === "device" ? "active" : ""} onClick={() => onTheme("device")}><span className="device-icon">▣</span>Perangkat</button>
+            </div>
+            <div className="accent-heading"><b>Warna aksen</b><small>Diterapkan pada tombol dan bagian aktif</small></div>
+            <div className="accent-grid">
+              {accents.map(([color, name]) => (
+                <button key={color} className={accent === color ? "active" : ""} onClick={() => onAccent(color)} title={name} aria-label={name}>
+                  <span style={{ background: color }} />
+                  {accent === color && <i>✓</i>}
+                </button>
+              ))}
+            </div>
+            <button className="customize-reset" onClick={() => { onTheme("light"); onAccent("#ff641e"); }}>Kembalikan ke bawaan</button>
+          </aside>
+        </div>
+      )}
     </header>
   );
 }
