@@ -86,3 +86,92 @@ button, a, input, textarea { -webkit-tap-highlight-color:transparent; }
 @media (orientation:landscape) and (max-height:500px) {
   .login-card { padding-block:18px !important; }.login-card h2{font-size:30px!important}.login-card p{margin:6px 0}.tour-game .tour-card.anchored{max-height:82dvh}
 }
+
+/* Navbar editor HP harus tetap tampil. Selector dibuat lebih kuat dari aturan editor lama. */
+@media (max-width: 760px) {
+  .ppt-editor .slide-stage { overflow:visible !important; }
+  .ppt-editor .slide-stage .editor-ribbon-tabs {
+    display:flex !important;
+    width:100% !important;
+    min-height:52px !important;
+    padding:6px 7px 0 !important;
+    gap:3px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    overscroll-behavior-x:contain;
+    scrollbar-width:none;
+    border:1px solid #e2e8f0 !important;
+    border-bottom:0 !important;
+    border-radius:14px 14px 0 0 !important;
+    background:#fff !important;
+  }
+  .ppt-editor .slide-stage .editor-ribbon-tabs::-webkit-scrollbar { display:none; }
+  .ppt-editor .slide-stage .editor-ribbon-tabs button {
+    display:flex !important;
+    flex:0 0 auto !important;
+    min-width:max-content !important;
+    min-height:44px !important;
+    padding:0 13px !important;
+    white-space:nowrap !important;
+    font-size:13px !important;
+  }
+  .ppt-editor .slide-stage .editor-toolbar {
+    position:relative !important;
+    top:auto !important;
+    display:flex !important;
+    width:100% !important;
+    min-height:62px !important;
+    margin:0 0 8px !important;
+    padding:8px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    border-radius:0 0 14px 14px !important;
+    background:#fff !important;
+  }
+  .ppt-editor .slide-stage .editor-toolbar .history-controls,
+  .ppt-editor .slide-stage .editor-toolbar .mobile-editor-actions,
+  .ppt-editor .slide-stage .editor-toolbar .ribbon-group {
+    display:flex !important;
+    flex:0 0 auto !important;
+    align-items:center;
+    gap:6px;
+  }
+  .ppt-editor .slide-stage .editor-toolbar .ribbon-group .solid-select { min-width:145px; }
+  .ppt-editor .slide-stage .desktop-ribbon-content {
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-height:64px !important;
+    padding:8px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    border:1px solid #e2e8f0 !important;
+    border-radius:12px !important;
+    background:#fff !important;
+  }
+  .ppt-editor .slide-stage .desktop-ribbon-content .word-toolbar {
+    width:max-content !important;
+    min-width:720px !important;
+    padding:0 !important;
+    border:0 !important;
+  }
+  .ppt-editor .slide-stage .desktop-ribbon-content.element-library {
+    display:flex !important;
+    gap:7px;
+  }
+  .ppt-editor .slide-stage .desktop-ribbon-content.element-library button {
+    flex:0 0 82px !important;
+    min-height:68px !important;
+  }
+  .ppt-editor .slide-stage .desktop-ribbon-content.template-ribbon {
+    display:block !important;
+    max-height:230px !important;
+    overflow:auto !important;
+  }
+  html[data-theme="dark"] .ppt-editor .slide-stage .editor-ribbon-tabs,
+  html[data-theme="dark"] .ppt-editor .slide-stage .editor-toolbar,
+  html[data-theme="dark"] .ppt-editor .slide-stage .desktop-ribbon-content {
+    background:#171b22 !important;
+    border-color:#343c48 !important;
+  }
+}
