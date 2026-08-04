@@ -6,7 +6,9 @@ import {
   Bold,
   Italic,
   Underline,
+  SlidersHorizontal,
 } from "lucide-react";
+import { useState } from "react";
 import { FONT_OPTIONS, loadWebFont } from "../../utils/fonts";
 import SolidSelect from "../ui/SolidSelect";
 
@@ -17,6 +19,7 @@ export default function TextToolbar({
   onChange,
   hasSelectedText,
 }) {
+  const [advanced, setAdvanced] = useState(false);
   const patch = (value) => onChange({ ...style, ...value });
   return (
     <section className="word-toolbar">
@@ -83,8 +86,16 @@ export default function TextToolbar({
             <Icon size={16} />
           </button>
         ))}
+        <button
+          className={`toolbar-more ${advanced ? "active" : ""}`}
+          title="Pengaturan teks lanjutan"
+          onClick={() => setAdvanced((value) => !value)}
+        >
+          <SlidersHorizontal size={16} />
+          <span>Lanjutan</span>
+        </button>
       </div>
-      <div className="word-toolbar-row compact">
+      {advanced && <div className="word-toolbar-row compact">
         <label>
           Warna{" "}
           <input
@@ -155,7 +166,7 @@ export default function TextToolbar({
           <option value="lowercase">huruf kecil</option>
           <option value="capitalize">Awal Kapital</option>
         </SolidSelect>
-      </div>
+      </div>}
     </section>
   );
 }
