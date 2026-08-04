@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import SolidSelect from "../ui/SolidSelect";
+import QuestionBankDrive from "./QuestionBankDrive";
+import GuideCenter from "./GuideCenter";
 import {
   Accessibility,
   ArchiveRestore,
@@ -241,9 +243,9 @@ export default function ProductivityHub({
           <p className="hub-note">Daftar dan hak akses sudah tersimpan. Sinkronisasi penyuntingan langsung memerlukan basis data kolaborasi daring.</p>
         </FeatureShell>}
 
-        {active === "questions" && <FeatureShell icon={FileQuestion} title="Bank Soal" desc="Simpan pertanyaan agar dapat digunakan kembali pada materi berikutnya." action={<button onClick={() => downloadJson(questions, "bank-soal-jeniusppt.json")}><Download size={17}/> Ekspor</button>}>
+        {active === "questions" && <FeatureShell icon={FileQuestion} title="Bank Soal" desc="Kelola soal dalam folder seperti penyimpanan berkas, lalu gunakan kembali pada materi berikutnya.">
           <form className="hub-question-form" onSubmit={addQuestion}><textarea value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="Tulis pertanyaan..."/><input value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Jawaban benar"/><button><Plus size={17}/> Tambah Soal</button></form>
-          <div className="hub-list">{questions.length ? questions.map((item) => <article key={item.id}><div><b>{item.question}</b><p>Jawaban: {item.answer}</p></div><button onClick={() => saveList("jeniusppt-question-bank", questions.filter((x) => x.id !== item.id), setQuestions)}><Trash2 size={16}/></button></article>) : <Empty text="Bank soal masih kosong."/>}</div>
+          <QuestionBankDrive questions={questions} setQuestions={(next) => saveList("jeniusppt-question-bank", next, setQuestions)} notify={notify}/>
         </FeatureShell>}
 
         {active === "presenter" && <FeatureShell icon={MonitorPlay} title="Mode Presenter Guru" desc="Gunakan timer saat menyampaikan materi dan buka presentasi dari daftar materi." action={<button onClick={() => onNavigate("materials")}><MonitorPlay size={17}/> Pilih Materi</button>}>
@@ -256,6 +258,7 @@ export default function ProductivityHub({
         </FeatureShell>}
 
         {active === "help" && <FeatureShell icon={HelpCircle} title="Pusat Bantuan" desc="Cari panduan singkat penggunaan fitur utama JeniusPPT.">
+          <GuideCenter />
           <input className="hub-search" value={helpQuery} onChange={(e) => setHelpQuery(e.target.value)} placeholder="Cari panduan..."/>
           <div className="hub-help">{helpItems.map(([title, text]) => <details key={title}><summary>{title}</summary><p>{text}</p></details>)}</div>
         </FeatureShell>}

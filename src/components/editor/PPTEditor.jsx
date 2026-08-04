@@ -494,7 +494,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   return (
     <div className="ppt-editor">
       <main className="slide-stage">
-        <nav className="editor-ribbon-tabs" aria-label="Menu editor slide">
+        <nav className="editor-ribbon-tabs" aria-label="Menu editor slide" data-tour="editor-ribbon">
           {[["home","Beranda"],["elements","Elemen"],["insert","Sisipkan"],["design","Desain"],["transition","Transisi"],["templates","Template"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
         </nav>
         <div className="editor-toolbar">
@@ -662,7 +662,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             </button>
           </div>
         )}
-        <section className="slide-canvas-wrap">
+        <section className="slide-canvas-wrap" data-tour="slide-canvas">
           <div
             key={`${activeIndex}-${active?.templateName || "custom"}`}
             className="slide-canvas editor-template-preview"

@@ -1,69 +1,64 @@
-import { ArrowRight, Check, X } from "lucide-react";
-import { useState } from "react";
-import JeniusMark from "./JeniusMark";
+import { ArrowLeft, ArrowRight, Check, X } from "lucide-react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 const steps = [
-  [
-    "Selamat datang di JeniusPPT",
-    "Buat materi, kuis, media, sertifikat, dan laporan dalam satu ruang kerja.",
-  ],
-  [
-    "Dashboard",
-    "Klik setiap kartu data untuk langsung membuka Materi, Peserta, Workspace, atau publikasi.",
-  ],
-  [
-    "Editor presentasi",
-    "Susun teks bebas, gambar, stiker, video, audio, animasi, dan soal interaktif.",
-  ],
-  [
-    "Jenius AI",
-    "Masukkan topik dan jenjang. AI menyiapkan susunan slide dan kuis yang masih dapat diedit.",
-  ],
-  [
-    "Publikasi dan hasil",
-    "Bagikan melalui tautan atau QR, lalu pantau peserta dan unduh laporannya.",
-  ],
+  { target: '[data-tour="menu-dashboard"]', title: "Dashboard", text: "Mulai dari sini untuk melihat ringkasan materi, peserta, dan aktivitas terbaru." },
+  { target: '[data-tour="menu-ai"]', title: "Jenius AI", text: "Tuliskan topik, jenjang, dan jumlah slide. AI akan membuat rancangan yang tetap dapat diedit." },
+  { target: '[data-tour="menu-workspace"]', title: "Workspace", text: "Kelola folder, file, materi, dan pekerjaan yang sedang berjalan dalam satu tempat." },
+  { target: '[data-tour="menu-materials"]', title: "Materi dan editor", text: "Buat presentasi, atur font, sisipkan media, tambah kuis, pratinjau, lalu publikasikan." },
+  { target: '[data-tour="menu-participants"]', title: "Peserta", text: "Pantau progres dan nilai, gunakan filter, lalu ekspor laporan atau hapus riwayat yang dipilih." },
+  { target: '[data-tour="menu-question_bank"]', title: "Bank Soal", text: "Simpan soal dalam folder, cari, pilih, duplikasi, pindahkan, impor, atau ekspor untuk dipakai kembali." },
+  { target: '[data-tour="menu-productivity"]', title: "Panduan penggunaan", text: "Buka Pusat Produktivitas untuk mengunduh buku PDF dan menonton video tutorial JeniusPPT." },
 ];
 
 export default function ProductTour({ onDone }) {
   const [index, setIndex] = useState(0);
+  const [rect, setRect] = useState(null);
+  const step = steps[index];
   const last = index === steps.length - 1;
+
+  useLayoutEffect(() => {
+    const target = document.querySelector(step.target);
+    if (!target) return setRect(null);
+    target.scrollIntoView({ block: "center", behavior: "smooth" });
+    const update = () => {
+      const box = target.getBoundingClientRect();
+      setRect({ left: box.left, top: box.top, width: box.width, height: box.height });
+    };
+    const timer = setTimeout(update, 220);
+    update();
+    window.addEventListener("resize", update);
+    return () => { clearTimeout(timer); window.removeEventListener("resize", update); };
+  }, [step.target]);
+
+  useEffect(() => {
+    const key = (event) => {
+      if (event.key === "Escape") onDone();
+      if (event.key === "ArrowRight") last ? onDone() : setIndex((value) => value + 1);
+      if (event.key === "ArrowLeft") setIndex((value) => Math.max(0, value - 1));
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  }, [last, onDone]);
+
+  const cardStyle = rect
+    ? { left: Math.min(window.innerWidth - 390, rect.left + rect.width + 24), top: Math.max(16, Math.min(window.innerHeight - 310, rect.top - 18)) }
+    : {};
+
   return (
-    <div className="tour-backdrop">
-      <section className="tour-card">
-        <button className="tour-close" onClick={onDone}>
-          <X size={18} />
-        </button>
-        <span className="tour-count">
-          {index + 1} / {steps.length}
-        </span>
-        <div className="tour-visual">
-          <JeniusMark title="JP" />
-        </div>
-        <h2>{steps[index][0]}</h2>
-        <p>{steps[index][1]}</p>
-        <div className="tour-progress">
-          {steps.map((_, i) => (
-            <i key={i} className={i <= index ? "active" : ""} />
-          ))}
-        </div>
+    <div className="tour-backdrop tour-game">
+      {rect && <div className="tour-spotlight" style={{ left: rect.left - 7, top: rect.top - 7, width: rect.width + 14, height: rect.height + 14 }} />}
+      {rect && <div className="tour-arrow" style={{ left: rect.left + rect.width + 7, top: rect.top + rect.height / 2 - 13 }}>➜</div>}
+      <section className={`tour-card ${rect ? "anchored" : ""}`} style={cardStyle}>
+        <button className="tour-close" onClick={onDone} aria-label="Tutup tur"><X size={18} /></button>
+        <span className="tour-count">LANGKAH {index + 1} DARI {steps.length}</span>
+        <h2>{step.title}</h2>
+        <p>{step.text}</p>
+        <div className="tour-progress">{steps.map((_, i) => <i key={i} className={i <= index ? "active" : ""} />)}</div>
         <div className="tour-actions">
-          <button onClick={onDone}>Lewati</button>
-          <button
-            className="primary-button"
-            onClick={() => (last ? onDone() : setIndex(index + 1))}
-          >
-            {last ? (
-              <>
-                <Check size={17} />
-                Mulai
-              </>
-            ) : (
-              <>
-                Lanjut
-                <ArrowRight size={17} />
-              </>
-            )}
+          <button disabled={!index} onClick={() => setIndex((value) => value - 1)}><ArrowLeft size={16}/> Kembali</button>
+          <button className="primary-button" onClick={() => last ? onDone() : setIndex((value) => value + 1)}>
+            {last ? <><Check size={17}/> Selesai</> : <>Berikutnya <ArrowRight size={17}/></>}
           </button>
         </div>
       </section>

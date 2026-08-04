@@ -65,6 +65,7 @@ export default function Sidebar({
           {menu.map(([key, Icon, label]) => (
             <button
               key={key}
+              data-tour={`menu-${key}`}
               className={page === key ? "active" : ""}
               onClick={() => navigate(key)}
             >

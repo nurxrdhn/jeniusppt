@@ -29,6 +29,7 @@ import StudentPlayer from "./components/student/StudentPlayer";
 import MaterialBuilder from "./components/materials/MaterialBuilder";
 import CodeImportModal from "./components/materials/CodeImportModal";
 import ShareModal from "./components/share/ShareModal";
+import PostPublishSurvey from "./components/share/PostPublishSurvey";
 import FileCenter from "./components/files/FileCenter";
 import { JeniusDialog, JeniusToast } from "./components/ui/JeniusNotice";
 import ProductTour from "./components/ui/ProductTour";
@@ -132,6 +133,7 @@ export default function App() {
   );
   const [editingId, setEditingId] = useState(null);
   const [shareMaterial, setShareMaterial] = useState(null);
+  const [postPublishMaterial, setPostPublishMaterial] = useState(null);
   const [showCodeImport, setShowCodeImport] = useState(false);
   const [participantMaterialFilter, setParticipantMaterialFilter] =
     useState("");
@@ -379,6 +381,7 @@ export default function App() {
         publishedAtLocal: updated.publishedAtLocal,
       });
       notify("Materi berhasil dipublish.");
+      setPostPublishMaterial(online);
       addNotification(
         "Materi dipublikasikan",
         `${updated.title} sudah dapat diakses siswa.`,
@@ -414,6 +417,7 @@ export default function App() {
         publishedAtLocal: instant.publishedAtLocal,
       });
       setShareMaterial(online);
+      setPostPublishMaterial(online);
       notify("QR dan link siswa siap dibuka di HP.");
       addNotification(
         "Tautan dibagikan",
@@ -604,6 +608,7 @@ export default function App() {
               notify={notify}
             />
           )}
+          {!shareMaterial && postPublishMaterial && <PostPublishSurvey material={postPublishMaterial} user={user} notify={notify} onClose={()=>setPostPublishMaterial(null)}/>} 
         </main>
       </div>
     );
@@ -793,6 +798,8 @@ export default function App() {
           "settings",
           "subscription",
           "trash",
+          "question_bank",
+          "creator_market",
         ].includes(page) && <ComingSoon title={title} />}
       </main>
 
@@ -803,6 +810,7 @@ export default function App() {
           notify={notify}
         />
       )}
+      {!shareMaterial && postPublishMaterial && <PostPublishSurvey material={postPublishMaterial} user={user} notify={notify} onClose={()=>setPostPublishMaterial(null)}/>}
 
       {showCodeImport && (
         <CodeImportModal
