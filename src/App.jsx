@@ -180,8 +180,20 @@ export default function App() {
     root.setProperty("--fresh-glow", `color-mix(in srgb, ${accent} 25%, transparent)`);
     const icon = document.querySelector('link[rel="icon"]');
     if (icon) {
-      const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="${accent}"/><text x="32" y="41" text-anchor="middle" font-family="Arial,sans-serif" font-size="27" font-weight="800" fill="white">JP</text></svg>`;
-      icon.href = `data:image/svg+xml,${encodeURIComponent(favicon)}`;
+      const mark = new Image();
+      mark.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 128;
+        canvas.height = 128;
+        const context = canvas.getContext("2d");
+        context.fillStyle = accent;
+        context.beginPath();
+        context.roundRect(0, 0, 128, 128, 26);
+        context.fill();
+        context.drawImage(mark, 13, 13, 102, 102);
+        icon.href = canvas.toDataURL("image/png");
+      };
+      mark.src = "/brand/jeniusppt-mark.png";
     }
   }, [accent]);
   useEffect(() => {

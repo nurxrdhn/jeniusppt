@@ -97,17 +97,14 @@ body {
   filter: drop-shadow(0 8px 12px rgba(16, 24, 40, 0.10));
 }
 .jenius-mark {
-  display: block;
+  display: inline-block;
   color: var(--fresh-orange);
-}
-.jenius-mark .jenius-mark-play {
-  fill: var(--fresh-surface, #fff);
+  background: currentColor;
+  -webkit-mask: url('/brand/jeniusppt-mark.png') center / contain no-repeat;
+  mask: url('/brand/jeniusppt-mark.png') center / contain no-repeat;
 }
 .jenius-mark-inverse {
   color: #fff;
-}
-.jenius-mark-inverse .jenius-mark-play {
-  fill: var(--fresh-orange);
 }
 .brand-icon-shell {
   width: 62px;

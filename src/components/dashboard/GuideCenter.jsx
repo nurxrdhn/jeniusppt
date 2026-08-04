@@ -31,7 +31,7 @@ export default function GuideCenter({ onStartTour }) {
         <small>VIDEO TUTORIAL</small>
         <h3>Belajar JeniusPPT Langkah demi Langkah</h3>
         <p>Video tutorial visual yang dapat diputar langsung atau diunduh untuk ditonton tanpa internet.</p>
-        <video controls preload="metadata" poster="/jeniusppt-logo-transparent.png"><source src="/downloads/video-tutorial-jeniusppt.mp4" type="video/mp4"/>Browser tidak mendukung video.</video>
+        <video controls preload="metadata" poster="/brand/jeniusppt-logo-solid.png"><source src="/downloads/video-tutorial-jeniusppt.mp4" type="video/mp4"/>Browser tidak mendukung video.</video>
         <div className="guide-video-actions"><a href="/downloads/video-tutorial-jeniusppt.mp4"><PlayCircle size={17}/> Putar</a><a href="/downloads/video-tutorial-jeniusppt.mp4" download><Download size={17}/> Unduh</a></div>
       </article>
     </div>
