@@ -9,6 +9,7 @@ import "./styles/themes.css";
 import "./styles/notices.css";
 import "./styles/pro-upgrades.css";
 import "./styles/mobile-sync.css";
+import "./styles/mobile-polish.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

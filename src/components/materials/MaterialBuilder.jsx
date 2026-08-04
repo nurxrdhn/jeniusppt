@@ -16,6 +16,7 @@ export default function MaterialBuilder({
 }) {
   const [tab, setTab] = useState("Info");
   const [busy, setBusy] = useState(false);
+  const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
 
   async function publish() {
     if (busy) return;
@@ -47,6 +48,33 @@ export default function MaterialBuilder({
               {t}
             </button>
           ))}
+        </div>
+
+        <div className="builder-mobile-switcher">
+          <button
+            type="button"
+            className="builder-mobile-current"
+            aria-expanded={mobileTabsOpen}
+            onClick={() => setMobileTabsOpen((value) => !value)}
+          >
+            <span><small>Langkah aktif</small><b>{tab}</b></span>
+            <i>{mobileTabsOpen ? "▲" : "▼"}</i>
+          </button>
+          {mobileTabsOpen && (
+            <div className="builder-mobile-menu">
+              {tabs.map((item, index) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={tab === item ? "active" : ""}
+                  onClick={() => { setTab(item); setMobileTabsOpen(false); }}
+                >
+                  <span>{index + 1}</span>
+                  {item}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <button className="primary-button" onClick={publish} disabled={busy}>
