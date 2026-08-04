@@ -110,7 +110,7 @@
   display: grid;
   place-items: center;
   border-radius: 17px;
-  background: linear-gradient(145deg, color-mix(in srgb, var(--fresh-orange) 14%, white), var(--fresh-line));
+  background: var(--fresh-orange);
   color: var(--fresh-orange-dark);
   margin-bottom: 18px;
 }
@@ -160,12 +160,12 @@
   color: var(--fresh-orange-dark);
 }
 .jp-dialog-primary {
-  background: linear-gradient(135deg, var(--fresh-orange-dark), var(--fresh-orange-light));
+  background: var(--fresh-orange);
   color: #fff;
   box-shadow: 0 9px 20px rgba(234, 88, 12, 0.22);
 }
 .jp-dialog.is-danger .jp-dialog-primary {
-  background: linear-gradient(135deg, #b91c1c, #ef4444);
+  background: #dc2626;
 }
 html[data-theme="dark"] .jp-toast,
 html[data-theme="dark"] .jp-dialog {

@@ -39,14 +39,14 @@ textarea {
   padding: 20px;
   border: 0;
   border-radius: 22px;
-  background: linear-gradient(120deg, var(--fresh-orange-dark), var(--fresh-orange-dark) 55%, var(--fresh-orange-light));
+  background: var(--fresh-orange);
   color: #fff;
   display: grid;
   grid-template-columns: 62px 1fr auto;
   gap: 16px;
   align-items: center;
   text-align: left;
-  box-shadow: 0 18px 45px rgba(194, 65, 12, 0.2);
+  box-shadow: none;
 }
 .dashboard-ai > span {
   width: 56px;
@@ -64,7 +64,7 @@ textarea {
 }
 .dashboard-ai p {
   margin: 4px 0 0;
-  color: color-mix(in srgb, var(--fresh-orange) 14%, white);
+  color: rgba(255, 255, 255, 0.82);
 }
 .dashboard-ai strong {
   white-space: nowrap;
@@ -148,7 +148,7 @@ textarea {
   display: grid;
   place-items: center;
   border-radius: 20px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--fresh-orange) 7%, white), color-mix(in srgb, var(--fresh-orange) 14%, white));
+  background: var(--fresh-orange);
 }
 .tour-visual img {
   width: 90px;
@@ -990,7 +990,7 @@ html[data-theme="dark"] .hub-help summary { color: color-mix(in srgb, var(--fres
   overflow-x: auto;
   padding: 3px 2px 8px;
   scrollbar-width: thin;
-  scrollbar-color: var(--fresh-orange-light) #ffe9dc;
+  scrollbar-color: var(--fresh-orange) #e4e7ec;
 }
 .slide-strip-scroll > button {
   position: relative;
@@ -1227,9 +1227,148 @@ html[data-theme="dark"] .mobile-sheet-head {
   }
 }
 
+/* Sistem warna antarmuka solid */
+body,
+.app-shell,
+.main-area,
+.page {
+  background-color: var(--fresh-bg) !important;
+  background-image: none !important;
+}
+
+.sidebar,
+.topbar,
+.login-card,
+.stat-card,
+.feature-card,
+.material-card,
+.tool-card,
+.info-form,
+.publish-card,
+.workspace-item,
+.data-panel,
+.analytics-card,
+.ai-panel,
+.properties-panel,
+.slide-list,
+.question-list,
+.preview-timeline {
+  background-color: #fff !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+}
+
+.opening-page {
+  background: var(--fresh-bg) !important;
+}
+
+.opening-left,
+.welcome-card,
+.dashboard-ai,
+.app-card,
+.primary-button,
+.side-menu button.active,
+.avatar-letter,
+.top-profile div,
+.logo-mark,
+.bg-panel > button,
+.stepper button.active,
+.media-upload,
+.question-rate i,
+.metric-row i,
+.feature-card::before,
+.jp-dialog-primary {
+  background-color: var(--fresh-orange) !important;
+  background-image: none !important;
+}
+
+.report-actions button:first-child {
+  background-color: #18794e !important;
+  background-image: none !important;
+}
+
+.certificate-button {
+  background-color: #ca8a04 !important;
+  background-image: none !important;
+}
+
+.jp-dialog.is-danger .jp-dialog-primary {
+  background-color: #dc2626 !important;
+  background-image: none !important;
+}
+
+.eyebrow,
+.badge,
+.material-meta span,
+.card-actions button:not(.danger),
+.card-actions a,
+.outline-btn,
+.panel-head button,
+.preview-controls button,
+.table-head,
+.metric-row > div,
+.tour-visual,
+.jp-notice-icon,
+.sidebar-user,
+.icon-button,
+.hamburger-button {
+  background-color: var(--fresh-peach) !important;
+  background-image: none !important;
+}
+
+.workspace-item p,
+.material-card > p,
+.muted,
+.empty-inline {
+  color: var(--fresh-muted) !important;
+}
+
+.ai-panel pre {
+  background-color: #111827 !important;
+  background-image: none !important;
+  color: #f8fafc !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.accent-grid button > span {
+  background: var(--swatch) !important;
+}
+
+.top-profile div,
+.avatar-letter {
+  color: #fff !important;
+}
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] .app-shell,
+html[data-theme="dark"] .main-area,
+html[data-theme="dark"] .page {
+  background-color: #101216 !important;
+}
+
+html[data-theme="dark"] .sidebar,
+html[data-theme="dark"] .topbar,
+html[data-theme="dark"] .login-card,
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .feature-card,
+html[data-theme="dark"] .material-card,
+html[data-theme="dark"] .tool-card,
+html[data-theme="dark"] .info-form,
+html[data-theme="dark"] .publish-card,
+html[data-theme="dark"] .workspace-item,
+html[data-theme="dark"] .data-panel,
+html[data-theme="dark"] .analytics-card,
+html[data-theme="dark"] .ai-panel,
+html[data-theme="dark"] .properties-panel {
+  background-color: #1a1d22 !important;
+  background-image: none !important;
+}
+
 /* Tampilan bersih tanpa efek neon */
 .primary-button,
 .side-menu button.active,
+.dashboard-ai,
 .welcome-card,
 .app-card,
 .stepper button.active,
@@ -1247,6 +1386,44 @@ html[data-theme="dark"] .mobile-sheet-head {
 .hub-question-form textarea:focus {
   box-shadow: none !important;
   text-shadow: none !important;
+}
+
+.side-menu button:not(.active) {
+  color: #667085 !important;
+}
+
+.side-menu button:not(.active) svg {
+  color: #98a2b3 !important;
+}
+
+.side-menu button:hover:not(.active) {
+  background: color-mix(in srgb, var(--fresh-orange) 10%, transparent) !important;
+  color: var(--fresh-orange) !important;
+}
+
+.side-menu button:hover:not(.active) svg {
+  color: var(--fresh-orange) !important;
+}
+
+html[data-theme="dark"] .side-menu button:not(.active) {
+  color: #d2d7df !important;
+}
+
+html[data-theme="dark"] .side-menu button:not(.active) svg {
+  color: #9da6b2 !important;
+}
+
+.dashboard-ai,
+.dashboard-ai:hover,
+.dashboard-ai:focus-visible {
+  background: var(--fresh-orange) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.dashboard-ai > span {
+  color: var(--fresh-orange-dark) !important;
 }
 
 .brand-logo,

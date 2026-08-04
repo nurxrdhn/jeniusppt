@@ -35,13 +35,7 @@ a {
 }
 .opening-page {
   min-height: 100vh;
-  background:
-    radial-gradient(
-      circle at 15% 12%,
-      rgba(29, 78, 216, 0.18),
-      transparent 32%
-    ),
-    linear-gradient(135deg, #fff, #f2f7ff 58%, #eaf2ff);
+  background: var(--fresh-bg);
   display: grid;
   place-items: center;
   padding: 28px;
@@ -79,7 +73,7 @@ a {
   border-radius: 18px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, var(--navy2), var(--blue));
+  background: var(--navy2);
   color: white;
   font-size: 24px;
   font-weight: 900;
@@ -182,7 +176,7 @@ a {
   color: var(--text);
 }
 .primary-button {
-  background: linear-gradient(135deg, var(--navy2), var(--blue));
+  background: var(--navy2);
   color: white;
   padding: 0 18px;
 }
@@ -719,7 +713,7 @@ a {
 .bg-panel > button {
   width: 100%;
   border: 0;
-  background: linear-gradient(135deg, var(--navy2), var(--blue));
+  background: var(--navy2);
   color: white;
   border-radius: 13px;
   padding: 12px;
@@ -768,13 +762,7 @@ a {
   min-height: 560px;
   border-radius: 28px;
   padding: clamp(28px, 5vw, 60px);
-  background:
-    radial-gradient(
-      circle at 18% 18%,
-      rgba(29, 78, 216, 0.28),
-      transparent 30%
-    ),
-    linear-gradient(135deg, #111827, #283c75);
+  background: #111827;
   display: grid;
   align-content: center;
   gap: 22px;
@@ -953,7 +941,7 @@ a {
   width: min(100%, 950px);
   min-height: 560px;
   border-radius: 24px;
-  background: linear-gradient(135deg, #111827, #283c75);
+  background: #111827;
   color: white;
   padding: 60px;
   display: grid;
@@ -1069,13 +1057,7 @@ a {
 }
 .student-page {
   min-height: 100vh;
-  background:
-    radial-gradient(
-      circle at 20% 10%,
-      rgba(29, 78, 216, 0.24),
-      transparent 32%
-    ),
-    linear-gradient(135deg, #06142f, #0f172a);
+  background: #0f172a;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -1113,9 +1095,7 @@ a {
   width: min(1180px, 100%);
   min-height: 660px;
   border-radius: 34px;
-  background:
-    radial-gradient(circle at 18% 18%, rgba(29, 78, 216, 0.3), transparent 30%),
-    linear-gradient(135deg, #111827, #283c75);
+  background: #111827;
   padding: clamp(32px, 6vw, 86px);
   box-shadow: 0 35px 100px rgba(0, 0, 0, 0.28);
   display: flex;
@@ -1850,10 +1830,10 @@ a {
 }
 body {
   color: var(--ink);
-  background: linear-gradient(135deg, #fffaf5 0%, color-mix(in srgb, var(--fresh-orange) 7%, white) 58%, color-mix(in srgb, var(--fresh-orange) 14%, white) 100%);
+  background: var(--fresh-orange);
 }
 .sidebar {
-  background: linear-gradient(180deg, var(--fresh-orange-dark) 0%, var(--fresh-orange-dark) 58%, var(--fresh-orange-dark) 100%);
+  background: var(--fresh-orange);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 14px 0 40px rgba(16, 24, 40, 0.10);
 }
@@ -1869,7 +1849,7 @@ body {
   height: 72px;
 }
 .side-menu button.active {
-  background: linear-gradient(135deg, var(--fresh-orange), var(--fresh-orange-light));
+  background: var(--fresh-orange);
   color: #fff;
   box-shadow: 0 10px 24px var(--fresh-glow);
 }
@@ -1878,7 +1858,7 @@ body {
   color: #fff;
 }
 .primary-button {
-  background: linear-gradient(135deg, var(--fresh-orange-dark), var(--fresh-orange)) !important;
+  background: var(--fresh-orange);
   color: #fff !important;
   border-color: var(--fresh-orange) !important;
   box-shadow: 0 9px 22px var(--fresh-glow);
@@ -1907,24 +1887,14 @@ body {
   color: var(--fresh-orange-dark);
 }
 .welcome-card {
-  background: linear-gradient(125deg, var(--fresh-orange-dark) 0%, var(--fresh-orange-dark) 48%, var(--fresh-orange) 100%);
+  background: var(--fresh-orange);
   box-shadow: 0 22px 55px rgba(16, 24, 40, 0.10);
 }
 .opening-page {
-  background:
-    radial-gradient(
-      circle at 10% 20%,
-      color-mix(in srgb, var(--fresh-orange) 16%, transparent),
-      transparent 35%
-    ),
-    linear-gradient(135deg, var(--fresh-orange-dark), var(--fresh-orange-dark) 52%, var(--fresh-orange));
+  background: var(--fresh-bg);
 }
 .opening-left {
-  background: linear-gradient(
-    145deg,
-    rgba(67, 20, 7, 0.97),
-    rgba(194, 65, 12, 0.91)
-  );
+  background: var(--fresh-orange);
 }
 .opening-progress button.active {
   background: var(--fresh-orange-light);
@@ -1990,10 +1960,10 @@ body {
   background: #fff;
 }
 .accent-card {
-  background: linear-gradient(145deg, #fff, color-mix(in srgb, var(--fresh-orange) 7%, white));
+  background: var(--fresh-orange);
 }
 .app-card {
-  background: linear-gradient(145deg, var(--fresh-orange-dark), var(--fresh-orange-dark));
+  background: var(--fresh-orange);
   color: #fff;
 }
 .app-card h2,
@@ -2044,7 +2014,7 @@ body {
 }
 .workspace-item p {
   margin: 5px 0 0;
-  color: #9a6a55;
+  color: var(--fresh-muted);
 }
 .data-panel,
 .analytics-card,
@@ -2073,7 +2043,7 @@ body {
 .empty-inline {
   padding: 38px;
   text-align: center;
-  color: #9a6a55;
+  color: var(--fresh-muted);
 }
 .metric-row {
   display: grid;
@@ -2091,7 +2061,7 @@ body {
 .metric-row i {
   height: 100%;
   display: block;
-  background: linear-gradient(90deg, var(--fresh-orange), var(--fresh-orange-light));
+  background: var(--fresh-orange);
   border-radius: 99px;
 }
 .ai-panel {
@@ -2101,15 +2071,15 @@ body {
   align-items: center;
 }
 .ai-panel pre {
-  background: var(--fresh-orange-dark);
-  color: var(--fresh-line);
+  background: #111827;
+  color: #f8fafc;
   border-radius: 18px;
   padding: 24px;
   overflow: auto;
   line-height: 1.7;
 }
 .muted {
-  color: #9a6a55;
+  color: var(--fresh-muted);
 }
 @media (max-width: 1000px) {
   .file-grid {

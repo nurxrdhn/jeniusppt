@@ -368,7 +368,7 @@ html[data-view="auto"] .device-auto {
 .accent-heading small { color: var(--fresh-muted); }
 .accent-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .accent-grid button { position: relative; display: grid; place-items: center; aspect-ratio: 1.18; padding: 10px; border: 2px solid transparent; border-radius: 16px; background: color-mix(in srgb, var(--fresh-muted) 9%, transparent); }
-.accent-grid button > span { width: 52px; max-width: 70%; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(var(--swatch) 0 25%, color-mix(in srgb, var(--swatch) 66%, #101828) 25% 50%, color-mix(in srgb, var(--swatch) 44%, white) 50% 75%, color-mix(in srgb, var(--swatch) 72%, white) 75% 100%); }
+.accent-grid button > span { width: 52px; max-width: 70%; aspect-ratio: 1; border-radius: 50%; background: var(--swatch); }
 .accent-grid button.active { border-color: var(--fresh-orange); }
 .accent-grid button i { position: absolute; top: 7px; right: 7px; display: grid; place-items: center; width: 23px; height: 23px; border-radius: 50%; background: var(--fresh-orange); color: white; font-style: normal; font-weight: 900; }
 .customize-reset { width: 100%; min-height: 46px; margin-top: 22px; border: 1px solid var(--fresh-line); border-radius: 13px; background: transparent; color: var(--fresh-ink); font-weight: 750; }
