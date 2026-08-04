@@ -34,6 +34,7 @@ import MediaPlayer from "../ui/MediaPlayer";
 import { normalizeVideoUrl } from "../../utils/mediaUrl";
 import TextToolbar from "./TextToolbar";
 import { loadWebFont, textStyle } from "../../utils/fonts";
+import { jeniusPrompt } from "../../utils/jeniusDialog";
 const defaultBg = {
   type: "css",
   value: "#ff641e",
@@ -317,11 +318,14 @@ export default function PPTEditor({ material, updateMaterial }) {
     addElement("sticker", { text, w: 13, h: 18, x: 44, y: 40 });
     setShowStickers(false);
   }
-  function customSticker() {
-    const text = window.prompt(
-      "Ketik emoji, simbol, atau stiker teks buatan sendiri:",
-      "✨",
-    );
+  async function customSticker() {
+    const text = await jeniusPrompt({
+      title: "Buat stiker sendiri",
+      message: "Masukkan emoji, simbol, atau teks singkat untuk dijadikan stiker.",
+      placeholder: "Contoh: ✨",
+      defaultValue: "✨",
+      confirmLabel: "Tambahkan",
+    });
     if (text) addSticker(text);
   }
   function uploadSticker(event) {
@@ -340,10 +344,13 @@ export default function PPTEditor({ material, updateMaterial }) {
     reader.readAsDataURL(file);
     event.target.value = "";
   }
-  function addMediaLink(type) {
-    const url = window.prompt(
-      `Tempel link ${type === "video" ? "video atau YouTube" : "audio"}:`,
-    );
+  async function addMediaLink(type) {
+    const url = await jeniusPrompt({
+      title: type === "video" ? "Tambahkan video" : "Tambahkan audio",
+      message: `Tempel tautan ${type === "video" ? "video atau YouTube" : "audio"} yang ingin dimasukkan ke slide.`,
+      placeholder: "https://...",
+      confirmLabel: "Tambahkan",
+    });
     if (!url) return;
     addElement(type, {
       src: type === "video" ? normalizeVideoUrl(url) : url,

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { AlertTriangle, Check, Info, Trash2, X, XCircle } from "lucide-react";
 
 const icons = {
@@ -31,13 +32,20 @@ export function JeniusToast({ notice, onClose }) {
 }
 
 export function JeniusDialog({ dialog, onClose }) {
+  const [inputValue, setInputValue] = useState("");
+  useEffect(() => setInputValue(dialog?.input?.defaultValue || ""), [dialog]);
   if (!dialog) return null;
   const Icon =
     dialog.icon === "trash" ? Trash2 : dialog.danger ? AlertTriangle : Info;
   return (
     <div
       className="jp-dialog-backdrop"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) {
+          dialog.onCancel?.();
+          onClose();
+        }
+      }}
     >
       <section
         className={`jp-dialog ${dialog.danger ? "is-danger" : ""}`}
@@ -47,7 +55,7 @@ export function JeniusDialog({ dialog, onClose }) {
       >
         <button
           className="jp-dialog-close"
-          onClick={onClose}
+          onClick={() => { dialog.onCancel?.(); onClose(); }}
           aria-label="Tutup"
         >
           <X size={18} />
@@ -58,9 +66,24 @@ export function JeniusDialog({ dialog, onClose }) {
         <span className="jp-dialog-brand">JENIUSPPT</span>
         <h2 id="jp-dialog-title">{dialog.title}</h2>
         <p>{dialog.message}</p>
+        {dialog.input && (
+          <input
+            className="jp-dialog-input"
+            autoFocus
+            value={inputValue}
+            placeholder={dialog.input.placeholder || ""}
+            onChange={(event) => setInputValue(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && inputValue.trim()) {
+                dialog.onConfirm?.(inputValue);
+                onClose();
+              }
+            }}
+          />
+        )}
         <div className="jp-dialog-actions">
           {dialog.showCancel && (
-            <button className="jp-dialog-cancel" onClick={onClose}>
+            <button className="jp-dialog-cancel" onClick={() => { dialog.onCancel?.(); onClose(); }}>
               {dialog.cancelLabel || "Batal"}
             </button>
           )}
@@ -78,9 +101,10 @@ export function JeniusDialog({ dialog, onClose }) {
           <button
             className="jp-dialog-primary"
             onClick={() => {
-              dialog.onConfirm?.();
-              onClose();
-            }}
+                dialog.onConfirm?.(inputValue);
+                onClose();
+              }}
+              disabled={Boolean(dialog.input) && !inputValue.trim()}
           >
             {dialog.confirmLabel || "Lanjutkan"}
           </button>

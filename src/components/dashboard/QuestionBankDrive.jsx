@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { CheckSquare, CopyPlus, Download, FileInput, FileQuestion, Folder, FolderPlus, Grid2X2, List, MoreVertical, Search, Trash2, Upload } from "lucide-react";
 import SolidSelect from "../ui/SolidSelect";
+import { jeniusConfirm, jeniusPrompt } from "../../utils/jeniusDialog";
 
 export default function QuestionBankDrive({ questions, setQuestions, notify }) {
   const [folders, setFolders] = useState(() => JSON.parse(localStorage.getItem("jeniusppt-question-folders") || "[]"));
@@ -18,15 +19,16 @@ export default function QuestionBankDrive({ questions, setQuestions, notify }) {
   }, [questions, folderId, search, sort]);
 
   function saveFolders(next) { setFolders(next); localStorage.setItem("jeniusppt-question-folders", JSON.stringify(next)); }
-  function newFolder() {
-    const name = window.prompt("Nama folder soal:", "Folder Baru");
+  async function newFolder() {
+    const name = await jeniusPrompt({ title:"Folder baru", message:"Beri nama folder agar soal lebih mudah dikelompokkan.", placeholder:"Nama folder", defaultValue:"Folder Baru", confirmLabel:"Buat folder" });
     if (!name?.trim()) return;
     saveFolders([...folders, { id: crypto.randomUUID(), name: name.trim() }]);
     notify("Folder bank soal dibuat.");
   }
-  function removeSelected() {
+  async function removeSelected() {
     if (!selected.length) return;
-    if (!window.confirm(`Hapus ${selected.length} soal yang dipilih?`)) return;
+    const approved = await jeniusConfirm({ title:"Hapus soal terpilih?", message:`${selected.length} soal akan dihapus dari Bank Soal.`, confirmLabel:"Ya, hapus", danger:true });
+    if (!approved) return;
     setQuestions(questions.filter((item) => !selected.includes(item.id)));
     setSelected([]);
     notify("Soal yang dipilih telah dihapus.");
@@ -78,7 +80,7 @@ export default function QuestionBankDrive({ questions, setQuestions, notify }) {
           <span className="drive-file-icon"><FileQuestion size={21}/></span>
           <div><b>{item.question}</b><p>{item.subject || "Umum"} · Jawaban: {item.answer}</p></div>
           <button className="icon-only" title="Duplikat" onClick={()=>duplicate(item)}><CopyPlus size={17}/></button>
-          <button className="icon-only" title="Hapus" onClick={()=>{ if (window.confirm("Hapus soal ini?")) { setQuestions(questions.filter((row)=>row.id!==item.id)); notify("Soal dihapus."); } }}><MoreVertical size={17}/></button>
+          <button className="icon-only" title="Hapus" onClick={async()=>{ const approved = await jeniusConfirm({ title:"Hapus soal?", message:"Soal ini akan dihapus dari Bank Soal.", confirmLabel:"Ya, hapus", danger:true }); if (approved) { setQuestions(questions.filter((row)=>row.id!==item.id)); notify("Soal dihapus."); } }}><MoreVertical size={17}/></button>
         </article>)}
         {!visible.length && <div className="drive-empty"><FileInput size={35}/><b>Folder ini masih kosong</b><p>Tambahkan soal baru atau impor berkas JSON.</p></div>}
       </div>

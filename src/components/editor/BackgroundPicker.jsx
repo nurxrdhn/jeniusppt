@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { jeniusConfirm } from "../../utils/jeniusDialog";
 
 export const slideTemplates = [
   {
@@ -195,9 +196,13 @@ export default function BackgroundPicker({ onPick, onTemplate, onApplyAll }) {
             key={template.name}
             className={selected.name === template.name ? "selected" : ""}
             title={template.name}
-            onClick={() => {
+            onClick={async () => {
               if (premium && !owned) {
-                const approved = window.confirm(`Template premium Rp9.900. Lanjutkan ke proses pembelian ${template.name}?`);
+                const approved = await jeniusConfirm({
+                  title: "Gunakan template premium?",
+                  message: `${template.name} tersedia dengan harga Rp9.900. Lanjutkan ke proses penggunaan template?`,
+                  confirmLabel: "Lanjutkan",
+                });
                 if (!approved) return;
                 const next = [...unlocked, template.name];
                 setUnlocked(next); localStorage.setItem("jeniusppt-unlocked-templates", JSON.stringify(next));

@@ -144,6 +144,20 @@
   margin-top: 25px;
   flex-wrap: wrap;
 }
+.jp-dialog-input {
+  width:100%;
+  min-height:48px;
+  margin:4px 0 14px;
+  padding:0 13px;
+  border:1px solid #d8dee8;
+  border-radius:11px;
+  outline:none;
+  background:#f8fafc;
+  color:#182230;
+  font:750 14px/1.2 "Plus Jakarta Sans",sans-serif;
+}
+.jp-dialog-input:focus { border-color:var(--fresh-orange); box-shadow:0 0 0 3px color-mix(in srgb,var(--fresh-orange) 14%,transparent); }
+.jp-dialog-primary:disabled { opacity:.45; cursor:not-allowed; }
 .jp-dialog-actions button {
   border: 0;
   border-radius: 13px;

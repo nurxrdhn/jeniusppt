@@ -32,6 +32,7 @@ import ShareModal from "./components/share/ShareModal";
 import PostPublishSurvey from "./components/share/PostPublishSurvey";
 import FileCenter from "./components/files/FileCenter";
 import { JeniusDialog, JeniusToast } from "./components/ui/JeniusNotice";
+import { jeniusConfirm } from "./utils/jeniusDialog";
 import ProductTour from "./components/ui/ProductTour";
 import ProductivityHub from "./components/dashboard/ProductivityHub";
 import { translateVisiblePage } from "./services/translationService";
@@ -148,6 +149,12 @@ export default function App() {
   const [accent, setAccent] = useState(
     () => localStorage.getItem("jeniusppt-accent") || "#ff641e",
   );
+
+  useEffect(() => {
+    const openJeniusDialog = (event) => setDialog(event.detail);
+    window.addEventListener("jeniusppt:dialog", openJeniusDialog);
+    return () => window.removeEventListener("jeniusppt:dialog", openJeniusDialog);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("jeniusppt-theme", theme);
@@ -1147,7 +1154,13 @@ function Participants({
   }
   async function removeSelected(items) {
     if (!items.length) return notify("Pilih riwayat yang ingin dihapus.", "warning");
-    if (!window.confirm(`Hapus ${items.length} riwayat peserta? Tindakan ini tidak dapat dibatalkan.`)) return;
+    const approved = await jeniusConfirm({
+      title: "Hapus riwayat peserta?",
+      message: `${items.length} riwayat yang dipilih akan dihapus dan tidak dapat dikembalikan.`,
+      confirmLabel: "Ya, hapus",
+      danger: true,
+    });
+    if (!approved) return;
     try {
       await deleteRecords(items);
       setSelectedRows([]);
