@@ -108,7 +108,7 @@ export default function PreviewPlayer({ material, teacher = true }) {
                 : {
                     background:
                       current.item.background?.value ||
-                      "linear-gradient(135deg,#ff7a25,#e94d08)",
+                      "#ff641e",
                   }),
               textAlign: current.item.textAlign || "left",
               animationDuration: `${current.item.duration || 700}ms`,

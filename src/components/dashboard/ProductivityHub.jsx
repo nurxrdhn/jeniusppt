@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import SolidSelect from "../ui/SolidSelect";
 import {
   Accessibility,
   ArchiveRestore,
@@ -48,8 +49,9 @@ export default function ProductivityHub({
   user,
   notify,
   onNavigate,
+  initialActive = "versions",
 }) {
-  const [active, setActive] = useState("versions");
+  const [active, setActive] = useState(initialActive);
   const [versions, setVersions] = useState(() =>
     readLocal("jeniusppt-version-history"),
   );
@@ -234,7 +236,7 @@ export default function ProductivityHub({
         </FeatureShell>}
 
         {active === "collaboration" && <FeatureShell icon={Users} title="Kolaborasi Guru" desc="Siapkan daftar editor dan peninjau untuk materi bersama.">
-          <form className="hub-inline-form" onSubmit={addInvite}><input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="email@sekolah.sch.id"/><select value={permission} onChange={(e) => setPermission(e.target.value)}><option>Editor</option><option>Peninjau</option><option>Hanya lihat</option></select><button><UserPlus size={17}/> Undang</button></form>
+          <form className="hub-inline-form" onSubmit={addInvite}><input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="email@sekolah.sch.id"/><SolidSelect value={permission} onChange={(e) => setPermission(e.target.value)}><option>Editor</option><option>Peninjau</option><option>Hanya lihat</option></SolidSelect><button><UserPlus size={17}/> Undang</button></form>
           <div className="hub-list">{invites.length ? invites.map((item) => <article key={item.id}><div><b>{item.email}</b><small>{item.permission} • {item.status}</small></div><button onClick={() => saveList("jeniusppt-collaborators", invites.filter((x) => x.id !== item.id), setInvites)}><Trash2 size={16}/></button></article>) : <Empty text="Belum ada kolaborator."/>}</div>
           <p className="hub-note">Daftar dan hak akses sudah tersimpan. Sinkronisasi penyuntingan langsung memerlukan basis data kolaborasi daring.</p>
         </FeatureShell>}

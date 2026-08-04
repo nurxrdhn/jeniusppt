@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Link, Mic, Square, Upload, Video, Volume2 } from "lucide-react";
 import { normalizeVideoUrl } from "../../utils/mediaUrl";
+import SolidSelect from "../ui/SolidSelect";
 
 export default function MediaManager({ material, updateMaterial }) {
   const [slideIndex, setSlideIndex] = useState(material.activeSlide || 0);
@@ -120,7 +121,7 @@ export default function MediaManager({ material, updateMaterial }) {
       <div className="media-form">
         <label>
           <span>Tempatkan pada Slide</span>
-          <select
+          <SolidSelect
             value={slideIndex}
             onChange={(e) => setSlideIndex(e.target.value)}
           >
@@ -129,7 +130,7 @@ export default function MediaManager({ material, updateMaterial }) {
                 {index + 1}. {slide.title}
               </option>
             ))}
-          </select>
+          </SolidSelect>
         </label>
         <div className="media-type">
           <button

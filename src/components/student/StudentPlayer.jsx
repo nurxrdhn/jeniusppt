@@ -6,6 +6,7 @@ import {
 } from "../../services/studentService";
 import MediaPlayer from "../ui/MediaPlayer";
 import { textStyle } from "../../utils/fonts";
+import SolidSelect from "../ui/SolidSelect";
 
 export default function StudentPlayer() {
   const code = decodeURIComponent(
@@ -270,11 +271,11 @@ export default function StudentPlayer() {
           >
             <input name="name" placeholder="Nama siswa" required />
 
-            <select name="gender" required>
+            <SolidSelect name="gender" required>
               <option value="">Jenis kelamin</option>
               <option value="Laki-laki">Laki-laki</option>
               <option value="Perempuan">Perempuan</option>
-            </select>
+            </SolidSelect>
 
             <input name="className" placeholder="Nama kelas" required />
 

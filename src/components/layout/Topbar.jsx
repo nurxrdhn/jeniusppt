@@ -31,7 +31,7 @@ export default function Topbar({
   const accents = [
     ["#ff641e", "Oranye"], ["#2563eb", "Biru"], ["#0f766e", "Toska"],
     ["#16a34a", "Hijau"], ["#ca8a04", "Emas"], ["#ea580c", "Jingga"],
-    ["#7c3aed", "Ungu"], ["#db2777", "Merah muda"], ["#475569", "Abu-abu"],
+    ["#7c3aed", "Ungu"], ["#db2777", "Merah muda"], ["#dc2626", "Merah"], ["#475569", "Abu-abu"],
   ];
   const unread = notifications.filter((item) => !item.read).length;
   return (

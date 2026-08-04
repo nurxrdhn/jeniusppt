@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { SLIDE_SIZES, ratioStyle } from "../../utils/slideSizes";
+import SolidSelect from "../ui/SolidSelect";
 import BackgroundPicker from "./BackgroundPicker";
 import MediaPlayer from "../ui/MediaPlayer";
 import { normalizeVideoUrl } from "../../utils/mediaUrl";
@@ -67,6 +68,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   const [textTarget, setTextTarget] = useState("title");
   const [showStickers, setShowStickers] = useState(false);
   const [mobileSheet, setMobileSheet] = useState(null);
+  const [ribbonTab, setRibbonTab] = useState("home");
   const [historyStatus, setHistoryStatus] = useState({
     canUndo: false,
     canRedo: false,
@@ -440,6 +442,9 @@ export default function PPTEditor({ material, updateMaterial }) {
   return (
     <div className="ppt-editor">
       <main className="slide-stage">
+        <nav className="editor-ribbon-tabs" aria-label="Menu editor slide">
+          {[["home","Beranda"],["insert","Sisipkan"],["design","Desain"],["transition","Transisi"],["templates","Template"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
+        </nav>
         <div className="editor-toolbar">
           <div className="history-controls">
             <button onClick={saveNow} title="Simpan (Ctrl+S)">
@@ -485,7 +490,7 @@ export default function PPTEditor({ material, updateMaterial }) {
               Atur
             </button>
           </div>
-          <div className="desktop-editor-tools">
+          {ribbonTab === "insert" && <div className="desktop-editor-tools ribbon-group">
           <button onClick={copySlide}>
             <Copy size={16} />
             Copy
@@ -524,7 +529,8 @@ export default function PPTEditor({ material, updateMaterial }) {
             <Trash2 size={16} />
             Slide
           </button>
-          <select
+          </div>}
+          {ribbonTab === "design" && <div className="desktop-editor-tools ribbon-group"><span className="ribbon-label">Ukuran slide</span><SolidSelect
             value={
               Object.keys(SLIDE_SIZES).find(
                 (key) => SLIDE_SIZES[key].label === slideSize.label,
@@ -537,10 +543,12 @@ export default function PPTEditor({ material, updateMaterial }) {
                 {size.label}
               </option>
             ))}
-          </select>
-          <button onClick={swapOrientation}>Putar</button>
-          </div>
+          </SolidSelect>
+          <button onClick={swapOrientation}>Putar</button></div>}
+          {ribbonTab === "transition" && <div className="desktop-editor-tools ribbon-group"><span className="ribbon-label">Animasi</span><SolidSelect value={active?.transition || "fade"} onChange={(e) => updateSlide({ transition: e.target.value })}>{animations.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</SolidSelect><span className="ribbon-label">Durasi</span><SolidSelect value={active?.duration || 700} onChange={(e) => updateSlide({ duration: Number(e.target.value) })}><option value={400}>Cepat</option><option value={700}>Normal</option><option value={1100}>Lembut</option><option value={1600}>Dramatis</option></SolidSelect></div>}
         </div>
+        {ribbonTab === "home" && <div className="desktop-ribbon-content"><TextToolbar target={textTarget} onTarget={setTextTarget} style={currentTextStyle} onChange={updateTextStyle} hasSelectedText={selected?.type === "text"}/></div>}
+        {ribbonTab === "templates" && <div className="desktop-ribbon-content template-ribbon"><BackgroundPicker onPick={(background) => updateSlide({ background })} onTemplate={applyTemplate} onApplyAll={applyTemplateAll}/></div>}
         <div className={`mobile-sheet text-sheet ${mobileSheet === "text" ? "open" : ""}`}>
           <div className="mobile-sheet-head">
             <b>Format Teks</b>
@@ -717,7 +725,7 @@ export default function PPTEditor({ material, updateMaterial }) {
         </div>
         <h3>Pengaturan Slide</h3>
         <label>Ukuran</label>
-        <select
+        <SolidSelect
           value={slideSize.label}
           onChange={(e) => {
             const found = Object.values(SLIDE_SIZES).find(
@@ -729,9 +737,9 @@ export default function PPTEditor({ material, updateMaterial }) {
           {Object.values(SLIDE_SIZES).map((size) => (
             <option key={size.label}>{size.label}</option>
           ))}
-        </select>
+        </SolidSelect>
         <label>Animasi Masuk</label>
-        <select
+        <SolidSelect
           value={active?.transition || "fade"}
           onChange={(e) => updateSlide({ transition: e.target.value })}
         >
@@ -740,9 +748,9 @@ export default function PPTEditor({ material, updateMaterial }) {
               {item.label}
             </option>
           ))}
-        </select>
+        </SolidSelect>
         <label>Durasi</label>
-        <select
+        <SolidSelect
           value={active?.duration || 700}
           onChange={(e) => updateSlide({ duration: Number(e.target.value) })}
         >
@@ -750,7 +758,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           <option value={700}>Normal</option>
           <option value={1100}>Lembut</option>
           <option value={1600}>Dramatis</option>
-        </select>
+        </SolidSelect>
         {selected && (
           <div className="element-properties">
             <h3>Elemen Terpilih</h3>

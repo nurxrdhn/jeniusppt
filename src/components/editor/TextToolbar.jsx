@@ -8,6 +8,7 @@ import {
   Underline,
 } from "lucide-react";
 import { FONT_OPTIONS, loadWebFont } from "../../utils/fonts";
+import SolidSelect from "../ui/SolidSelect";
 
 export default function TextToolbar({
   target,
@@ -20,12 +21,12 @@ export default function TextToolbar({
   return (
     <section className="word-toolbar">
       <div className="word-toolbar-row">
-        <select value={target} onChange={(e) => onTarget(e.target.value)}>
+        <SolidSelect value={target} onChange={(e) => onTarget(e.target.value)}>
           <option value="title">Judul</option>
           <option value="body">Isi</option>
           {hasSelectedText && <option value="selected">Teks Terpilih</option>}
-        </select>
-        <select
+        </SolidSelect>
+        <SolidSelect
           className="font-select"
           value={style.fontFamily || "Arial"}
           onChange={(e) => {
@@ -38,7 +39,7 @@ export default function TextToolbar({
               {font}
             </option>
           ))}
-        </select>
+        </SolidSelect>
         <input
           className="font-size-input"
           type="number"
@@ -145,7 +146,7 @@ export default function TextToolbar({
             onChange={(e) => patch({ letterSpacing: Number(e.target.value) })}
           />
         </label>
-        <select
+        <SolidSelect
           value={style.textTransform || "none"}
           onChange={(e) => patch({ textTransform: e.target.value })}
         >
@@ -153,7 +154,7 @@ export default function TextToolbar({
           <option value="uppercase">HURUF BESAR</option>
           <option value="lowercase">huruf kecil</option>
           <option value="capitalize">Awal Kapital</option>
-        </select>
+        </SolidSelect>
       </div>
     </section>
   );

@@ -60,7 +60,7 @@ export default function CodeImportModal({ onClose, onImport, notify }) {
           body: slide.body || slide.text || "Mulai mengetik...",
           background: slide.background || {
             type: "css",
-            value: "linear-gradient(135deg,#0b1f46,#1d4ed8)",
+            value: "#1d4ed8",
           },
         })),
         questions: (data.questions || data.quiz || []).map((q) => ({

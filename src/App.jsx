@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SolidSelect from "./components/ui/SolidSelect";
 
 import {
   Archive,
@@ -33,6 +34,7 @@ import { translateVisiblePage } from "./services/translationService";
 import { auth } from "./firebase/config";
 import {
   SubscriptionPage,
+  CreatorMarketplace,
   TemplateRecommendations,
   TrashPage,
 } from "./components/dashboard/FeaturePages";
@@ -63,7 +65,7 @@ const blankMaterial = () => ({
       body: "Mulai mengetik...",
       background: {
         type: "css",
-        value: "linear-gradient(135deg,#7c2d12,#f97316)",
+        value: "#ff641e",
       },
     },
   ],
@@ -515,7 +517,7 @@ export default function App() {
     });
   }
   function useEducationTemplate(template) {
-    const background = `linear-gradient(135deg,${template.colors[0]},${template.colors[1]})`;
+    const background = template.colors[0];
     const item = {
       ...blankMaterial(),
       title: template.title,
@@ -618,7 +620,11 @@ export default function App() {
               : page === "feedback"
                 ? "Saran & Kritik"
                 : page === "productivity"
-                  ? "Pusat Produktivitas"
+                ? "Pusat Produktivitas"
+                : page === "question_bank"
+                  ? "Bank Soal"
+                  : page === "creator_market"
+                    ? "Galeri Kreator"
               : page === "trash"
                 ? "Tempat Sampah"
                 : "JeniusPPT";
@@ -706,7 +712,7 @@ export default function App() {
         )}
 
         {page === "workspace" && (
-          <Workspace state={state} editMaterial={(m) => setEditingId(m.id)} />
+          <Workspace state={state} editMaterial={(m) => setEditingId(m.id)} deleteMaterial={deleteMaterial} />
         )}
 
         {page === "analytics" && <Analytics state={state} />}
@@ -728,6 +734,12 @@ export default function App() {
             onNavigate={setPage}
           />
         )}
+
+        {page === "question_bank" && (
+          <ProductivityHub state={state} setState={setState} user={user} notify={notify} onNavigate={setPage} initialActive="questions" />
+        )}
+
+        {page === "creator_market" && <CreatorMarketplace user={user} notify={notify} />}
 
         {page === "settings" && (
           <SettingsPage
@@ -1150,7 +1162,7 @@ function Participants({
         </label>
         <label>
           <span>Materi</span>
-          <select
+          <SolidSelect
             value={material}
             onChange={(e) => setMaterial(e.target.value)}
           >
@@ -1160,11 +1172,11 @@ function Participants({
                 {m.label}
               </option>
             ))}
-          </select>
+          </SolidSelect>
         </label>
         <label>
           <span>Kelas</span>
-          <select
+          <SolidSelect
             value={className}
             onChange={(e) => setClassName(e.target.value)}
           >
@@ -1172,27 +1184,27 @@ function Participants({
             {classes.map((item) => (
               <option key={item}>{item}</option>
             ))}
-          </select>
+          </SolidSelect>
         </label>
         <label>
           <span>Jenis Kelamin</span>
-          <select value={gender} onChange={(e) => setGender(e.target.value)}>
+          <SolidSelect value={gender} onChange={(e) => setGender(e.target.value)}>
             <option value="">Semua</option>
             <option>Laki-laki</option>
             <option>Perempuan</option>
-          </select>
+          </SolidSelect>
         </label>
         <label>
           <span>Status</span>
-          <select value={status} onChange={(e) => setStatus(e.target.value)}>
+          <SolidSelect value={status} onChange={(e) => setStatus(e.target.value)}>
             <option value="">Semua status</option>
             <option>Mengerjakan</option>
             <option>Selesai</option>
-          </select>
+          </SolidSelect>
         </label>
         <label>
           <span>Rentang Nilai</span>
-          <select
+          <SolidSelect
             value={scoreRange}
             onChange={(e) => setScoreRange(e.target.value)}
           >
@@ -1200,7 +1212,7 @@ function Participants({
             <option value="high">80–100</option>
             <option value="medium">60–79</option>
             <option value="low">Di bawah 60</option>
-          </select>
+          </SolidSelect>
         </label>
         <button className="reset-filter" onClick={reset}>
           Reset Filter
@@ -1266,7 +1278,7 @@ function Participants({
   );
 }
 
-function Workspace({ state, editMaterial }) {
+function Workspace({ state, editMaterial, deleteMaterial }) {
   const drafts = state.materials.filter((m) => m.status !== "Published");
   return (
     <section className="page">
@@ -1278,19 +1290,18 @@ function Workspace({ state, editMaterial }) {
       <div className="workspace-list">
         {drafts.length ? (
           drafts.map((m) => (
-            <button
+            <article
               key={m.id}
               className="workspace-item"
-              onClick={() => editMaterial(m)}
             >
-              <div>
+              <button className="workspace-open" onClick={() => editMaterial(m)}><div>
                 <b>{m.title}</b>
                 <p>
                   {m.subject} • {m.className}
                 </p>
-              </div>
-              <span>{m.slides.length} slide →</span>
-            </button>
+              </div><span>{m.slides.length} slide →</span></button>
+              <button className="workspace-delete" onClick={() => deleteMaterial(m)} title="Hapus draft"><Trash2 size={17}/><span>Hapus</span></button>
+            </article>
           ))
         ) : (
           <div className="empty-state">
@@ -1461,11 +1472,11 @@ function AIAssistant({ onGenerated, notify }) {
           <div className="ai-options">
             <label>
               Jenjang
-              <select value={level} onChange={(e) => setLevel(e.target.value)}>
+              <SolidSelect value={level} onChange={(e) => setLevel(e.target.value)}>
                 {["SD", "SMP", "SMA", "SMK", "D3", "S1"].map((x) => (
                   <option key={x}>{x}</option>
                 ))}
-              </select>
+              </SolidSelect>
             </label>
             <label>
               Jumlah slide
@@ -1590,7 +1601,7 @@ function SettingsPage({
           placeholder="Masukkan nama sekolah"
         />
         <label>Bahasa Aplikasi</label>
-        <select
+        <SolidSelect
           value={language}
           onChange={(e) => changeLanguage(e.target.value)}
         >
@@ -1599,7 +1610,7 @@ function SettingsPage({
               {label}
             </option>
           ))}
-        </select>
+        </SolidSelect>
         <button className="primary-button" onClick={save}>
           Simpan Pengaturan
         </button>
@@ -1803,7 +1814,7 @@ function FeedbackPage({ user, notify }) {
 
           <div className="feedback-field">
             <label htmlFor="feedback-category">Jenis masukan</label>
-            <select
+            <SolidSelect
               id="feedback-category"
               value={category}
               onChange={(event) => setCategory(event.target.value)}
@@ -1813,7 +1824,7 @@ function FeedbackPage({ user, notify }) {
               <option>Laporan kendala</option>
               <option>Apresiasi</option>
               <option>Lainnya</option>
-            </select>
+            </SolidSelect>
           </div>
 
           <div className="feedback-field">

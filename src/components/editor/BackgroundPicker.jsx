@@ -4,7 +4,7 @@ export const slideTemplates = [
   {
     name: "Jenius Orange",
     category: "Modern",
-    background: "linear-gradient(135deg,#ff7a25,#e94d08)",
+    background: "#ff641e",
     titleColor: "#ffffff",
     bodyColor: "#fff7ed",
     textAlign: "left",
@@ -12,7 +12,7 @@ export const slideTemplates = [
   {
     name: "Academic Blue",
     category: "Pendidikan",
-    background: "linear-gradient(135deg,#0f2a5f,#2563eb)",
+    background: "#2563eb",
     titleColor: "#ffffff",
     bodyColor: "#dbeafe",
     textAlign: "left",
@@ -20,7 +20,7 @@ export const slideTemplates = [
   {
     name: "Minimal Paper",
     category: "Minimal",
-    background: "linear-gradient(135deg,#ffffff,#fff7ed)",
+    background: "#fffaf5",
     titleColor: "#431407",
     bodyColor: "#7c2d12",
     textAlign: "left",
@@ -29,7 +29,7 @@ export const slideTemplates = [
     name: "Peach Classroom",
     category: "Pendidikan",
     background:
-      "radial-gradient(circle at 88% 15%,#fdba74 0 10%,transparent 11%),linear-gradient(135deg,#fff7ed,#fed7aa)",
+      "#fed7aa",
     titleColor: "#9a3412",
     bodyColor: "#7c2d12",
     textAlign: "left",
@@ -37,7 +37,7 @@ export const slideTemplates = [
   {
     name: "Forest Study",
     category: "Alam",
-    background: "linear-gradient(135deg,#064e3b,#16a34a)",
+    background: "#15803d",
     titleColor: "#ffffff",
     bodyColor: "#dcfce7",
     textAlign: "left",
@@ -46,7 +46,7 @@ export const slideTemplates = [
     name: "Galaxy Class",
     category: "Teknologi",
     background:
-      "radial-gradient(circle at 18% 16%,#8b5cf6,transparent 28%),radial-gradient(circle at 82% 20%,#22d3ee,transparent 25%),linear-gradient(135deg,#020617,#111827)",
+      "#111827",
     titleColor: "#ffffff",
     bodyColor: "#e0e7ff",
     textAlign: "center",
@@ -54,7 +54,7 @@ export const slideTemplates = [
   {
     name: "Sunset Talk",
     category: "Modern",
-    background: "linear-gradient(125deg,#7c2d12,#f97316 58%,#fbbf24)",
+    background: "#c2410c",
     titleColor: "#ffffff",
     bodyColor: "#ffedd5",
     textAlign: "left",
@@ -63,7 +63,7 @@ export const slideTemplates = [
     name: "Ocean Wave",
     category: "Alam",
     background:
-      "radial-gradient(circle at 80% 90%,#67e8f9 0 18%,transparent 19%),linear-gradient(135deg,#075985,#0891b2)",
+      "#0891b2",
     titleColor: "#ffffff",
     bodyColor: "#cffafe",
     textAlign: "left",
@@ -71,7 +71,7 @@ export const slideTemplates = [
   {
     name: "Lavender Idea",
     category: "Kreatif",
-    background: "linear-gradient(135deg,#f5f3ff,#ddd6fe)",
+    background: "#ddd6fe",
     titleColor: "#5b21b6",
     bodyColor: "#6d28d9",
     textAlign: "left",
@@ -79,7 +79,7 @@ export const slideTemplates = [
   {
     name: "Dark Professional",
     category: "Bisnis",
-    background: "linear-gradient(135deg,#111827,#374151)",
+    background: "#1f2937",
     titleColor: "#ffffff",
     bodyColor: "#d1d5db",
     textAlign: "left",
@@ -88,7 +88,7 @@ export const slideTemplates = [
     name: "Notebook",
     category: "Pendidikan",
     background:
-      "repeating-linear-gradient(0deg,#ffffff 0,#ffffff 38px,#bfdbfe 39px,#bfdbfe 40px)",
+      "#eff6ff",
     titleColor: "#1e3a8a",
     bodyColor: "#334155",
     textAlign: "left",
@@ -97,7 +97,7 @@ export const slideTemplates = [
     name: "Geometric",
     category: "Modern",
     background:
-      "linear-gradient(30deg,#fb923c 12%,transparent 12.5%,transparent 87%,#fb923c 87.5%),linear-gradient(150deg,#fff7ed 12%,transparent 12.5%,transparent 87%,#fff7ed 87.5%),#fed7aa",
+      "#fdba74",
     titleColor: "#7c2d12",
     bodyColor: "#9a3412",
     textAlign: "center",
@@ -106,7 +106,7 @@ export const slideTemplates = [
     name: "Science Lab",
     category: "Sains",
     background:
-      "radial-gradient(circle at 15% 20%,#22d3ee 0 3%,transparent 3.5%),radial-gradient(circle at 85% 75%,#34d399 0 4%,transparent 4.5%),linear-gradient(135deg,#ecfeff,#d1fae5)",
+      "#ccfbf1",
     titleColor: "#115e59",
     bodyColor: "#0f766e",
     textAlign: "left",
@@ -114,7 +114,7 @@ export const slideTemplates = [
   {
     name: "Business Gold",
     category: "Bisnis",
-    background: "linear-gradient(135deg,#18181b 0 72%,#ca8a04 72%)",
+    background: "#292524",
     titleColor: "#fef3c7",
     bodyColor: "#fde68a",
     textAlign: "left",
@@ -123,7 +123,7 @@ export const slideTemplates = [
     name: "Kids Fun",
     category: "Anak",
     background:
-      "radial-gradient(circle at 13% 18%,#f472b6 0 6%,transparent 6.5%),radial-gradient(circle at 88% 20%,#60a5fa 0 7%,transparent 7.5%),linear-gradient(135deg,#fef3c7,#fce7f3)",
+      "#fce7f3",
     titleColor: "#be185d",
     bodyColor: "#7c3aed",
     textAlign: "center",
@@ -138,6 +138,9 @@ export default function BackgroundPicker({ onPick, onTemplate, onApplyAll }) {
   const [mediaType, setMediaType] = useState("video");
   const [category, setCategory] = useState("Semua");
   const [selected, setSelected] = useState(slideTemplates[0]);
+  const [unlocked, setUnlocked] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("jeniusppt-unlocked-templates")) || []; } catch { return []; }
+  });
   const categories = [
     "Semua",
     ...new Set(slideTemplates.map((item) => item.category)),
@@ -184,12 +187,21 @@ export default function BackgroundPicker({ onPick, onTemplate, onApplyAll }) {
         ))}
       </div>
       <div className="template-grid">
-        {shown.map((template) => (
+        {shown.map((template) => {
+          const premium = slideTemplates.indexOf(template) > 2;
+          const owned = unlocked.includes(template.name);
+          return (
           <button
             key={template.name}
             className={selected.name === template.name ? "selected" : ""}
             title={template.name}
             onClick={() => {
+              if (premium && !owned) {
+                const approved = window.confirm(`Template premium Rp9.900. Lanjutkan ke proses pembelian ${template.name}?`);
+                if (!approved) return;
+                const next = [...unlocked, template.name];
+                setUnlocked(next); localStorage.setItem("jeniusppt-unlocked-templates", JSON.stringify(next));
+              }
               setSelected(template);
               onTemplate(template);
             }}
@@ -199,8 +211,9 @@ export default function BackgroundPicker({ onPick, onTemplate, onApplyAll }) {
             </span>
             <b>{template.name}</b>
             <small>{template.category}</small>
+            <em>{premium ? (owned ? "Dimiliki" : "Rp9.900") : "Gratis"}</em>
           </button>
-        ))}
+        )})}
       </div>
       <button
         className="apply-all-template"

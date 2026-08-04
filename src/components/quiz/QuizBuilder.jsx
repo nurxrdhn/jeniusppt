@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { BookmarkPlus, Plus, Search, Trash2 } from "lucide-react";
+import SolidSelect from "../ui/SolidSelect";
 const BANK_KEY = "jeniusppt_question_bank_v1";
 const loadBank = () => {
   try {
@@ -190,16 +191,16 @@ export default function QuizBuilder({ material, updateMaterial }) {
           onChange={(e) => updateQuestion({ topic: e.target.value })}
         />
         <label>Tingkat Kesulitan</label>
-        <select
+        <SolidSelect
           value={q?.difficulty || "Mudah"}
           onChange={(e) => updateQuestion({ difficulty: e.target.value })}
         >
           <option>Mudah</option>
           <option>Sedang</option>
           <option>Sulit</option>
-        </select>
+        </SolidSelect>
         <label>Tipe</label>
-        <select
+        <SolidSelect
           value={q?.type || "pg"}
           onChange={(e) =>
             updateQuestion(
@@ -215,9 +216,9 @@ export default function QuizBuilder({ material, updateMaterial }) {
         >
           <option value="pg">Pilihan Ganda</option>
           <option value="truefalse">Benar/Salah</option>
-        </select>
+        </SolidSelect>
         <label>Timer</label>
-        <select
+        <SolidSelect
           value={q?.timer || 15}
           onChange={(e) => updateQuestion({ timer: Number(e.target.value) })}
         >
@@ -226,9 +227,9 @@ export default function QuizBuilder({ material, updateMaterial }) {
           <option>20</option>
           <option>30</option>
           <option>60</option>
-        </select>
+        </SolidSelect>
         <label>Poin</label>
-        <select
+        <SolidSelect
           value={q?.points || 1000}
           onChange={(e) => updateQuestion({ points: Number(e.target.value) })}
         >
@@ -236,7 +237,7 @@ export default function QuizBuilder({ material, updateMaterial }) {
           <option>500</option>
           <option>1000</option>
           <option>2000</option>
-        </select>
+        </SolidSelect>
         <div className="bank-divider">
           <h3>Bank Soal</h3>
           <span>{bank.length} soal tersimpan</span>
@@ -249,7 +250,7 @@ export default function QuizBuilder({ material, updateMaterial }) {
             placeholder="Cari soal atau topik"
           />
         </div>
-        <select
+        <SolidSelect
           value={difficulty}
           onChange={(e) => setDifficulty(e.target.value)}
         >
@@ -257,7 +258,7 @@ export default function QuizBuilder({ material, updateMaterial }) {
           <option>Mudah</option>
           <option>Sedang</option>
           <option>Sulit</option>
-        </select>
+        </SolidSelect>
         <div className="bank-list">
           {shown.length ? (
             shown.map((item) => (

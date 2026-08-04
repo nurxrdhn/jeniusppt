@@ -12,6 +12,7 @@ import { Document, Packer, Paragraph, HeadingLevel } from "docx";
 import { jsPDF } from "jspdf";
 import { renderSlideToDataUrl } from "../../utils/slideRenderer";
 import { isYouTubeUrl, normalizeVideoUrl } from "../../utils/mediaUrl";
+import SolidSelect from "../ui/SolidSelect";
 
 const saveBlob = (blob, name) => {
   const url = URL.createObjectURL(blob);
@@ -56,7 +57,7 @@ async function readOffice(file) {
           body: parts.join(" ") || "Konten hasil impor",
           background: {
             type: "css",
-            value: "linear-gradient(135deg,#7c2d12,#f97316)",
+            value: "#ff641e",
           },
         };
       }),
@@ -70,7 +71,7 @@ async function readOffice(file) {
     body: i === 0 ? "Dokumen hasil impor" : p,
     background: {
       type: "css",
-      value: "linear-gradient(135deg,#7c2d12,#f97316)",
+      value: "#ff641e",
     },
   }));
 }
@@ -96,7 +97,7 @@ async function readPdf(file) {
       body: text.slice(80) || "Konten hasil impor PDF",
       background: {
         type: "css",
-        value: "linear-gradient(135deg,#7c2d12,#f97316)",
+        value: "#ff641e",
       },
     });
   }
@@ -229,7 +230,7 @@ export default function FileCenter({ materials, onImport, notify }) {
           <FileDown size={30} />
           <h2>Ekspor Materi</h2>
           <p>Pilih materi lalu unduh sebagai presentasi, dokumen, atau PDF.</p>
-          <select
+          <SolidSelect
             value={material?.id || ""}
             onChange={(e) => setSelected(e.target.value)}
           >
@@ -238,7 +239,7 @@ export default function FileCenter({ materials, onImport, notify }) {
                 {m.title}
               </option>
             ))}
-          </select>
+          </SolidSelect>
           {material ? (
             <div className="export-actions">
               <button onClick={() => exportPptx(material)}>
