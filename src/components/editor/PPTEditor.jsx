@@ -91,9 +91,14 @@ export default function PPTEditor({ material, updateMaterial }) {
   const stickerRef = useRef(null);
   const videoRef = useRef(null);
   const audioRef = useRef(null);
+  const mobileRibbonRef = useRef(null);
   const historyRef = useRef([JSON.stringify(slides)]);
   const historyIndexRef = useRef(0);
   const lastCommitRef = useRef(0);
+
+  useEffect(() => {
+    if (mobileRibbonRef.current) mobileRibbonRef.current.scrollLeft = 0;
+  }, [material.id]);
 
   useEffect(() => {
     historyRef.current = [JSON.stringify(material.slides || [])];
@@ -495,7 +500,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   return (
     <div className="ppt-editor">
       <main className="slide-stage">
-        <nav className="mobile-ribbon-tabs" aria-label="Menu editor slide di HP">
+        <nav ref={mobileRibbonRef} className="mobile-ribbon-tabs" aria-label="Menu editor slide di HP">
           {[["home","Beranda"],["elements","Elemen"],["insert","Sisipkan"]].map(([key,label]) => (
             <button
               key={key}

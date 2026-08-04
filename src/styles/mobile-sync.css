@@ -488,3 +488,65 @@ button, a, input, textarea { -webkit-tap-highlight-color:transparent; }
   html[data-theme="dark"] .mobile-ribbon-menu > button { background:#242a33 !important; color:#e5e7eb !important; }
   html[data-theme="dark"] .mobile-ribbon-menu > button.active { background:#34251e !important; color:#ff9b61 !important; }
 }
+
+/* Koreksi v7.8: tab pembuat materi utuh dan navbar editor selalu mulai dari Beranda. */
+@media (max-width: 760px) {
+  .builder-top .stepper {
+    width:100% !important;
+    max-width:100% !important;
+    padding:5px !important;
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:4px !important;
+    overflow:visible !important;
+  }
+  .builder-top .stepper > button {
+    width:100% !important;
+    min-width:0 !important;
+    min-height:42px !important;
+    padding:7px 4px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    overflow:hidden !important;
+    color:#344054 !important;
+    font-size:11px !important;
+    line-height:1.15 !important;
+    text-align:center !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+  }
+  .builder-top .stepper > button.active { background:var(--fresh-orange) !important; color:#fff !important; }
+  .builder-page .info-form { height:auto !important; min-height:0 !important; overflow:visible !important; }
+  .builder-page .info-form label,
+  .builder-page .info-form label > span,
+  .builder-page .settings-divider h2,
+  .builder-page .settings-divider p {
+    max-width:100% !important;
+    overflow:visible !important;
+    overflow-wrap:anywhere !important;
+    white-space:normal !important;
+  }
+  .builder-page .info-form input,
+  .builder-page .info-form textarea,
+  .builder-page .info-form .solid-select,
+  .builder-page .info-form .solid-select-trigger {
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+  }
+
+  .ppt-editor .slide-stage > .mobile-ribbon-tabs {
+    direction:ltr !important;
+    left:auto !important;
+    right:auto !important;
+    margin-left:0 !important;
+    transform:none !important;
+  }
+  .ppt-editor .slide-stage > .mobile-ribbon-tabs > button:nth-child(1),
+  .ppt-editor .slide-stage > .mobile-ribbon-tabs > button:nth-child(2) {
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+  }
+}
