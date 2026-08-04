@@ -1680,31 +1680,27 @@ function FeedbackPage({ user, notify }) {
 
     setSending(true);
     try {
+      const token = await auth.currentUser?.getIdToken();
       const response = await fetch(
-        "https://formsubmit.co/ajax/jeniusppt@gmail.com",
+        "/api/feedback",
         {
           method: "POST",
           headers: {
-            Accept: "application/json",
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token || ""}`,
           },
           body: JSON.stringify({
-            _subject: `[JeniusPPT] ${category} • ${rating}/5`,
-            _template: "table",
-            nama: user?.name || "Pengguna JeniusPPT",
-            email_pengirim: user?.email || "Tidak tersedia",
-            kategori: category,
-            penilaian: `${rating} dari 5 • ${ratingLabels[rating]}`,
-            komentar: comment.trim(),
-            waktu: new Date().toLocaleString("id-ID"),
+            name: user?.name || "Pengguna JeniusPPT",
+            email: user?.email || "",
+            category,
+            rating,
+            ratingLabel: ratingLabels[rating],
+            comment: comment.trim(),
           }),
         },
       );
-      if (!response.ok) throw new Error("Pengiriman ditolak layanan email.");
       const result = await response.json();
-      if (result.success === false || result.success === "false") {
-        throw new Error(result.message || "Saran belum dapat dikirim.");
-      }
+      if (!response.ok || !result.success) throw new Error(result.error || "Saran belum dapat dikirim ke Gmail.");
       setRating(0);
       setComment("");
       setCategory("Saran fitur");

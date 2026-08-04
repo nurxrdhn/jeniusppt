@@ -33,7 +33,7 @@ import BackgroundPicker from "./BackgroundPicker";
 import MediaPlayer from "../ui/MediaPlayer";
 import { normalizeVideoUrl } from "../../utils/mediaUrl";
 import TextToolbar from "./TextToolbar";
-import { textStyle } from "../../utils/fonts";
+import { loadWebFont, textStyle } from "../../utils/fonts";
 const defaultBg = {
   type: "css",
   value: "#ff641e",
@@ -113,6 +113,12 @@ export default function PPTEditor({ material, updateMaterial }) {
       updateMaterial(material.id, { slides: migratedSlides });
     }
   }, [material.id]);
+
+  useEffect(() => {
+    const fonts = [active?.titleStyle?.fontFamily, active?.bodyStyle?.fontFamily];
+    (active?.elements || []).forEach((item) => fonts.push(item.style?.fontFamily));
+    fonts.filter(Boolean).forEach(loadWebFont);
+  }, [activeIndex, active?.titleStyle?.fontFamily, active?.bodyStyle?.fontFamily, active?.elements]);
 
   useEffect(() => {
     function shortcuts(event) {
@@ -678,6 +684,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 ⋮⋮
               </button>
               <input
+                key={`title-${active?.titleStyle?.fontFamily || "Arial"}`}
                 style={textStyle(
                   active?.titleStyle || {
                     fontFamily: "Arial",
@@ -689,6 +696,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 )}
                 value={active?.title || ""}
                 onChange={(e) => updateSlide({ title: e.target.value })}
+                onFocus={() => setTextTarget("title")}
                 className="slide-title-input"
                 placeholder="Judul"
               />
@@ -709,6 +717,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 ⋮⋮
               </button>
               <textarea
+                key={`body-${active?.bodyStyle?.fontFamily || "Arial"}`}
                 style={textStyle(
                   active?.bodyStyle || {
                     fontFamily: "Arial",
@@ -720,6 +729,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 )}
                 value={active?.body || ""}
                 onChange={(e) => updateSlide({ body: e.target.value })}
+                onFocus={() => setTextTarget("body")}
                 className="slide-body-input"
                 placeholder="Mulai mengetik..."
               />
