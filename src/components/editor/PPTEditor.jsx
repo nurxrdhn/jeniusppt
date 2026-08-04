@@ -81,6 +81,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   const [showStickers, setShowStickers] = useState(false);
   const [mobileSheet, setMobileSheet] = useState(null);
   const [ribbonTab, setRibbonTab] = useState("home");
+  const [mobileRibbonMore, setMobileRibbonMore] = useState(false);
   const [historyStatus, setHistoryStatus] = useState({
     canUndo: false,
     canRedo: false,
@@ -495,17 +496,43 @@ export default function PPTEditor({ material, updateMaterial }) {
     <div className="ppt-editor">
       <main className="slide-stage">
         <nav className="mobile-ribbon-tabs" aria-label="Menu editor slide di HP">
-          {[["home","Beranda"],["elements","Elemen"],["insert","Sisipkan"],["design","Desain"],["transition","Transisi"],["templates","Template"]].map(([key,label]) => (
+          {[["home","Beranda"],["elements","Elemen"],["insert","Sisipkan"]].map(([key,label]) => (
             <button
               key={key}
               type="button"
               className={ribbonTab === key ? "active" : ""}
               aria-pressed={ribbonTab === key}
-              onClick={() => setRibbonTab(key)}
+              onClick={() => { setRibbonTab(key); setMobileRibbonMore(false); }}
             >
               {label}
             </button>
           ))}
+          <div className="mobile-ribbon-more">
+            <button
+              type="button"
+              className={["design","transition","templates"].includes(ribbonTab) ? "active" : ""}
+              aria-expanded={mobileRibbonMore}
+              onClick={() => setMobileRibbonMore((value) => !value)}
+            >
+              <MoreHorizontal size={17} />
+              Lainnya
+            </button>
+            {mobileRibbonMore && (
+              <div className="mobile-ribbon-menu" role="menu">
+                {[["design","Desain"],["transition","Transisi"],["templates","Template"]].map(([key,label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    role="menuitem"
+                    className={ribbonTab === key ? "active" : ""}
+                    onClick={() => { setRibbonTab(key); setMobileRibbonMore(false); }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
         <nav className="editor-ribbon-tabs" aria-label="Menu editor slide" data-tour="editor-ribbon">
           {[["home","Beranda"],["elements","Elemen"],["insert","Sisipkan"],["design","Desain"],["transition","Transisi"],["templates","Template"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
@@ -696,7 +723,8 @@ export default function PPTEditor({ material, updateMaterial }) {
               >
                 ⋮⋮
               </button>
-              <input
+              <textarea
+                rows={2}
                 key={`title-${active?.titleStyle?.fontFamily || "Arial"}`}
                 style={textStyle(
                   active?.titleStyle || {

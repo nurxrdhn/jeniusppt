@@ -346,3 +346,145 @@ button, a, input, textarea { -webkit-tap-highlight-color:transparent; }
   .ppt-editor .slide-stage .desktop-ribbon-content { padding:7px !important; }
   .ppt-editor .slide-stage .desktop-ribbon-content.element-library { grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
 }
+
+/* Penyederhanaan final navbar dan galeri template HP. */
+@media (max-width: 760px) {
+  .ppt-editor .slide-stage > .editor-ribbon-tabs {
+    display:none !important;
+    height:0 !important;
+    min-height:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+    border:0 !important;
+    overflow:hidden !important;
+  }
+  .ppt-editor .slide-stage > .mobile-ribbon-tabs {
+    position:relative !important;
+    height:52px !important;
+    min-height:52px !important;
+    padding:4px 6px 0 !important;
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    align-items:stretch !important;
+    gap:2px !important;
+    overflow:visible !important;
+  }
+  .ppt-editor .slide-stage > .mobile-ribbon-tabs > button,
+  .ppt-editor .slide-stage > .mobile-ribbon-tabs > .mobile-ribbon-more > button {
+    width:100% !important;
+    min-width:0 !important;
+    height:47px !important;
+    min-height:47px !important;
+    padding:0 4px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:4px !important;
+    border:0 !important;
+    border-top:0 !important;
+    border-bottom:3px solid transparent !important;
+    border-radius:8px 8px 0 0 !important;
+    background:transparent !important;
+    color:#475467 !important;
+    font-size:11px !important;
+    font-weight:800 !important;
+    white-space:nowrap !important;
+    box-shadow:none !important;
+  }
+  .ppt-editor .slide-stage > .mobile-ribbon-tabs > button.active,
+  .ppt-editor .slide-stage > .mobile-ribbon-tabs > .mobile-ribbon-more > button.active {
+    border-top:0 !important;
+    border-bottom-color:var(--fresh-orange) !important;
+    background:transparent !important;
+    color:#c2410c !important;
+    box-shadow:none !important;
+  }
+  .mobile-ribbon-more { position:relative !important; min-width:0 !important; }
+  .mobile-ribbon-menu {
+    position:absolute !important;
+    z-index:600 !important;
+    top:calc(100% + 7px) !important;
+    right:0 !important;
+    width:168px !important;
+    padding:7px !important;
+    display:grid !important;
+    gap:4px !important;
+    border:1px solid #dfe4eb !important;
+    border-radius:13px !important;
+    background:#fff !important;
+    box-shadow:0 12px 28px rgba(15,23,42,.16) !important;
+  }
+  .mobile-ribbon-menu > button {
+    width:100% !important;
+    min-height:42px !important;
+    padding:0 12px !important;
+    border:0 !important;
+    border-radius:9px !important;
+    background:#f6f7f9 !important;
+    color:#344054 !important;
+    text-align:left !important;
+    font-size:12px !important;
+    font-weight:800 !important;
+  }
+  .mobile-ribbon-menu > button.active { background:#fff0e8 !important; color:#c2410c !important; }
+
+  .ppt-editor .template-ribbon .bg-panel { width:100% !important; min-width:0 !important; padding:10px !important; }
+  .ppt-editor .template-ribbon .template-categories {
+    width:100% !important;
+    max-width:100% !important;
+    padding:7px 0 !important;
+    gap:5px !important;
+    overflow-x:auto !important;
+    scrollbar-width:none !important;
+  }
+  .ppt-editor .template-ribbon .template-categories::-webkit-scrollbar { display:none !important; }
+  .ppt-editor .template-ribbon .template-categories button { flex:0 0 auto !important; max-width:112px !important; overflow:hidden !important; text-overflow:ellipsis !important; }
+  .ppt-editor .template-ribbon .template-grid {
+    width:100% !important;
+    min-width:0 !important;
+    max-height:330px !important;
+    padding:3px !important;
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:9px !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+  }
+  .ppt-editor .template-ribbon .template-grid > button {
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    padding:7px !important;
+    overflow:hidden !important;
+  }
+  .ppt-editor .template-ribbon .template-grid > button > span { width:100% !important; height:68px !important; filter:saturate(.72) brightness(1.04); }
+  .ppt-editor .template-ribbon .template-grid > button b,
+  .ppt-editor .template-ribbon .template-grid > button small,
+  .ppt-editor .template-ribbon .template-grid > button em {
+    width:100% !important;
+    max-width:100% !important;
+    display:block !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+  }
+
+  .ppt-editor .slide-canvas .movable-text { min-width:0 !important; max-width:100% !important; overflow:hidden !important; }
+  .ppt-editor .slide-canvas .movable-text .slide-title-input,
+  .ppt-editor .slide-canvas .movable-text .slide-body-input {
+    width:100% !important;
+    max-width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+    overflow-wrap:anywhere !important;
+    word-break:break-word !important;
+    white-space:pre-wrap !important;
+    resize:none !important;
+  }
+
+  html[data-theme="dark"] .mobile-ribbon-menu { background:#1b2028 !important; border-color:#343c48 !important; }
+  html[data-theme="dark"] .mobile-ribbon-menu > button { background:#242a33 !important; color:#e5e7eb !important; }
+  html[data-theme="dark"] .mobile-ribbon-menu > button.active { background:#34251e !important; color:#ff9b61 !important; }
+}
