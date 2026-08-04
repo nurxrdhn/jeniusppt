@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { signInWithPopup } from "firebase/auth";
+import {
+  browserLocalPersistence,
+  getRedirectResult,
+  setPersistence,
+  signInWithPopup,
+  signInWithRedirect,
+} from "firebase/auth";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { auth, googleProvider } from "../../firebase/config";
 import GoogleLogo from "../ui/GoogleLogo";
@@ -22,19 +28,58 @@ export default function OpeningLogin({ onLogin }) {
     );
     return () => clearInterval(t);
   }, []);
+  useEffect(() => {
+    let active = true;
+    async function finishRedirectLogin() {
+      try {
+        await setPersistence(auth, browserLocalPersistence);
+        const result = await getRedirectResult(auth);
+        if (active && result?.user) completeLogin(result.user);
+      } catch (loginError) {
+        console.error("Google redirect login failed", loginError);
+        if (active) setError(loginMessage(loginError));
+      }
+    }
+    finishRedirectLogin();
+    return () => { active = false; };
+  }, []);
+
+  function completeLogin(user) {
+    onLogin({
+      uid: user.uid,
+      name: user.displayName || "Guru",
+      email: user.email,
+      photoURL: user.photoURL,
+      role: "teacher",
+    });
+  }
+
+  function loginMessage(loginError) {
+    const code = loginError?.code || "";
+    if (code.includes("unauthorized-domain"))
+      return "Domain jeniusppt.online belum diizinkan pada Firebase Authentication.";
+    if (code.includes("popup-blocked"))
+      return "Popup diblokir browser. Izinkan popup atau coba masuk kembali.";
+    if (code.includes("network-request-failed"))
+      return "Koneksi ke Google gagal. Periksa jaringan lalu coba kembali.";
+    return "Login Google gagal. Periksa domain Firebase dan konfigurasi OAuth.";
+  }
+
   async function login() {
     try {
       setError("");
-      const r = await signInWithPopup(auth, googleProvider);
-      onLogin({
-        uid: r.user.uid,
-        name: r.user.displayName || "Guru",
-        email: r.user.email,
-        photoURL: r.user.photoURL,
-        role: "teacher",
-      });
-    } catch {
-      setError("Google Auth belum aktif atau domain belum diizinkan.");
+      await setPersistence(auth, browserLocalPersistence);
+      googleProvider.setCustomParameters({ prompt: "select_account" });
+      const mobile = window.matchMedia("(max-width: 860px)").matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (mobile) {
+        await signInWithRedirect(auth, googleProvider);
+        return;
+      }
+      const result = await signInWithPopup(auth, googleProvider);
+      completeLogin(result.user);
+    } catch (loginError) {
+      console.error("Google login failed", loginError);
+      setError(loginMessage(loginError));
     }
   }
   return (
