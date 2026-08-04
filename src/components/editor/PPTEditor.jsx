@@ -23,8 +23,13 @@ import TextToolbar from "./TextToolbar";
 import { textStyle } from "../../utils/fonts";
 const defaultBg = {
   type: "css",
-  value: "linear-gradient(135deg,#ff7a25,#e94d08)",
+  value: "#ff641e",
 };
+const legacyDefaultBackgrounds = new Set([
+  "linear-gradient(135deg,#ff7a25,#e94d08)",
+  "linear-gradient(135deg,#7c2d12,#f97316)",
+  "linear-gradient(125deg,#7c2d12,#f97316 58%,#fbbf24)",
+]);
 const animations = [
   { value: "none", label: "Tanpa Animasi" },
   { value: "fade", label: "Fade" },
@@ -81,6 +86,18 @@ export default function PPTEditor({ material, updateMaterial }) {
     lastCommitRef.current = 0;
     setHistoryStatus({ canUndo: false, canRedo: false });
     setSavedAt(material.lastSavedAt || null);
+  }, [material.id]);
+
+  useEffect(() => {
+    const sourceSlides = material.slides || [];
+    const migratedSlides = sourceSlides.map((slide) =>
+      legacyDefaultBackgrounds.has(slide.background?.value)
+        ? { ...slide, background: defaultBg }
+        : slide,
+    );
+    if (migratedSlides.some((slide, index) => slide !== sourceSlides[index])) {
+      updateMaterial(material.id, { slides: migratedSlides });
+    }
   }, [material.id]);
 
   useEffect(() => {
