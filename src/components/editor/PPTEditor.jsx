@@ -494,6 +494,19 @@ export default function PPTEditor({ material, updateMaterial }) {
   return (
     <div className="ppt-editor">
       <main className="slide-stage">
+        <nav className="mobile-ribbon-tabs" aria-label="Menu editor slide di HP">
+          {[["home","Beranda"],["elements","Elemen"],["insert","Sisipkan"],["design","Desain"],["transition","Transisi"],["templates","Template"]].map(([key,label]) => (
+            <button
+              key={key}
+              type="button"
+              className={ribbonTab === key ? "active" : ""}
+              aria-pressed={ribbonTab === key}
+              onClick={() => setRibbonTab(key)}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
         <nav className="editor-ribbon-tabs" aria-label="Menu editor slide" data-tour="editor-ribbon">
           {[["home","Beranda"],["elements","Elemen"],["insert","Sisipkan"],["design","Desain"],["transition","Transisi"],["templates","Template"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
         </nav>
