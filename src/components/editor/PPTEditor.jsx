@@ -83,6 +83,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   const [mobileSheet, setMobileSheet] = useState(null);
   const [ribbonTab, setRibbonTab] = useState("home");
   const [mobileRibbonMore, setMobileRibbonMore] = useState(false);
+  const [textBoxMenu, setTextBoxMenu] = useState(null);
   const [historyStatus, setHistoryStatus] = useState({
     canUndo: false,
     canRedo: false,
@@ -418,6 +419,34 @@ export default function PPTEditor({ material, updateMaterial }) {
     updateSlide({ elements: [...(active.elements || []), copy] });
     setSelectedElement(copy.id);
   }
+  function textBoxData(key) {
+    const isTitle = key === "title";
+    return {
+      text: active?.[key] || "",
+      style: active?.[`${key}Style`] || {},
+      color: active?.[isTitle ? "titleColor" : "bodyColor"] || "#ffffff",
+      box: active?.[isTitle ? "titleBox" : "bodyBox"] || (isTitle
+        ? { x: 7, y: 10, w: 86, h: 20 }
+        : { x: 8, y: 38, w: 84, h: 40 }),
+    };
+  }
+  function duplicateTextBox(key) {
+    const source = textBoxData(key);
+    addElement("text", {
+      text: source.text || "Teks salinan",
+      style: { ...source.style, color: source.color },
+      color: source.color,
+      x: Math.min(source.box.x + 3, 66),
+      y: Math.min(source.box.y + 3, 82),
+      w: Math.min(source.box.w, 50),
+      h: Math.max(10, Math.min(source.box.h, 28)),
+    });
+    setTextBoxMenu(null);
+  }
+  function clearTextBox(key) {
+    updateSlide({ [key]: "" });
+    setTextBoxMenu(null);
+  }
   function reorderElement(elementId, position) {
     const items = [...(active.elements || [])];
     const index = items.findIndex((item) => item.id === elementId);
@@ -734,11 +763,19 @@ export default function PPTEditor({ material, updateMaterial }) {
               }}
             >
               <button
+                className="text-box-move"
                 title="Geser judul"
                 onPointerDown={(e) => moveTextBox(e, "titleBox", titleBox)}
               >
                 +
               </button>
+              <button className="text-box-more" title="Pilihan judul" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setTextBoxMenu(textBoxMenu === "title" ? null : "title"); }}><MoreHorizontal size={16}/></button>
+              {textBoxMenu === "title" && <div className="text-box-menu" onPointerDown={(e) => e.stopPropagation()}>
+                <strong>Pilihan judul</strong>
+                <button onClick={() => duplicateTextBox("title")}><Copy size={15}/>Salin</button>
+                <button onClick={() => duplicateTextBox("title")}><CopyPlus size={15}/>Duplikat</button>
+                <button className="danger" onClick={() => clearTextBox("title")}><Trash2 size={15}/>Hapus</button>
+              </div>}
               <textarea
                 rows={2}
                 key={`title-${active?.titleStyle?.fontFamily || "Arial"}`}
@@ -768,11 +805,19 @@ export default function PPTEditor({ material, updateMaterial }) {
               }}
             >
               <button
+                className="text-box-move"
                 title="Geser isi"
                 onPointerDown={(e) => moveTextBox(e, "bodyBox", bodyBox)}
               >
                 +
               </button>
+              <button className="text-box-more" title="Pilihan isi" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setTextBoxMenu(textBoxMenu === "body" ? null : "body"); }}><MoreHorizontal size={16}/></button>
+              {textBoxMenu === "body" && <div className="text-box-menu" onPointerDown={(e) => e.stopPropagation()}>
+                <strong>Pilihan isi</strong>
+                <button onClick={() => duplicateTextBox("body")}><Copy size={15}/>Salin</button>
+                <button onClick={() => duplicateTextBox("body")}><CopyPlus size={15}/>Duplikat</button>
+                <button className="danger" onClick={() => clearTextBox("body")}><Trash2 size={15}/>Hapus</button>
+              </div>}
               <textarea
                 key={`body-${active?.bodyStyle?.fontFamily || "Arial"}`}
                 style={textStyle(

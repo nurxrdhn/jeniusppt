@@ -400,3 +400,48 @@
   html[data-theme="dark"] .builder-mobile-menu button { background:#242a33 !important; border-color:#3b4553 !important; color:#f4f7fb !important; }
   html[data-theme="dark"] .builder-mobile-menu button.active { background:#34251e !important; color:#ff9b61 !important; }
 }
+
+/* v8.3 — controls stay outside the editable zone. */
+.ppt-editor .slide-canvas .movable-text { overflow:visible!important; border:1px dashed rgba(255,255,255,.72); }
+.ppt-editor .slide-canvas .movable-text > .text-box-move,
+.ppt-editor .slide-canvas .movable-text > .text-box-more { position:absolute!important; z-index:24!important; top:-18px!important; width:34px!important; height:34px!important; min-width:34px!important; padding:0!important; display:grid!important; place-items:center!important; border:2px solid #fff!important; border-radius:50%!important; color:#fff!important; box-shadow:0 5px 14px rgba(15,23,42,.22)!important; touch-action:none; }
+.ppt-editor .slide-canvas .movable-text > .text-box-move { left:-18px!important; background:#ff641e!important; font-size:23px!important; line-height:1!important; cursor:move!important; }
+.ppt-editor .slide-canvas .movable-text > .text-box-more { right:-18px!important; left:auto!important; background:#182230!important; }
+.ppt-editor .slide-canvas .movable-text > .text-box-menu { position:absolute!important; z-index:30!important; top:24px!important; right:-18px!important; left:auto!important; width:168px!important; height:auto!important; padding:8px!important; display:grid!important; gap:4px!important; border:1px solid #e1e6ed!important; border-radius:12px!important; background:#fff!important; color:#182230!important; box-shadow:0 16px 34px rgba(15,23,42,.22)!important; }
+.ppt-editor .text-box-menu strong { padding:5px 7px; color:#182230; font-size:11px; }
+.ppt-editor .text-box-menu button { position:static!important; width:100%!important; height:36px!important; min-width:0!important; padding:0 9px!important; display:flex!important; align-items:center!important; justify-content:flex-start!important; gap:8px!important; border:0!important; border-radius:8px!important; background:#fff!important; color:#182230!important; box-shadow:none!important; font-size:12px!important; font-weight:750!important; }
+.ppt-editor .text-box-menu button:hover { background:#fff3eb!important; color:#c2410c!important; }
+.ppt-editor .text-box-menu button.danger { color:#c81e1e!important; }
+.ppt-editor .free-element { overflow:visible!important; }
+.ppt-editor .element-move-handle { left:-18px!important; top:-18px!important; }
+.ppt-editor .element-quick-more { right:-18px!important; top:-18px!important; }
+.ppt-editor .element-quick-delete { display:none!important; }
+.ppt-editor .element-context-menu { transform:translateY(10px); }
+
+.certificate-assets label,
+.certificate-assets .certificate-draw-button,
+.certificate-assets .certificate-frame-button { border:1px solid #ffb48e!important; background:#fff!important; color:#182230!important; box-shadow:none!important; }
+.certificate-assets label:hover,
+.certificate-assets .certificate-draw-button:hover,
+.certificate-assets .certificate-frame-button:hover { border-color:#ff641e!important; background:#fff!important; }
+.certificate-assets label span,
+.certificate-assets .certificate-draw-button span,
+.certificate-assets .certificate-frame-button span { background:#ff641e!important; color:#fff!important; }
+.certificate-assets label b,
+.certificate-assets label small,
+.certificate-assets .certificate-draw-button b,
+.certificate-assets .certificate-draw-button small,
+.certificate-assets .certificate-frame-button b,
+.certificate-assets .certificate-frame-button small { color:#182230!important; }
+html[data-theme="dark"] .certificate-assets label,
+html[data-theme="dark"] .certificate-assets .certificate-draw-button,
+html[data-theme="dark"] .certificate-assets .certificate-frame-button { background:#fff!important; border-color:#ffb48e!important; color:#182230!important; }
+
+@media(max-width:760px){
+  .ppt-editor .slide-canvas .movable-text { overflow:visible!important; }
+  .ppt-editor .slide-canvas .movable-text > .text-box-move { left:-13px!important; top:-15px!important; width:30px!important; height:30px!important; min-width:30px!important; font-size:20px!important; }
+  .ppt-editor .slide-canvas .movable-text > .text-box-more { right:-13px!important; top:-15px!important; width:30px!important; height:30px!important; min-width:30px!important; }
+  .ppt-editor .slide-canvas .movable-text > .text-box-menu { top:20px!important; right:-12px!important; width:150px!important; }
+  .ppt-editor .element-move-handle { left:-13px!important; top:-15px!important; width:30px!important; height:30px!important; }
+  .ppt-editor .element-quick-more { right:-13px!important; top:-15px!important; }
+}
