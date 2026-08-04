@@ -28,6 +28,7 @@ const menu = [
   ["subscription", Crown, "Langganan"],
   ["trash", Trash2, "Tempat Sampah"],
   ["question_bank", BookOpenCheck, "Bank Soal"],
+  ["guide", BookOpen, "Panduan & Tutorial"],
   ["creator_market", Store, "Galeri Kreator"],
   ["productivity", PanelsTopLeft, "Pusat Produktivitas"],
   ["feedback", MessageSquareHeart, "Saran & Kritik"],

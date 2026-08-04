@@ -128,8 +128,11 @@ export default function App() {
   const [state, setState] = useState(loadState);
   const [toast, setToast] = useState(null);
   const [dialog, setDialog] = useState(null);
+  const [tourEnabled, setTourEnabled] = useState(
+    () => localStorage.getItem("jeniusppt-tour-enabled") !== "0",
+  );
   const [showTour, setShowTour] = useState(
-    () => !localStorage.getItem("jeniusppt-tour-done"),
+    () => localStorage.getItem("jeniusppt-tour-enabled") !== "0" && !localStorage.getItem("jeniusppt-tour-done-v2"),
   );
   const [editingId, setEditingId] = useState(null);
   const [shareMaterial, setShareMaterial] = useState(null);
@@ -631,6 +634,8 @@ export default function App() {
                 ? "Pusat Produktivitas"
                 : page === "question_bank"
                   ? "Bank Soal"
+                  : page === "guide"
+                    ? "Panduan & Tutorial"
                   : page === "creator_market"
                     ? "Galeri Kreator"
               : page === "trash"
@@ -741,11 +746,16 @@ export default function App() {
             user={user}
             notify={notify}
             onNavigate={setPage}
+            onStartTour={() => setShowTour(true)}
           />
         )}
 
         {page === "question_bank" && (
-          <ProductivityHub state={state} setState={setState} user={user} notify={notify} onNavigate={setPage} initialActive="questions" />
+          <ProductivityHub state={state} setState={setState} user={user} notify={notify} onNavigate={setPage} initialActive="questions" onStartTour={() => setShowTour(true)} />
+        )}
+
+        {page === "guide" && (
+          <ProductivityHub state={state} setState={setState} user={user} notify={notify} onNavigate={setPage} initialActive="help" onStartTour={() => setShowTour(true)} />
         )}
 
         {page === "creator_market" && <CreatorMarketplace user={user} notify={notify} />}
@@ -759,6 +769,15 @@ export default function App() {
               setState((old) => ({ ...old, notifications }))
             }
             restartTour={() => setShowTour(true)}
+            tourEnabled={tourEnabled}
+            setTourEnabled={(enabled) => {
+              setTourEnabled(enabled);
+              localStorage.setItem("jeniusppt-tour-enabled", enabled ? "1" : "0");
+              if (enabled) {
+                localStorage.removeItem("jeniusppt-tour-done-v2");
+                setShowTour(true);
+              } else setShowTour(false);
+            }}
           />
         )}
 
@@ -800,6 +819,7 @@ export default function App() {
           "trash",
           "question_bank",
           "creator_market",
+          "guide",
         ].includes(page) && <ComingSoon title={title} />}
       </main>
 
@@ -819,10 +839,10 @@ export default function App() {
           notify={notify}
         />
       )}
-      {showTour && (
+      {showTour && tourEnabled && (
         <ProductTour
           onDone={() => {
-            localStorage.setItem("jeniusppt-tour-done", "1");
+            localStorage.setItem("jeniusppt-tour-done-v2", "1");
             setShowTour(false);
           }}
         />
@@ -1506,6 +1526,8 @@ function SettingsPage({
   notifications,
   setNotifications,
   restartTour,
+  tourEnabled,
+  setTourEnabled,
 }) {
   const [school, setSchool] = useState(
     localStorage.getItem("jeniusppt_school") || "",
@@ -1649,8 +1671,12 @@ function SettingsPage({
           )}
         </div>
       </div>
+      <div className="tour-settings-card">
+        <div><b>Tour Guide Otomatis</b><p>Tampilkan panduan panah untuk pengguna baru. Setelah selesai atau dilewati, tur tidak muncul lagi secara otomatis.</p></div>
+        <label className="tour-setting-switch"><input type="checkbox" checked={tourEnabled} onChange={(event) => setTourEnabled(event.target.checked)}/><span>{tourEnabled ? "Aktif" : "Nonaktif"}</span></label>
+      </div>
       <div className="settings-tools">
-        <button onClick={restartTour}>Mulai Ulang Tour Guide</button>
+        <button onClick={restartTour} disabled={!tourEnabled}>Mulai Tour Guide Sekarang</button>
         <button className="danger" onClick={clearAppData}>
           Bersihkan Cookie & Cache Aplikasi
         </button>

@@ -52,6 +52,7 @@ export default function ProductivityHub({
   notify,
   onNavigate,
   initialActive = "versions",
+  onStartTour,
 }) {
   const [active, setActive] = useState(initialActive);
   const [versions, setVersions] = useState(() =>
@@ -258,7 +259,7 @@ export default function ProductivityHub({
         </FeatureShell>}
 
         {active === "help" && <FeatureShell icon={HelpCircle} title="Pusat Bantuan" desc="Cari panduan singkat penggunaan fitur utama JeniusPPT.">
-          <GuideCenter />
+          <GuideCenter onStartTour={onStartTour} />
           <input className="hub-search" value={helpQuery} onChange={(e) => setHelpQuery(e.target.value)} placeholder="Cari panduan..."/>
           <div className="hub-help">{helpItems.map(([title, text]) => <details key={title}><summary>{title}</summary><p>{text}</p></details>)}</div>
         </FeatureShell>}

@@ -8,7 +8,11 @@ const steps = [
   { target: '[data-tour="menu-materials"]', title: "Materi dan editor", text: "Buat presentasi, atur font, sisipkan media, tambah kuis, pratinjau, lalu publikasikan." },
   { target: '[data-tour="menu-participants"]', title: "Peserta", text: "Pantau progres dan nilai, gunakan filter, lalu ekspor laporan atau hapus riwayat yang dipilih." },
   { target: '[data-tour="menu-question_bank"]', title: "Bank Soal", text: "Simpan soal dalam folder, cari, pilih, duplikasi, pindahkan, impor, atau ekspor untuk dipakai kembali." },
-  { target: '[data-tour="menu-productivity"]', title: "Panduan penggunaan", text: "Buka Pusat Produktivitas untuk mengunduh buku PDF dan menonton video tutorial JeniusPPT." },
+  { target: '[data-tour="menu-analytics"]', title: "Analitik", text: "Lihat perkembangan materi, slide, soal, publikasi, peserta, dan nilai dalam bentuk ringkasan." },
+  { target: '[data-tour="menu-trash"]', title: "Tempat Sampah", text: "Materi yang dihapus disimpan sementara agar masih dapat dipulihkan sebelum dihapus permanen." },
+  { target: '[data-tour="menu-guide"]', title: "Panduan dan Tutorial", text: "Pilih panduan web interaktif, unduh buku PDF, atau tonton video tutorial langsung dari halaman ini." },
+  { target: '[data-tour="menu-feedback"]', title: "Saran dan Kritik", text: "Berikan nilai serta komentar. Masukan dikirim kepada pengelola JeniusPPT." },
+  { target: '[data-tour="menu-settings"]', title: "Pengaturan Tour Guide", text: "Aktifkan atau nonaktifkan tur otomatis, dan jalankan kembali tur kapan pun diperlukan." },
 ];
 
 export default function ProductTour({ onDone }) {

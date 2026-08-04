@@ -1,4 +1,4 @@
-import { BookOpen, Download, FileText, MonitorPlay, PlayCircle } from "lucide-react";
+import { BookOpen, Compass, Download, FileText, MonitorPlay, PlayCircle } from "lucide-react";
 
 const chapters = [
   ["1", "Mulai dan masuk", "Login guru, pilihan tema, bahasa, serta pengenalan dashboard."],
@@ -9,9 +9,16 @@ const chapters = [
   ["6", "Fitur lanjutan", "Jenius AI, Galeri Kreator, Workspace, sampah, keamanan, dan pemulihan."],
 ];
 
-export default function GuideCenter() {
+export default function GuideCenter({ onStartTour }) {
   return <div className="guide-center">
     <div className="guide-options">
+      <article className="guide-option web-guide">
+        <span><Compass size={27}/></span>
+        <small>PANDUAN VERSI WEB</small>
+        <h3>Tour Interaktif dengan Panah</h3>
+        <p>Ikuti penjelasan langsung pada halaman. Sorotan dan panah akan menunjuk menu satu per satu.</p>
+        <button className="primary-button" onClick={onStartTour}><PlayCircle size={17}/> Mulai Tour Web</button>
+      </article>
       <article className="guide-option pdf-guide">
         <span><FileText size={27}/></span>
         <small>BUKU DIGITAL</small>

@@ -246,13 +246,14 @@ html[data-theme="dark"] .drive-search input,html[data-theme="dark"] .drive-bread
 html[data-theme="dark"] .drive-items article:hover,html[data-theme="dark"] .drive-items article.selected { background:#273449; border-color:#ff6b1a; }
 @media(max-width:800px){.question-drive{grid-template-columns:1fr}.question-drive-sidebar{border-right:0;border-bottom:1px solid #e5e7eb;display:flex;flex-direction:row;overflow:auto}.question-drive-sidebar button{white-space:nowrap}.drive-toolbar{flex-wrap:wrap}.drive-search{flex-basis:100%}.drive-actions{overflow:auto}.drive-items.grid{grid-template-columns:1fr}}
 .guide-center { margin:18px 0 22px; }
-.guide-options { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.guide-options { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
 .guide-option { padding:20px; border:1px solid #dbe2ea; border-radius:17px; background:#fff; color:#1f2937; }
 .guide-option>span { width:48px; height:48px; display:grid; place-items:center; border-radius:13px; background:#ff6b1a; color:#fff; }
 .guide-option small { display:block; margin:16px 0 5px; color:#64748b; font-weight:850; letter-spacing:.08em; }
 .guide-option h3 { margin:0; color:#111827; }
 .guide-option p { color:#64748b; line-height:1.55; }
 .guide-option .primary-button { display:inline-flex; align-items:center; gap:8px; width:max-content; color:#fff; text-decoration:none; padding:11px 15px; border-radius:11px; }
+.guide-option button.primary-button { border:0; }
 .video-guide video { width:100%; max-height:220px; margin-top:8px; border-radius:12px; background:#0f172a; }
 .guide-video-actions { display:flex; gap:8px; margin-top:9px; }
 .guide-video-actions a { flex:1; min-height:40px; display:flex; align-items:center; justify-content:center; gap:7px; border:1px solid #ff6b1a; border-radius:10px; color:#c2410c; font-weight:800; text-decoration:none; }
@@ -265,7 +266,7 @@ html[data-theme="dark"] .drive-items article:hover,html[data-theme="dark"] .driv
 .guide-chapters p { color:#64748b; font-size:13px; margin-top:3px; }
 html[data-theme="dark"] .guide-option,html[data-theme="dark"] .guide-chapters { background:#111827; border-color:#334155; }
 html[data-theme="dark"] .guide-option h3,html[data-theme="dark"] .guide-chapters h3,html[data-theme="dark"] .guide-chapters h4 { color:#f8fafc; }
-@media(max-width:720px){.guide-options{grid-template-columns:1fr}.guide-option{padding:16px}}
+@media(max-width:980px){.guide-options{grid-template-columns:1fr 1fr}}@media(max-width:720px){.guide-options{grid-template-columns:1fr}.guide-option{padding:16px}}
 .post-publish-backdrop { position:fixed; inset:0; z-index:3500; display:grid; place-items:center; padding:18px; background:rgba(15,23,42,.66); }
 .post-publish-survey { position:relative; width:min(500px,100%); padding:28px; border-radius:22px; background:#fff; color:#1f2937; box-shadow:0 30px 90px rgba(0,0,0,.28); }
 .survey-close { position:absolute; right:15px; top:15px; width:38px; height:38px; display:grid; place-items:center; border:0; border-radius:11px; background:#f1f5f9; color:#334155; }
@@ -322,6 +323,13 @@ html[data-theme="dark"] .post-publish-survey { background:#111827;color:#f8fafc 
   gap: 10px;
   margin-top: 14px;
 }
+.tour-settings-card { margin-top:18px; padding:18px; border:1px solid #dbe2ea; border-radius:16px; background:#fff; display:flex; align-items:center; justify-content:space-between; gap:18px; }
+.tour-settings-card b { color:#111827; }.tour-settings-card p{margin:5px 0 0;color:#64748b;line-height:1.5;max-width:680px}
+.tour-setting-switch { flex:0 0 auto; min-width:116px; min-height:44px; padding:0 13px; border-radius:12px; background:#f1f5f9; color:#475569; display:flex; align-items:center; gap:9px; font-weight:850; }
+.tour-setting-switch:has(input:checked) { background:#ff6b1a;color:#fff; }.tour-setting-switch input{width:19px;height:19px;accent-color:#fff}
+.settings-tools button:disabled{opacity:.45;cursor:not-allowed}
+html[data-theme="dark"] .tour-settings-card{background:#111827;border-color:#334155}html[data-theme="dark"] .tour-settings-card b{color:#f8fafc}
+@media(max-width:640px){.tour-settings-card{align-items:flex-start;flex-direction:column}.tour-setting-switch{width:100%;justify-content:center}}
 .settings-tools .danger {
   background: #fff1f2;
   color: #be123c;
