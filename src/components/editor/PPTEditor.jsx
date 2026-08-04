@@ -496,6 +496,36 @@ export default function PPTEditor({ material, updateMaterial }) {
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", stop);
   }
+  function moveTextBoxFromZone(event, key, fallback) {
+    if (event.button !== undefined && event.button !== 0) return;
+    if (event.target.closest("button")) return;
+    const canvas = event.currentTarget.closest(".slide-canvas").getBoundingClientRect();
+    const start = active?.[key] || fallback;
+    const startX = event.clientX;
+    const startY = event.clientY;
+    let dragging = false;
+    const move = (nextEvent) => {
+      const dx = nextEvent.clientX - startX;
+      const dy = nextEvent.clientY - startY;
+      if (!dragging && Math.hypot(dx, dy) < 4) return;
+      dragging = true;
+      updateSlide({
+        [key]: {
+          ...start,
+          x: Math.max(0, Math.min(100 - start.w, start.x + (dx / canvas.width) * 100)),
+          y: Math.max(0, Math.min(100 - start.h, start.y + (dy / canvas.height) * 100)),
+        },
+      });
+    };
+    const stop = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
+    };
+    window.addEventListener("pointermove", move, { passive: false });
+    window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
+  }
   const selected = (active?.elements || []).find(
     (item) => item.id === selectedElement,
   );
@@ -624,7 +654,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             </button>
             <button onClick={() => setMobileSheet("settings")}>
               <Settings2 size={17} />
-              Atur
+              Slide
             </button>
           </div>
           {ribbonTab === "insert" && <div className="desktop-editor-tools ribbon-group">
@@ -662,10 +692,6 @@ export default function PPTEditor({ material, updateMaterial }) {
             accept="image/*"
             onChange={uploadSticker}
           />
-          <button onClick={deleteSlide}>
-            <Trash2 size={16} />
-            Slide
-          </button>
           </div>}
           {ribbonTab === "design" && <div className="desktop-editor-tools ribbon-group"><span className="ribbon-label">Ukuran slide</span><SolidSelect
             value={
@@ -755,6 +781,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           >
             <div
               className="movable-text title-box"
+              onPointerDown={(e) => moveTextBoxFromZone(e, "titleBox", titleBox)}
               style={{
                 left: `${titleBox.x}%`,
                 top: `${titleBox.y}%`,
@@ -797,6 +824,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             </div>
             <div
               className="movable-text body-box"
+              onPointerDown={(e) => moveTextBoxFromZone(e, "bodyBox", bodyBox)}
               style={{
                 left: `${bodyBox.x}%`,
                 top: `${bodyBox.y}%`,

@@ -445,3 +445,25 @@ html[data-theme="dark"] .certificate-assets .certificate-frame-button { backgrou
   .ppt-editor .element-move-handle { left:-13px!important; top:-15px!important; width:30px!important; height:30px!important; }
   .ppt-editor .element-quick-more { right:-13px!important; top:-15px!important; }
 }
+
+/* v8.4 — document-style dropdowns, solid font color, direct dragging. */
+.solid-select-trigger { display:grid!important; grid-template-columns:minmax(0,1fr) auto!important; align-items:center!important; gap:8px!important; text-align:left!important; }
+.solid-select-trigger > span { min-width:0!important; overflow:hidden!important; text-overflow:ellipsis!important; white-space:nowrap!important; }
+.solid-select-trigger > svg { justify-self:end!important; flex:0 0 auto!important; margin:0!important; }
+.word-toolbar-row > .text-color-control { position:relative; min-width:42px; height:38px; padding:4px 9px 3px; display:grid; grid-template-rows:1fr 4px; place-items:center; border:1px solid #d0d5dd; border-radius:8px; background:#fff; color:#182230; cursor:pointer; overflow:hidden; }
+.text-color-control > span { font-size:18px; line-height:1; font-weight:700; }
+.text-color-control > i { width:100%; height:4px; border-radius:4px; }
+.text-color-control > input { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+.ppt-editor .movable-text { touch-action:none!important; cursor:move; }
+.ppt-editor .movable-text textarea { cursor:text; touch-action:none!important; }
+.ppt-editor .free-element { touch-action:none!important; cursor:grab; }
+.ppt-editor .free-element:active { cursor:grabbing; }
+.ppt-editor .free-element.selected { outline-offset:3px!important; }
+.certificate-corner { display:none!important; }
+
+@media(max-width:760px){
+  .ppt-editor .word-toolbar-row > .text-color-control { grid-column:7/9!important; grid-row:3!important; width:100%!important; height:40px!important; }
+  .ppt-editor .word-toolbar-row > button.toolbar-more { grid-column:8/9!important; grid-row:1!important; }
+  .ppt-editor .movable-text { touch-action:none!important; }
+  .ppt-editor .free-element { touch-action:none!important; }
+}

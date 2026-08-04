@@ -93,6 +93,11 @@ export default function TextToolbar({
             <Icon size={16} />
           </button>
         ))}
+        <label className="text-color-control" title="Warna huruf">
+          <span>A</span>
+          <i style={{ background: style.color || "#ffffff" }} />
+          <input type="color" value={style.color || "#ffffff"} onChange={(e) => patch({ color: e.target.value, gradientEnabled: false })} />
+        </label>
         <button
           className={`toolbar-more ${advanced ? "active" : ""}`}
           title="Pengaturan teks lanjutan"
@@ -103,46 +108,6 @@ export default function TextToolbar({
         </button>
       </div>
       {advanced && <div className="word-toolbar-row compact">
-        <label>
-          Warna{" "}
-          <input
-            type="color"
-            value={style.color || "#ffffff"}
-            onChange={(e) =>
-              patch({ color: e.target.value, gradientEnabled: false })
-            }
-          />
-        </label>
-        <label className="gradient-toggle">
-          <input
-            type="checkbox"
-            checked={Boolean(style.gradientEnabled)}
-            onChange={(e) => patch({ gradientEnabled: e.target.checked })}
-          />{" "}
-          Gradasi
-        </label>
-        {style.gradientEnabled && (
-          <>
-            <input
-              type="color"
-              value={style.gradientFrom || "#f97316"}
-              onChange={(e) => patch({ gradientFrom: e.target.value })}
-            />
-            <input
-              type="color"
-              value={style.gradientTo || "#facc15"}
-              onChange={(e) => patch({ gradientTo: e.target.value })}
-            />
-            <input
-              title="Sudut gradasi"
-              type="number"
-              min="0"
-              max="360"
-              value={style.gradientAngle || 90}
-              onChange={(e) => patch({ gradientAngle: Number(e.target.value) })}
-            />
-          </>
-        )}
         <label>
           Jarak baris{" "}
           <input

@@ -88,7 +88,6 @@ export default function CertificateStudio({ material, updateMaterial }) {
       </div>
       <div className="certificate-preview-shell">
         <div ref={previewRef} className={`certificate-preview ${material.certificateFrame === "double" ? "double" : ""}`} style={{ "--certificate-accent": material.certificateColor || "#ff641e" }}>
-          <i className="certificate-corner top"/><i className="certificate-corner bottom"/>
           <div className="certificate-brand">{material.certificateLogo ? <img src={material.certificateLogo} alt="Logo penerbit"/> : <b>JP</b>}<span>{material.certificateIssuer || "JeniusPPT.online"}</span></div>
           {material.certificatePhoto && <img className="certificate-photo" src={material.certificatePhoto} alt="Foto penerima"/>}
           <small>DIBERIKAN KEPADA</small>
