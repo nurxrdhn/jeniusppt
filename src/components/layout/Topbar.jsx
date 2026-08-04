@@ -4,7 +4,9 @@ import {
   CheckCheck,
   Code2,
   Menu,
+  Monitor,
   Moon,
+  Paintbrush,
   Palette,
   Plus,
   Search,
@@ -121,17 +123,33 @@ export default function Topbar({
               <div><span>Tampilan</span><h2>Kustomisasi JeniusPPT</h2></div>
               <button onClick={() => setCustomizeOpen(false)} aria-label="Tutup"><X size={20} /></button>
             </header>
-            <p>Pilih tema dan warna yang paling nyaman untuk mata Anda.</p>
+            <section className="customize-preview" aria-label="Pratinjau tampilan">
+              <div className="preview-window">
+                <div className="preview-tabbar"><span /><span /><span /></div>
+                <div className="preview-toolbar"><i>‹</i><i>›</i><i>↻</i><b /></div>
+                <div className="preview-page">
+                  <span className="preview-brand">JP</span>
+                  <div><i /><i /><i /></div>
+                </div>
+              </div>
+            </section>
+            <p className="customize-preview-label">Pratinjau JeniusPPT</p>
+            <button
+              className="customize-theme-button"
+              onClick={() => onTheme(theme === "dark" ? "light" : "dark")}
+            >
+              <Paintbrush size={18} /> Ganti tema
+            </button>
             <div className="theme-segment" role="group" aria-label="Pilihan tema">
               <button className={theme === "light" ? "active" : ""} onClick={() => onTheme("light")}><Sun size={18} />Terang</button>
               <button className={theme === "dark" ? "active" : ""} onClick={() => onTheme("dark")}><Moon size={18} />Gelap</button>
-              <button className={theme === "device" ? "active" : ""} onClick={() => onTheme("device")}><span className="device-icon">▣</span>Perangkat</button>
+              <button className={theme === "device" ? "active" : ""} onClick={() => onTheme("device")}><Monitor size={18} />Perangkat</button>
             </div>
             <div className="accent-heading"><b>Warna aksen</b><small>Diterapkan pada tombol dan bagian aktif</small></div>
             <div className="accent-grid">
               {accents.map(([color, name]) => (
                 <button key={color} className={accent === color ? "active" : ""} onClick={() => onAccent(color)} title={name} aria-label={name}>
-                  <span style={{ background: color }} />
+                  <span style={{ "--swatch": color }} />
                   {accent === color && <i>✓</i>}
                 </button>
               ))}
