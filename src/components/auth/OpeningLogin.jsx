@@ -3,6 +3,7 @@ import { signInWithPopup } from "firebase/auth";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { auth, googleProvider } from "../../firebase/config";
 import GoogleLogo from "../ui/GoogleLogo";
+import JeniusMark from "../ui/JeniusMark";
 const slides = [
   {
     title: "Mengajar Lebih Mudah",
@@ -42,11 +43,7 @@ export default function OpeningLogin({ onLogin }) {
         <div className="opening-left">
           <div className="brand-row logo-only">
             <div className="opening-logo-shell">
-              <img
-                className="opening-logo"
-                src="/jeniusppt-mark-white.svg"
-                alt="Logo JP"
-              />
+              <JeniusMark className="opening-logo" inverse />
             </div>
           </div>
           <div className="opening-copy" key={active}>
@@ -74,7 +71,7 @@ export default function OpeningLogin({ onLogin }) {
         </div>
         <div className="login-card">
           <div className="login-brand-mobile">
-            <img src="/jeniusppt-mark-orange.svg" alt="Logo JP" />
+            <JeniusMark title="Logo JP" />
           </div>
           <span className="eyebrow">Khusus Guru</span>
           <h2>Selamat Datang</h2>

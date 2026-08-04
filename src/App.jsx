@@ -153,8 +153,19 @@ export default function App() {
   }, [theme]);
   useEffect(() => {
     localStorage.setItem("jeniusppt-accent", accent);
-    document.documentElement.style.setProperty("--fresh-orange", accent);
-    document.documentElement.style.setProperty("--accent", accent);
+    const root = document.documentElement.style;
+    root.setProperty("--fresh-orange", accent);
+    root.setProperty("--accent", accent);
+    root.setProperty("--fresh-orange-dark", `color-mix(in srgb, ${accent} 78%, #111827)`);
+    root.setProperty("--fresh-orange-light", `color-mix(in srgb, ${accent} 68%, white)`);
+    root.setProperty("--fresh-peach", `color-mix(in srgb, ${accent} 12%, white)`);
+    root.setProperty("--fresh-line", `color-mix(in srgb, ${accent} 23%, transparent)`);
+    root.setProperty("--fresh-glow", `color-mix(in srgb, ${accent} 25%, transparent)`);
+    const icon = document.querySelector('link[rel="icon"]');
+    if (icon) {
+      const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="${accent}"/><text x="32" y="41" text-anchor="middle" font-family="Arial,sans-serif" font-size="27" font-weight="800" fill="white">JP</text></svg>`;
+      icon.href = `data:image/svg+xml,${encodeURIComponent(favicon)}`;
+    }
   }, [accent]);
   useEffect(() => {
     localStorage.removeItem("jeniusppt-view");

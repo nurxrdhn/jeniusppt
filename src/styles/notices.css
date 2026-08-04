@@ -1,5 +1,5 @@
 .jp-toast {
-  --notice: #f97316;
+  --notice: var(--fresh-orange);
   position: fixed;
   z-index: 2200;
   right: 24px;
@@ -68,7 +68,7 @@
   --notice: #d97706;
 }
 .jp-toast-info {
-  --notice: #f97316;
+  --notice: var(--fresh-orange);
 }
 .jp-dialog-backdrop {
   position: fixed;
@@ -99,7 +99,7 @@
   height: 34px;
   border: 0;
   border-radius: 11px;
-  background: #fff4ec;
+  background: var(--fresh-peach);
   color: #8b5c45;
   display: grid;
   place-items: center;
@@ -110,8 +110,8 @@
   display: grid;
   place-items: center;
   border-radius: 17px;
-  background: linear-gradient(145deg, #ffedd5, #fed7aa);
-  color: #c2410c;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--fresh-orange) 14%, white), var(--fresh-line));
+  color: var(--fresh-orange-dark);
   margin-bottom: 18px;
 }
 .jp-dialog.is-danger .jp-dialog-symbol {
@@ -121,7 +121,7 @@
 .jp-dialog-brand {
   font-size: 10px;
   letter-spacing: 0.18em;
-  color: #f97316;
+  color: var(--fresh-orange);
   font-weight: 950;
 }
 .jp-dialog h2 {
@@ -156,11 +156,11 @@
   color: #6e584d;
 }
 .jp-dialog-secondary {
-  background: #fff0e5;
-  color: #c2410c;
+  background: var(--fresh-peach);
+  color: var(--fresh-orange-dark);
 }
 .jp-dialog-primary {
-  background: linear-gradient(135deg, #ea580c, #fb923c);
+  background: linear-gradient(135deg, var(--fresh-orange-dark), var(--fresh-orange-light));
   color: #fff;
   box-shadow: 0 9px 20px rgba(234, 88, 12, 0.22);
 }
@@ -174,7 +174,7 @@ html[data-theme="dark"] .jp-dialog {
 }
 html[data-theme="dark"] .jp-toast b,
 html[data-theme="dark"] .jp-dialog h2 {
-  color: #fff7ed;
+  color: color-mix(in srgb, var(--fresh-orange) 7%, white);
 }
 html[data-theme="dark"] .jp-toast p,
 html[data-theme="dark"] .jp-dialog p {

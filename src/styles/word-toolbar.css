@@ -26,9 +26,9 @@
   place-items: center;
 }
 .word-toolbar button.active {
-  background: #f97316;
+  background: var(--fresh-orange);
   color: #fff;
-  border-color: #f97316;
+  border-color: var(--fresh-orange);
 }
 .word-toolbar .font-select {
   width: 190px;

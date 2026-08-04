@@ -40,7 +40,7 @@ html[data-theme="dark"] h1,
 html[data-theme="dark"] h2,
 html[data-theme="dark"] h3,
 html[data-theme="dark"] b {
-  color: #fff7ed;
+  color: color-mix(in srgb, var(--fresh-orange) 7%, white);
 }
 html[data-theme="dark"] p,
 html[data-theme="dark"] small,
@@ -55,28 +55,30 @@ html[data-theme="dark"] .stepper,
 html[data-theme="dark"] .word-toolbar button {
   background: #2e1d16 !important;
   border-color: #5f3929 !important;
-  color: #fff7ed !important;
+  color: color-mix(in srgb, var(--fresh-orange) 7%, white) !important;
 }
 html[data-theme="dark"] .side-menu button {
   color: #ead5c9;
 }
 html[data-theme="dark"] .side-menu button.active,
 html[data-theme="dark"] .side-menu button:hover {
-  background: #4a200f;
-  color: #fb923c;
+  background: color-mix(in srgb, var(--fresh-orange) 28%, #171717);
+  color: color-mix(in srgb, var(--fresh-orange) 72%, white);
 }
 html[data-theme="dark"] .sidebar-user,
 html[data-theme="dark"] .icon-button,
 html[data-theme="dark"] .hamburger-button {
   background: #321c13;
-  color: #fb923c;
+  color: var(--fresh-orange-light);
 }
 
 html[data-theme="dark"] .sidebar-brand .brand-logo,
-html[data-theme="dark"] .login-brand-mobile img,
-html[data-theme="dark"] .tour-visual img[src*="jeniusppt-mark-orange"] {
-  filter: brightness(0) invert(1) !important;
+html[data-theme="dark"] .login-brand-mobile .jenius-mark,
+html[data-theme="dark"] .tour-visual .jenius-mark {
+  color: var(--fresh-orange) !important;
+  filter: none !important;
 }
+html[data-theme="dark"] .jenius-mark-play { fill: #211510; }
 .display-controls {
   display: flex;
   gap: 7px;
@@ -342,7 +344,7 @@ html[data-view="auto"] .device-auto {
 .customize-panel header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .customize-panel header span { color: var(--fresh-orange); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
 .customize-panel h2 { margin: 4px 0 0; font-size: 22px; }
-.customize-panel header button { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 12px; background: var(--fresh-peach, #fff0e4); color: var(--fresh-ink, #25150f); }
+.customize-panel header button { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 12px; background: var(--fresh-peach, var(--fresh-peach)); color: var(--fresh-ink, #25150f); }
 .customize-panel > p { color: var(--fresh-muted); font-size: 13px; line-height: 1.6; }
 .customize-preview { margin-top: 22px; padding: 22px 21px 0; border-radius: 18px; background: var(--fresh-orange); overflow: hidden; }
 .preview-window { overflow: hidden; border-radius: 14px 14px 4px 4px; background: #343434; box-shadow: 0 10px 22px rgba(0,0,0,.3); }
@@ -372,7 +374,7 @@ html[data-view="auto"] .device-auto {
 .customize-reset { width: 100%; min-height: 46px; margin-top: 22px; border: 1px solid var(--fresh-line); border-radius: 13px; background: transparent; color: var(--fresh-ink); font-weight: 750; }
 html[data-theme="dark"] .customize-panel { background: #211510; border-color: #4a2c20; }
 html[data-theme="dark"] .customize-panel header button,
-html[data-theme="dark"] .accent-grid button { background: #321f17; color: #fff7ed; }
+html[data-theme="dark"] .accent-grid button { background: #321f17; color: color-mix(in srgb, var(--fresh-orange) 7%, white); }
 html[data-theme="light"] .preview-window { background: #f4f4f4; }
 html[data-theme="light"] .preview-tabbar { background: #e7e7e7; }
 html[data-theme="light"] .preview-toolbar { color: #555; }
@@ -380,7 +382,7 @@ html[data-theme="light"] .preview-toolbar b { background: #d1d1d1; }
 html[data-theme="light"] .preview-page { background: #fff; }
 html[data-theme="light"] .preview-page div i { background: #d7d7d7; }
 html[data-theme="dark"] .theme-segment,
-html[data-theme="dark"] .customize-reset { border-color: #5f3929; color: #fff7ed; }
+html[data-theme="dark"] .customize-reset { border-color: #5f3929; color: color-mix(in srgb, var(--fresh-orange) 7%, white); }
 @media (max-width: 560px) {
   .customize-backdrop { align-items: flex-end; }
   .customize-panel { width: 100%; height: auto; max-height: 88dvh; padding: 18px; border: 0; border-radius: 22px 22px 0 0; }

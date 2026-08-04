@@ -14,6 +14,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import JeniusMark from "../ui/JeniusMark";
 const menu = [
   ["dashboard", Home, "Dashboard"],
   ["workspace", FolderOpen, "Workspace"],
@@ -53,11 +54,7 @@ export default function Sidebar({
         </button>
         <div className="sidebar-brand logo-only">
           <div className="brand-icon-shell">
-            <img
-              className="brand-logo"
-              src="/jeniusppt-mark-orange.svg"
-              alt="Logo JP"
-            />
+            <JeniusMark className="brand-logo" />
           </div>
         </div>
         <nav className="side-menu">
