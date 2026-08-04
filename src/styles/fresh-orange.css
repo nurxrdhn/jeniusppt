@@ -1,14 +1,14 @@
 :root {
-  --fresh-bg: #fffaf4;
+  --fresh-bg: #f7f8fa;
   --fresh-surface: #fff;
-  --fresh-ink: #25150f;
-  --fresh-muted: #7a6258;
+  --fresh-ink: #20242a;
+  --fresh-muted: #667085;
   --fresh-orange: #ff6b1a;
   --fresh-orange-dark: #d94b08;
   --fresh-orange-light: #ff9a62;
   --fresh-peach: #fff0e4;
   --fresh-line: #f2ddd0;
-  --fresh-shadow: 0 14px 45px rgba(110, 48, 17, 0.09);
+  --fresh-shadow: 0 8px 24px rgba(16, 24, 40, 0.07);
 }
 html {
   background: var(--fresh-bg);
@@ -45,7 +45,7 @@ body {
   height: 300px;
   left: -140px;
   bottom: -140px;
-  background: rgba(255, 180, 122, 0.18);
+  background: color-mix(in srgb, var(--fresh-orange) 16%, transparent);
 }
 .opening-shell {
   position: relative;
@@ -58,7 +58,7 @@ body {
   overflow: hidden;
   border: 0;
   background: linear-gradient(145deg, var(--fresh-orange), var(--fresh-orange-dark));
-  box-shadow: 0 30px 90px rgba(217, 75, 8, 0.24);
+  box-shadow: 0 30px 90px rgba(16, 24, 40, 0.10);
   color: #fff;
 }
 .opening-left:after {
@@ -96,7 +96,7 @@ body {
   width: 72px;
   height: 72px;
   display: block;
-  filter: drop-shadow(0 8px 12px rgba(105, 28, 0, 0.2));
+  filter: drop-shadow(0 8px 12px rgba(16, 24, 40, 0.10));
 }
 .jenius-mark {
   display: block;
@@ -120,7 +120,7 @@ body {
   width: 58px;
   height: 58px;
   display: block;
-  filter: drop-shadow(0 6px 9px rgba(105, 28, 0, 0.14));
+  filter: drop-shadow(0 6px 9px rgba(16, 24, 40, 0.10));
 }
 .brand-row.logo-only {
   justify-content: flex-start;
@@ -144,7 +144,7 @@ body {
 .login-brand-mobile img {
   width: 64px !important;
   height: 64px !important;
-  filter: drop-shadow(0 7px 10px rgba(105, 28, 0, 0.15));
+  filter: drop-shadow(0 7px 10px rgba(16, 24, 40, 0.10));
 }
 .opening-copy {
   position: relative;
@@ -215,7 +215,7 @@ body {
   display: block;
   margin-top: 16px;
   text-align: center;
-  color: #9a8175;
+  color: #8a94a3;
 }
 .google-btn {
   margin-top: 14px;
@@ -257,7 +257,7 @@ body {
   padding: 18px 0;
 }
 .side-menu button {
-  color: #6f554a;
+  color: #667085;
   padding: 13px 14px;
   transition: 0.18s;
 }
@@ -373,7 +373,7 @@ body {
 .feature-card:hover,
 .material-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 50px rgba(110, 48, 17, 0.13);
+  box-shadow: 0 20px 50px rgba(16, 24, 40, 0.10);
 }
 .stat-card div {
   background: var(--fresh-peach);
@@ -515,7 +515,7 @@ body {
 .participant-filters label span {
   display: block;
   margin: 0 0 7px;
-  color: #73584c;
+  color: #667085;
   font-size: 11px;
   font-weight: 850;
 }
@@ -579,7 +579,7 @@ body {
 }
 .participant-table-row small {
   margin-top: 4px;
-  color: #90766a;
+  color: #8a94a3;
   font-size: 11px;
 }
 .participant-name {
@@ -816,7 +816,7 @@ body {
   background: #fff;
   color: var(--fresh-orange-dark);
   font-weight: 850;
-  box-shadow: 0 8px 20px rgba(110, 48, 17, 0.06);
+  box-shadow: 0 8px 20px rgba(16, 24, 40, 0.10);
 }
 .report-actions button:first-child {
   background: linear-gradient(135deg, #18794e, #1f9d66);
@@ -830,7 +830,7 @@ body {
 }
 .report-actions button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(110, 48, 17, 0.12);
+  box-shadow: 0 12px 26px rgba(16, 24, 40, 0.10);
 }
 @media (max-width: 700px) {
   .participant-page-head {
@@ -1090,12 +1090,12 @@ body {
   margin-bottom: 7px;
   font-size: 12px;
   font-weight: 850;
-  color: #73584c;
+  color: #667085;
 }
 .settings-grid label small {
   display: block;
   margin-top: 5px;
-  color: #9a8175;
+  color: #8a94a3;
 }
 .toggle-setting {
   display: flex !important;
@@ -1314,7 +1314,7 @@ body {
 }
 .question-analysis-list small {
   margin-top: 5px;
-  color: #90766a;
+  color: #8a94a3;
 }
 .question-rate {
   display: grid;
@@ -1501,7 +1501,7 @@ body {
 }
 .notification-panel article p {
   margin: 4px 0;
-  color: #6f554a;
+  color: #667085;
   font-size: 12px;
 }
 .notification-panel article small {
@@ -1759,7 +1759,7 @@ body {
 .media-form label > span {
   display: block;
   margin-bottom: 8px;
-  color: #73584c;
+  color: #667085;
   font-size: 12px;
   font-weight: 850;
 }
@@ -1785,7 +1785,7 @@ body {
   border-radius: 13px;
   padding: 14px;
   background: #fff;
-  color: #6f554a;
+  color: #667085;
   font-weight: 850;
 }
 .media-type button.active {
@@ -1818,7 +1818,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #9a8175;
+  color: #8a94a3;
   font-size: 11px;
 }
 .media-or span {
@@ -1827,7 +1827,7 @@ body {
   background: var(--fresh-line);
 }
 .media-form > small {
-  color: #9a8175;
+  color: #8a94a3;
 }
 .free-element video,
 .free-element iframe {

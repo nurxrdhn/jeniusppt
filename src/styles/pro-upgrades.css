@@ -159,7 +159,7 @@ textarea {
   color: var(--fresh-orange-dark);
 }
 .tour-card p {
-  color: #785f53;
+  color: #667085;
   line-height: 1.6;
 }
 .tour-progress {
@@ -184,7 +184,7 @@ textarea {
 .tour-actions > button:first-child {
   border: 0;
   background: transparent;
-  color: #785f53;
+  color: #667085;
   font-weight: 800;
 }
 .settings-history {
@@ -223,7 +223,7 @@ textarea {
   margin: 3px 0;
 }
 .history-list small {
-  color: #9a8175;
+  color: #8a94a3;
 }
 .settings-tools {
   display: flex;
@@ -422,13 +422,13 @@ textarea {
   opacity: 0.65;
 }
 html[data-theme="dark"] .feedback-form {
-  background: #21140f;
-  border-color: #53301f;
+  background: #1a1d22;
+  border-color: #3d434c;
 }
 html[data-theme="dark"] .feedback-field select,
 html[data-theme="dark"] .feedback-field textarea {
-  background: #2b1a13;
-  border-color: #593421;
+  background: #1a1d22;
+  border-color: #3d434c;
   color: color-mix(in srgb, var(--fresh-orange) 7%, white);
 }
 html[data-theme="dark"] .feedback-field > label,
@@ -436,8 +436,8 @@ html[data-theme="dark"] .feedback-sender b {
   color: color-mix(in srgb, var(--fresh-orange) 7%, white);
 }
 html[data-theme="dark"] .rating-scale button {
-  background: #2b1a13;
-  border-color: #593421;
+  background: #1a1d22;
+  border-color: #3d434c;
 }
 html[data-theme="dark"] .rating-scale button:hover,
 html[data-theme="dark"] .rating-scale button.selected,
@@ -895,8 +895,8 @@ html[data-theme="dark"] .hub-inline-form select,
 html[data-theme="dark"] .hub-question-form input,
 html[data-theme="dark"] .hub-question-form textarea,
 html[data-theme="dark"] .hub-search {
-  background: #21140f;
-  border-color: #53301f;
+  background: #1a1d22;
+  border-color: #3d434c;
   color: color-mix(in srgb, var(--fresh-orange) 7%, white);
 }
 html[data-theme="dark"] .hub-feature h2,
@@ -1065,8 +1065,8 @@ html[data-theme="dark"] .hub-help summary { color: color-mix(in srgb, var(--fres
 }
 html[data-theme="dark"] .slide-strip,
 html[data-theme="dark"] .slide-strip-scroll > button {
-  background: #21140f;
-  border-color: #53301f;
+  background: #1a1d22;
+  border-color: #3d434c;
 }
 html[data-theme="dark"] .slide-strip-head b { color: color-mix(in srgb, var(--fresh-orange) 7%, white); }
 @media (max-width: 1180px) and (min-width: 861px) {
@@ -1222,7 +1222,112 @@ html[data-theme="dark"] .slide-strip-head b { color: color-mix(in srgb, var(--fr
     display: none;
   }
 html[data-theme="dark"] .mobile-sheet-head {
-    background: #211510;
-    border-color: #4a2c20;
+    background: #1a1d22;
+    border-color: #343941;
+  }
+}
+
+/* Tampilan bersih tanpa efek neon */
+.primary-button,
+.side-menu button.active,
+.welcome-card,
+.app-card,
+.stepper button.active,
+.bg-panel > button,
+.customize-theme-button,
+.theme-segment button.active,
+.accent-grid button.active,
+.slide-list > button.active,
+.question-list > button.active,
+.preview-timeline button.active,
+.feedback-field select:focus,
+.feedback-field textarea:focus,
+.hub-inline-form input:focus,
+.hub-question-form input:focus,
+.hub-question-form textarea:focus {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+.brand-logo,
+.opening-logo,
+.login-brand-mobile .jenius-mark,
+.tour-visual .jenius-mark {
+  filter: none !important;
+}
+
+html[data-theme="dark"] .sidebar,
+html[data-theme="dark"] .topbar,
+html[data-theme="dark"] .page,
+html[data-theme="dark"] .main-area {
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .feature-card,
+html[data-theme="dark"] .material-card,
+html[data-theme="dark"] .tool-card,
+html[data-theme="dark"] .info-form,
+html[data-theme="dark"] .publish-card,
+html[data-theme="dark"] .properties-panel,
+html[data-theme="dark"] .slide-stage {
+  border-color: #343941 !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 700px) {
+  html,
+  body,
+  #root,
+  .app-shell,
+  .main-area,
+  .page {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .main-area,
+  .page,
+  .dashboard-grid,
+  .stats-grid,
+  .feature-grid,
+  .material-grid,
+  .editor-layout,
+  .ppt-editor {
+    min-width: 0;
+  }
+
+  .page {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .welcome-card {
+    min-height: 0;
+    padding: 24px 20px !important;
+  }
+
+  .welcome-card h1 {
+    font-size: clamp(30px, 10vw, 42px) !important;
+    line-height: 1.08;
+  }
+
+  .stat-card,
+  .feature-card,
+  .material-card,
+  .tool-card {
+    min-width: 0;
+  }
+
+  .topbar {
+    width: 100%;
+    min-width: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .customize-backdrop {
+    overscroll-behavior: contain;
   }
 }
