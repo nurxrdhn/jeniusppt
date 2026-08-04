@@ -240,25 +240,29 @@ export default function PPTEditor({ material, updateMaterial }) {
     setSlides(next);
     updateMaterial(material.id, { activeSlide: next.length - 1 });
   }
-  function copySlide() {
+  function copySlideAt(index = activeIndex) {
+    const source = slides[index];
+    if (!source) return;
     const next = [...slides];
-    next.splice(activeIndex + 1, 0, {
-      ...active,
-      title: `${active.title} Copy`,
-      elements: (active.elements || []).map((item) => ({
+    next.splice(index + 1, 0, {
+      ...source,
+      title: `${source.title} Copy`,
+      elements: (source.elements || []).map((item) => ({
         ...item,
         id: crypto.randomUUID(),
       })),
     });
     setSlides(next);
-    updateMaterial(material.id, { activeSlide: activeIndex + 1 });
+    updateMaterial(material.id, { activeSlide: index + 1 });
   }
-  function deleteSlide() {
+  function copySlide() { copySlideAt(activeIndex); }
+  function deleteSlideAt(index = activeIndex) {
     if (slides.length <= 1) return;
-    const next = slides.filter((_, index) => index !== activeIndex);
+    const next = slides.filter((_, slideIndex) => slideIndex !== index);
     setSlides(next);
-    updateMaterial(material.id, { activeSlide: Math.max(0, activeIndex - 1) });
+    updateMaterial(material.id, { activeSlide: Math.max(0, Math.min(index - 1, next.length - 1)) });
   }
+  function deleteSlide() { deleteSlideAt(activeIndex); }
   function setSizeKey(key) {
     updateMaterial(material.id, { slideSize: SLIDE_SIZES[key] });
   }
@@ -733,7 +737,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 title="Geser judul"
                 onPointerDown={(e) => moveTextBox(e, "titleBox", titleBox)}
               >
-                ⋮⋮
+                +
               </button>
               <textarea
                 rows={2}
@@ -767,7 +771,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 title="Geser isi"
                 onPointerDown={(e) => moveTextBox(e, "bodyBox", bodyBox)}
               >
-                ⋮⋮
+                +
               </button>
               <textarea
                 key={`body-${active?.bodyStyle?.fontFamily || "Arial"}`}
@@ -819,10 +823,8 @@ export default function PPTEditor({ material, updateMaterial }) {
           </div>
           <div className="slide-strip-scroll">
             {slides.map((slide, index) => (
-              <button
-                key={index}
-                className={index === activeIndex ? "active" : ""}
-                onClick={() => {
+              <article key={index} className={`slide-thumb-card ${index === activeIndex ? "active" : ""}`}>
+              <button className="slide-thumb-select" onClick={() => {
                   updateMaterial(material.id, { activeSlide: index });
                   setSelectedElement(null);
                 }}
@@ -839,6 +841,11 @@ export default function PPTEditor({ material, updateMaterial }) {
                   <small>{(slide.body || "").slice(0, 48)}</small>
                 </div>
               </button>
+              <div className="slide-thumb-actions">
+                <button title="Duplikat slide" aria-label={`Duplikat slide ${index + 1}`} onClick={() => copySlideAt(index)}><CopyPlus size={14}/></button>
+                <button className="danger" title="Hapus slide" aria-label={`Hapus slide ${index + 1}`} disabled={slides.length <= 1} onClick={() => deleteSlideAt(index)}><Trash2 size={14}/></button>
+              </div>
+              </article>
             ))}
             <button className="slide-strip-add" onClick={addSlide}>
               <Plus size={22} />
@@ -968,6 +975,7 @@ export default function PPTEditor({ material, updateMaterial }) {
 
 function ElementLayer({ elements, selected, select, update, remove, duplicate, reorder, toggleLock }) {
   const [contextMenu, setContextMenu] = useState(null);
+  const clipboardRef = useRef(null);
 
   useEffect(() => {
     const close = () => setContextMenu(null);
@@ -995,6 +1003,13 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
   function run(action) {
     action();
     setContextMenu(null);
+  }
+  function copyElement(id) {
+    const source = elements.find((item) => item.id === id);
+    if (source) {
+      clipboardRef.current = structuredClone(source);
+      duplicate(id);
+    }
   }
 
   function startDrag(event, item) {
@@ -1069,6 +1084,7 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
             <MediaPlayer item={item} />
           )}
           {selected === item.id && <>
+            <button className="element-move-handle" title="Geser elemen" aria-label="Geser elemen" onPointerDown={(event) => startDrag(event, item)}>+</button>
             <button className="element-quick-more" title="Pilihan elemen" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => openMenu(event, item)}><MoreHorizontal size={16}/></button>
             <button className="element-quick-delete" title="Hapus elemen" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => { event.stopPropagation(); remove(item.id); }}><Trash2 size={15}/></button>
           </>}
@@ -1077,6 +1093,7 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
       {contextMenu && (
         <div className="element-context-menu" style={{ left: contextMenu.x, top: contextMenu.y }} onPointerDown={(event) => event.stopPropagation()}>
           <strong>Pilihan elemen</strong>
+          <button onClick={() => run(() => copyElement(contextMenu.id))}><Copy size={17}/><span>Salin</span><kbd>Ctrl+C</kbd></button>
           <button onClick={() => run(() => duplicate(contextMenu.id))}><CopyPlus size={17}/><span>Duplikat</span><kbd>Ctrl+D</kbd></button>
           <button onClick={() => run(() => reorder(contextMenu.id, "front"))}><BringToFront size={17}/><span>Bawa ke depan</span></button>
           <button onClick={() => run(() => reorder(contextMenu.id, "back"))}><SendToBack size={17}/><span>Kirim ke belakang</span></button>
