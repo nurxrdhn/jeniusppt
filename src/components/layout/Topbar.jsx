@@ -28,6 +28,7 @@ export default function Topbar({
 }) {
   const [open, setOpen] = React.useState(false);
   const [customizeOpen, setCustomizeOpen] = React.useState(false);
+  const [query, setQuery] = React.useState("");
   const accents = [
     ["#ff641e", "Oranye"], ["#2563eb", "Biru"], ["#0f766e", "Toska"],
     ["#16a34a", "Hijau"], ["#ca8a04", "Emas"], ["#ea580c", "Jingga"],
@@ -45,7 +46,8 @@ export default function Topbar({
       </div>
       <div className="topbar-search">
         <Search size={17} />
-        <input placeholder="Cari..." />
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari materi, peserta, atau menu..." />
+        {query ? <button onClick={() => setQuery("")} aria-label="Hapus pencarian"><X size={15}/></button> : <kbd>Ctrl K</kbd>}
       </div>
       <div className="notification-wrap">
         <button

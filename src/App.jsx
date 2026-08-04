@@ -3,6 +3,7 @@ import SolidSelect from "./components/ui/SolidSelect";
 
 import {
   Archive,
+  Bot,
   BookOpen,
   Copy,
   Edit3,
@@ -11,12 +12,14 @@ import {
   FileText,
   FolderOpen,
   Heart,
+  Lightbulb,
   MessageSquareHeart,
   Send,
   Share2,
   Star,
   Trash2,
   Users,
+  WandSparkles,
 } from "lucide-react";
 
 import OpeningLogin from "./components/auth/OpeningLogin";
@@ -41,7 +44,7 @@ import {
 
 import { SLIDE_SIZES } from "./utils/slideSizes";
 import { publishMaterialToFirestore } from "./services/materialService";
-import { subscribeParticipants } from "./services/studentService";
+import { subscribeParticipants, deleteParticipantRecords } from "./services/studentService";
 import {
   exportParticipantsExcel,
   exportParticipantsPdf,
@@ -700,6 +703,7 @@ export default function App() {
             initialMaterial={participantMaterialFilter}
             clearInitialMaterial={() => setParticipantMaterialFilter("")}
             notify={notify}
+            deleteRecords={deleteParticipantRecords}
           />
         )}
 
@@ -1023,6 +1027,7 @@ function Participants({
   initialMaterial,
   clearInitialMaterial,
   notify,
+  deleteRecords,
 }) {
   const [search, setSearch] = useState("");
   const [material, setMaterial] = useState(initialMaterial || "");
@@ -1030,6 +1035,7 @@ function Participants({
   const [gender, setGender] = useState("");
   const [status, setStatus] = useState("");
   const [scoreRange, setScoreRange] = useState("");
+  const [selectedRows, setSelectedRows] = useState([]);
 
   useEffect(() => {
     if (initialMaterial) setMaterial(initialMaterial);
@@ -1111,6 +1117,17 @@ function Participants({
       notify(error.message || "Laporan gagal dibuat.", "error");
     }
   }
+  async function removeSelected(items) {
+    if (!items.length) return notify("Pilih riwayat yang ingin dihapus.", "warning");
+    if (!window.confirm(`Hapus ${items.length} riwayat peserta? Tindakan ini tidak dapat dibatalkan.`)) return;
+    try {
+      await deleteRecords(items);
+      setSelectedRows([]);
+      notify(`${items.length} riwayat peserta berhasil dihapus.`);
+    } catch (error) {
+      notify(error.message || "Riwayat peserta gagal dihapus.", "error");
+    }
+  }
 
   return (
     <section className="page participants-page">
@@ -1123,6 +1140,8 @@ function Participants({
           </p>
         </div>
         <div className="report-actions">
+          <button className="participant-delete-selected" onClick={() => removeSelected(filtered.filter((item, index) => selectedRows.includes(item.id || `row-${index}`)))} disabled={!selectedRows.length}><Trash2 size={17}/>Hapus dipilih</button>
+          <button className="participant-delete-all" onClick={() => removeSelected(filtered)} disabled={!filtered.length}><Trash2 size={17}/>Hapus semua</button>
           <button onClick={() => downloadReport("excel")}>
             <FileSpreadsheet size={17} />
             Export Excel
@@ -1220,6 +1239,7 @@ function Participants({
       </div>
       <div className="data-panel participant-table">
         <div className="participant-table-head">
+          <label className="participant-check"><input type="checkbox" checked={filtered.length > 0 && selectedRows.length === filtered.length} onChange={(event) => setSelectedRows(event.target.checked ? filtered.map((item,index) => item.id || `row-${index}`) : [])}/></label>
           <b>Peserta</b>
           <b>Kelas</b>
           <b>Materi</b>
@@ -1230,6 +1250,7 @@ function Participants({
         {filtered.length ? (
           filtered.map((p, i) => (
             <div className="participant-table-row" key={p.id || i}>
+              <label className="participant-check"><input type="checkbox" checked={selectedRows.includes(p.id || `row-${i}`)} onChange={(event) => setSelectedRows((old) => event.target.checked ? [...old, p.id || `row-${i}`] : old.filter((id) => id !== (p.id || `row-${i}`)))}/></label>
               <span className="participant-name">
                 <i>{(p.studentName || "S")[0].toUpperCase()}</i>
                 <span>
@@ -1423,6 +1444,11 @@ function AIAssistant({ onGenerated, notify }) {
   const [level, setLevel] = useState("SMA");
   const [slideCount, setSlideCount] = useState(8);
   const [loading, setLoading] = useState(false);
+  const suggestions = [
+    "Buat materi tata surya untuk kelas 6 SD",
+    "Susun presentasi keamanan siber dasar",
+    "Buat kuis interaktif tentang ekonomi kreatif",
+  ];
   async function generate() {
     if (!prompt.trim())
       return notify("Tuliskan topik materi terlebih dahulu.", "warning");
@@ -1449,56 +1475,19 @@ function AIAssistant({ onGenerated, notify }) {
     }
   }
   return (
-    <section className="page">
-      <div className="page-head">
-        <span className="eyebrow">Jenius AI · Gemini</span>
-        <h1>Buat Materi Lebih Cepat</h1>
-        <p>
-          Jelaskan topik, jenjang, dan jumlah slide. Jenius AI menyusun materi
-          dan kuis yang dapat diedit menggunakan Gemini.
-        </p>
-      </div>
-      <div className="ai-panel">
-        <div>
-          <h2>Instruksi Presentasi</h2>
-          <label>
-            Topik dan tujuan
-            <textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Contoh: Sistem tata surya untuk kelas 6 SD, gunakan analogi sederhana dan aktivitas refleksi."
-            />
-          </label>
-          <div className="ai-options">
-            <label>
-              Jenjang
-              <SolidSelect value={level} onChange={(e) => setLevel(e.target.value)}>
-                {["SD", "SMP", "SMA", "SMK", "D3", "S1"].map((x) => (
-                  <option key={x}>{x}</option>
-                ))}
-              </SolidSelect>
-            </label>
-            <label>
-              Jumlah slide
-              <input
-                type="number"
-                min="4"
-                max="20"
-                value={slideCount}
-                onChange={(e) => setSlideCount(e.target.value)}
-              />
-            </label>
-          </div>
-          <button
-            className="primary-button"
-            disabled={loading}
-            onClick={generate}
-          >
-            {loading ? "AI sedang menyusun..." : "Buat PPT dengan AI"}
-          </button>
-        </div>
-        <pre>{`{\n  "title": "Topik Pembelajaran",\n  "slides": [...],\n  "questions": [...]\n}`}</pre>
-      </div>
+    <section className="page ai-workspace">
+      <aside className="ai-history"><button className="ai-new-chat"><WandSparkles size={18}/>Percakapan baru</button><div><small>TERBARU</small><button>Materi pembelajaran baru</button><button>Ide presentasi kelas</button></div><p>Riwayat tersimpan di perangkat ini.</p></aside>
+      <main className="ai-chat">
+        <header><span><Bot size={22}/></span><div><h1>Jenius AI</h1><p>Asisten presentasi dan pembelajaran</p></div><i>Gemini</i></header>
+        <section className="ai-chat-body">
+          <div className="ai-greeting"><span><WandSparkles size={28}/></span><h2>Apa yang ingin kamu buat hari ini?</h2><p>Ceritakan topik dan tujuan. Jenius AI akan menyusun materi, slide, dan kuis yang tetap dapat kamu edit.</p></div>
+          <div className="ai-suggestions">{suggestions.map((item) => <button key={item} onClick={() => setPrompt(item)}><Lightbulb size={17}/>{item}</button>)}</div>
+        </section>
+        <footer className="ai-composer">
+          <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Ketik instruksi presentasi..." />
+          <div><span><SolidSelect value={level} onChange={(e) => setLevel(e.target.value)}>{["SD","SMP","SMA","SMK","D3","S1"].map((x) => <option key={x}>{x}</option>)}</SolidSelect><label>Slide <input type="number" min="4" max="20" value={slideCount} onChange={(e) => setSlideCount(e.target.value)}/></label></span><button onClick={generate} disabled={loading} aria-label="Kirim instruksi"><Send size={19}/>{loading ? "Menyusun..." : "Buat PPT"}</button></div>
+        </footer>
+      </main>
     </section>
   );
 }

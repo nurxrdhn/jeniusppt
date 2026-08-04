@@ -19,6 +19,7 @@ import {
 import JeniusMark from "../ui/JeniusMark";
 const menu = [
   ["dashboard", Home, "Dashboard"],
+  ["ai", Sparkles, "Jenius AI"],
   ["workspace", FolderOpen, "Workspace"],
   ["materials", BookOpen, "Materi"],
   ["files", ArrowUpDown, "Impor & Ekspor"],
@@ -26,7 +27,6 @@ const menu = [
   ["analytics", BarChart3, "Analitik"],
   ["subscription", Crown, "Langganan"],
   ["trash", Trash2, "Tempat Sampah"],
-  ["ai", Sparkles, "AI"],
   ["question_bank", BookOpenCheck, "Bank Soal"],
   ["creator_market", Store, "Galeri Kreator"],
   ["productivity", PanelsTopLeft, "Pusat Produktivitas"],

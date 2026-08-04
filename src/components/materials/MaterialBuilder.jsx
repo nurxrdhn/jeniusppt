@@ -4,6 +4,7 @@ import PPTEditor from "../editor/PPTEditor";
 import QuizBuilder from "../quiz/QuizBuilder";
 import PreviewPlayer from "../preview/PreviewPlayer";
 import MediaManager from "../editor/MediaManager";
+import CertificateStudio from "../certificate/CertificateStudio";
 
 const tabs = ["Info", "Slide", "Media", "Quiz", "Preview", "Publish"];
 
@@ -265,6 +266,7 @@ export default function MaterialBuilder({
                     }
                   />
                 </label>
+                <CertificateStudio material={material} updateMaterial={updateMaterial}/>
               </>
             )}
           </div>

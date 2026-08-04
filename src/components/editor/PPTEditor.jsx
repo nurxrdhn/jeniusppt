@@ -13,6 +13,12 @@ import {
   Undo2,
   Video,
   Volume2,
+  Table2,
+  ChartColumn,
+  Frame,
+  FileInput,
+  GalleryHorizontal,
+  Box,
   X,
 } from "lucide-react";
 import { SLIDE_SIZES, ratioStyle } from "../../utils/slideSizes";
@@ -353,11 +359,11 @@ export default function PPTEditor({ material, updateMaterial }) {
       ),
     });
   }
-  function deleteElement() {
-    if (!selectedElement) return;
+  function deleteElement(elementId = selectedElement) {
+    if (!elementId) return;
     updateSlide({
       elements: (active.elements || []).filter(
-        (item) => item.id !== selectedElement,
+        (item) => item.id !== elementId,
       ),
     });
     setSelectedElement(null);
@@ -443,7 +449,7 @@ export default function PPTEditor({ material, updateMaterial }) {
     <div className="ppt-editor">
       <main className="slide-stage">
         <nav className="editor-ribbon-tabs" aria-label="Menu editor slide">
-          {[["home","Beranda"],["insert","Sisipkan"],["design","Desain"],["transition","Transisi"],["templates","Template"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
+          {[["home","Beranda"],["elements","Elemen"],["insert","Sisipkan"],["design","Desain"],["transition","Transisi"],["templates","Template"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
         </nav>
         <div className="editor-toolbar">
           <div className="history-controls">
@@ -548,6 +554,20 @@ export default function PPTEditor({ material, updateMaterial }) {
           {ribbonTab === "transition" && <div className="desktop-editor-tools ribbon-group"><span className="ribbon-label">Animasi</span><SolidSelect value={active?.transition || "fade"} onChange={(e) => updateSlide({ transition: e.target.value })}>{animations.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</SolidSelect><span className="ribbon-label">Durasi</span><SolidSelect value={active?.duration || 700} onChange={(e) => updateSlide({ duration: Number(e.target.value) })}><option value={400}>Cepat</option><option value={700}>Normal</option><option value={1100}>Lembut</option><option value={1600}>Dramatis</option></SolidSelect></div>}
         </div>
         {ribbonTab === "home" && <div className="desktop-ribbon-content"><TextToolbar target={textTarget} onTarget={setTextTarget} style={currentTextStyle} onChange={updateTextStyle} hasSelectedText={selected?.type === "text"}/></div>}
+        {ribbonTab === "elements" && <div className="desktop-ribbon-content element-library">
+          <button onClick={() => addElement("shape", { text: "Bentuk", background: "#14b8a6" })}><Shapes/><span>Shapes</span></button>
+          <button onClick={() => setShowStickers(true)}><GalleryHorizontal/><span>Graphics</span></button>
+          <button onClick={() => imageRef.current?.click()}><ImagePlus/><span>Photos</span></button>
+          <button onClick={() => videoRef.current?.click()}><Video/><span>Videos</span></button>
+          <button onClick={() => addElement("shape", { kind: "form", text: "Formulir", background: "#22c55e", w: 28, h: 28 })}><FileInput/><span>Forms</span></button>
+          <button onClick={() => audioRef.current?.click()}><Volume2/><span>Audio</span></button>
+          <button onClick={() => addElement("shape", { kind: "table", text: "Tabel", background: "#f97316", w: 36, h: 30 })}><Table2/><span>Tables</span></button>
+          <button onClick={() => addElement("shape", { kind: "chart", text: "Bagan", background: "#0891b2", w: 36, h: 30 })}><ChartColumn/><span>Charts</span></button>
+          <button onClick={() => addElement("shape", { kind: "frame", text: "Bingkai", background: "transparent", w: 38, h: 38 })}><Frame/><span>Frames</span></button>
+          <button onClick={() => addElement("shape", { kind: "box", text: "Kotak 3D", background: "#8b5cf6", w: 26, h: 26 })}><Box/><span>3D</span></button>
+          <input ref={videoRef} hidden type="file" accept="video/*" onChange={(event) => uploadMedia(event,"video")}/>
+          <input ref={audioRef} hidden type="file" accept="audio/*" onChange={(event) => uploadMedia(event,"audio")}/>
+        </div>}
         {ribbonTab === "templates" && <div className="desktop-ribbon-content template-ribbon"><BackgroundPicker onPick={(background) => updateSlide({ background })} onTemplate={applyTemplate} onApplyAll={applyTemplateAll}/></div>}
         <div className={`mobile-sheet text-sheet ${mobileSheet === "text" ? "open" : ""}`}>
           <div className="mobile-sheet-head">
@@ -574,6 +594,8 @@ export default function PPTEditor({ material, updateMaterial }) {
             <button onClick={() => { addElement("shape"); setMobileSheet(null); }}><Shapes size={19} />Bentuk</button>
             <button onClick={() => imageRef.current?.click()}><ImagePlus size={19} />Gambar</button>
             <button onClick={() => { setShowStickers(true); setMobileSheet(null); }}><Sticker size={19} />Stiker</button>
+            <button onClick={() => { addElement("shape", { kind: "table", text: "Tabel", background: "#f97316", w: 36, h: 30 }); setMobileSheet(null); }}><Table2 size={19}/>Tabel</button>
+            <button onClick={() => { addElement("shape", { kind: "chart", text: "Bagan", background: "#0891b2", w: 36, h: 30 }); setMobileSheet(null); }}><ChartColumn size={19}/>Bagan</button>
           </div>
         </div>
         {showStickers && (
@@ -674,6 +696,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                   setTextTarget("selected");
               }}
               update={updateElement}
+              remove={deleteElement}
             />
           </div>
         </section>
@@ -837,7 +860,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   );
 }
 
-function ElementLayer({ elements, selected, select, update }) {
+function ElementLayer({ elements, selected, select, update, remove }) {
   function startDrag(event, item) {
     event.preventDefault();
     event.stopPropagation();
@@ -877,7 +900,7 @@ function ElementLayer({ elements, selected, select, update }) {
         <div
           key={item.id}
           onPointerDown={(event) => startDrag(event, item)}
-          className={`free-element ${item.type} ${selected === item.id ? "selected" : ""}`}
+          className={`free-element ${item.type} ${item.kind || ""} ${selected === item.id ? "selected" : ""}`}
           style={{
             left: `${item.x}%`,
             top: `${item.y}%`,
@@ -898,12 +921,16 @@ function ElementLayer({ elements, selected, select, update }) {
           }}
         >
           {item.type === "text" && item.text}
+          {item.type === "shape" && item.kind === "table" && <span className="element-table">{Array.from({length:9}).map((_,index) => <i key={index}/>)}</span>}
+          {item.type === "shape" && item.kind === "chart" && <span className="element-chart"><i/><i/><i/><i/></span>}
+          {item.type === "shape" && !["table","chart"].includes(item.kind) && <span className="shape-label">{item.text}</span>}
           {item.type === "sticker" &&
             (item.src ? <img src={item.src} alt="Stiker" /> : item.text)}
           {item.type === "image" && <img src={item.src} alt="Elemen slide" />}
           {(item.type === "video" || item.type === "audio") && (
             <MediaPlayer item={item} />
           )}
+          {selected === item.id && <button className="element-quick-delete" title="Hapus elemen" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => { event.stopPropagation(); remove(item.id); }}><Trash2 size={15}/></button>}
         </div>
       ))}
     </div>

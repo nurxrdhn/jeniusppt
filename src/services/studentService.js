@@ -1,6 +1,8 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   onSnapshot,
   serverTimestamp,
 } from "firebase/firestore";
@@ -126,4 +128,13 @@ export function subscribeParticipants(callback, onError) {
     stopEntries();
     stopResults();
   };
+}
+
+export async function deleteParticipantRecords(items = []) {
+  const jobs = [];
+  items.forEach((item) => {
+    if (item.id) jobs.push(deleteDoc(doc(db, item.status === "Selesai" ? "studentResults" : "studentEntries", item.id)));
+    if (item.entryId && item.entryId !== item.id) jobs.push(deleteDoc(doc(db, "studentEntries", item.entryId)));
+  });
+  await Promise.all(jobs);
 }
