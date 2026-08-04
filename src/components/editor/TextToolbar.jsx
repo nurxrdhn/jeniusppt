@@ -8,7 +8,7 @@ import {
   Underline,
   SlidersHorizontal,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FONT_OPTIONS, loadWebFont } from "../../utils/fonts";
 import SolidSelect from "../ui/SolidSelect";
 
@@ -20,7 +20,13 @@ export default function TextToolbar({
   hasSelectedText,
 }) {
   const [advanced, setAdvanced] = useState(false);
+  const fontPreviewsLoaded = useRef(false);
   const patch = (value) => onChange({ ...style, ...value });
+  function loadFontPreviews() {
+    if (fontPreviewsLoaded.current) return;
+    fontPreviewsLoaded.current = true;
+    FONT_OPTIONS.forEach((font) => loadWebFont(font));
+  }
   return (
     <section className="word-toolbar">
       <div className="word-toolbar-row">
@@ -31,6 +37,7 @@ export default function TextToolbar({
         </SolidSelect>
         <SolidSelect
           className="font-select"
+          onOpen={loadFontPreviews}
           value={style.fontFamily || "Arial"}
           onChange={(e) => {
             loadWebFont(e.target.value);
@@ -38,7 +45,7 @@ export default function TextToolbar({
           }}
         >
           {FONT_OPTIONS.map((font) => (
-            <option key={font} value={font} style={{ fontFamily: font }}>
+            <option key={font} value={font} style={{ fontFamily: `"${font}", sans-serif` }}>
               {font}
             </option>
           ))}

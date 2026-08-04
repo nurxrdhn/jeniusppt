@@ -20,6 +20,12 @@ import {
   GalleryHorizontal,
   Box,
   X,
+  BringToFront,
+  SendToBack,
+  Lock,
+  Unlock,
+  CopyPlus,
+  MoreHorizontal,
 } from "lucide-react";
 import { SLIDE_SIZES, ratioStyle } from "../../utils/slideSizes";
 import SolidSelect from "../ui/SolidSelect";
@@ -110,6 +116,12 @@ export default function PPTEditor({ material, updateMaterial }) {
 
   useEffect(() => {
     function shortcuts(event) {
+      const editable = ["INPUT", "TEXTAREA"].includes(event.target?.tagName) || event.target?.isContentEditable;
+      if (!editable && selectedElement && ["Delete", "Backspace"].includes(event.key)) {
+        event.preventDefault();
+        deleteElement(selectedElement);
+        return;
+      }
       if (!(event.ctrlKey || event.metaKey)) return;
       const key = event.key.toLowerCase();
       if (key === "s") {
@@ -124,6 +136,9 @@ export default function PPTEditor({ material, updateMaterial }) {
       } else if (key === "y") {
         event.preventDefault();
         redo();
+      } else if (key === "d" && selectedElement && !editable) {
+        event.preventDefault();
+        duplicateElement(selectedElement);
       }
     }
     window.addEventListener("keydown", shortcuts);
@@ -367,6 +382,31 @@ export default function PPTEditor({ material, updateMaterial }) {
       ),
     });
     setSelectedElement(null);
+  }
+  function duplicateElement(elementId = selectedElement) {
+    const source = (active.elements || []).find((item) => item.id === elementId);
+    if (!source) return;
+    const copy = {
+      ...source,
+      id: crypto.randomUUID(),
+      x: Math.min(Math.max(0, source.x + 3), Math.max(0, 100 - source.w)),
+      y: Math.min(Math.max(0, source.y + 3), Math.max(0, 100 - source.h)),
+    };
+    updateSlide({ elements: [...(active.elements || []), copy] });
+    setSelectedElement(copy.id);
+  }
+  function reorderElement(elementId, position) {
+    const items = [...(active.elements || [])];
+    const index = items.findIndex((item) => item.id === elementId);
+    if (index < 0) return;
+    const [item] = items.splice(index, 1);
+    if (position === "front") items.push(item);
+    else items.unshift(item);
+    updateSlide({ elements: items });
+  }
+  function toggleElementLock(elementId) {
+    const item = (active.elements || []).find((entry) => entry.id === elementId);
+    if (item) updateElement(elementId, { locked: !item.locked });
   }
   function moveTextBox(event, key, fallback) {
     event.preventDefault();
@@ -697,6 +737,9 @@ export default function PPTEditor({ material, updateMaterial }) {
               }}
               update={updateElement}
               remove={deleteElement}
+              duplicate={duplicateElement}
+              reorder={reorderElement}
+              toggleLock={toggleElementLock}
             />
           </div>
         </section>
@@ -860,11 +903,42 @@ export default function PPTEditor({ material, updateMaterial }) {
   );
 }
 
-function ElementLayer({ elements, selected, select, update, remove }) {
+function ElementLayer({ elements, selected, select, update, remove, duplicate, reorder, toggleLock }) {
+  const [contextMenu, setContextMenu] = useState(null);
+
+  useEffect(() => {
+    const close = () => setContextMenu(null);
+    window.addEventListener("pointerdown", close);
+    window.addEventListener("scroll", close, true);
+    return () => {
+      window.removeEventListener("pointerdown", close);
+      window.removeEventListener("scroll", close, true);
+    };
+  }, []);
+
+  function openMenu(event, item) {
+    event.preventDefault();
+    event.stopPropagation();
+    select(item.id);
+    const canvas = event.currentTarget.closest(".slide-canvas").getBoundingClientRect();
+    setContextMenu({
+      id: item.id,
+      locked: Boolean(item.locked),
+      x: Math.max(8, Math.min(event.clientX - canvas.left, canvas.width - 232)),
+      y: Math.max(8, Math.min(event.clientY - canvas.top, canvas.height - 292)),
+    });
+  }
+
+  function run(action) {
+    action();
+    setContextMenu(null);
+  }
+
   function startDrag(event, item) {
     event.preventDefault();
     event.stopPropagation();
     select(item.id);
+    if (item.locked) return;
     const canvas = event.currentTarget.parentElement.getBoundingClientRect();
     const startX = event.clientX,
       startY = event.clientY,
@@ -900,7 +974,8 @@ function ElementLayer({ elements, selected, select, update, remove }) {
         <div
           key={item.id}
           onPointerDown={(event) => startDrag(event, item)}
-          className={`free-element ${item.type} ${item.kind || ""} ${selected === item.id ? "selected" : ""}`}
+          onContextMenu={(event) => openMenu(event, item)}
+          className={`free-element ${item.type} ${item.kind || ""} ${item.locked ? "locked" : ""} ${selected === item.id ? "selected" : ""}`}
           style={{
             left: `${item.x}%`,
             top: `${item.y}%`,
@@ -930,9 +1005,23 @@ function ElementLayer({ elements, selected, select, update, remove }) {
           {(item.type === "video" || item.type === "audio") && (
             <MediaPlayer item={item} />
           )}
-          {selected === item.id && <button className="element-quick-delete" title="Hapus elemen" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => { event.stopPropagation(); remove(item.id); }}><Trash2 size={15}/></button>}
+          {selected === item.id && <>
+            <button className="element-quick-more" title="Pilihan elemen" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => openMenu(event, item)}><MoreHorizontal size={16}/></button>
+            <button className="element-quick-delete" title="Hapus elemen" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => { event.stopPropagation(); remove(item.id); }}><Trash2 size={15}/></button>
+          </>}
         </div>
       ))}
+      {contextMenu && (
+        <div className="element-context-menu" style={{ left: contextMenu.x, top: contextMenu.y }} onPointerDown={(event) => event.stopPropagation()}>
+          <strong>Pilihan elemen</strong>
+          <button onClick={() => run(() => duplicate(contextMenu.id))}><CopyPlus size={17}/><span>Duplikat</span><kbd>Ctrl+D</kbd></button>
+          <button onClick={() => run(() => reorder(contextMenu.id, "front"))}><BringToFront size={17}/><span>Bawa ke depan</span></button>
+          <button onClick={() => run(() => reorder(contextMenu.id, "back"))}><SendToBack size={17}/><span>Kirim ke belakang</span></button>
+          <button onClick={() => run(() => toggleLock(contextMenu.id))}>{contextMenu.locked ? <Unlock size={17}/> : <Lock size={17}/>}<span>{contextMenu.locked ? "Buka kunci" : "Kunci elemen"}</span></button>
+          <hr/>
+          <button className="danger" onClick={() => run(() => remove(contextMenu.id))}><Trash2 size={17}/><span>Hapus</span><kbd>Delete</kbd></button>
+        </div>
+      )}
     </div>
   );
 }
