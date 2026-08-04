@@ -140,7 +140,7 @@ export default function App() {
   const [showCodeImport, setShowCodeImport] = useState(false);
   const [participantMaterialFilter, setParticipantMaterialFilter] =
     useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 860);
   const [theme, setTheme] = useState(
     () => localStorage.getItem("jeniusppt-theme") || "light",
   );

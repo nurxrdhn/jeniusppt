@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   browserLocalPersistence,
   getRedirectResult,
+  onAuthStateChanged,
   setPersistence,
   signInWithPopup,
   signInWithRedirect,
@@ -30,6 +31,9 @@ export default function OpeningLogin({ onLogin }) {
   }, []);
   useEffect(() => {
     let active = true;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (active && user) completeLogin(user);
+    });
     async function finishRedirectLogin() {
       try {
         await setPersistence(auth, browserLocalPersistence);
@@ -41,7 +45,7 @@ export default function OpeningLogin({ onLogin }) {
       }
     }
     finishRedirectLogin();
-    return () => { active = false; };
+    return () => { active = false; unsubscribe(); };
   }, []);
 
   function completeLogin(user) {
@@ -70,13 +74,14 @@ export default function OpeningLogin({ onLogin }) {
       setError("");
       await setPersistence(auth, browserLocalPersistence);
       googleProvider.setCustomParameters({ prompt: "select_account" });
-      const mobile = window.matchMedia("(max-width: 860px)").matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      if (mobile) {
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        completeLogin(result.user);
+      } catch (popupError) {
+        const fallbackCodes = ["auth/popup-blocked", "auth/operation-not-supported-in-this-environment", "auth/web-storage-unsupported"];
+        if (!fallbackCodes.includes(popupError?.code)) throw popupError;
         await signInWithRedirect(auth, googleProvider);
-        return;
       }
-      const result = await signInWithPopup(auth, googleProvider);
-      completeLogin(result.user);
     } catch (loginError) {
       console.error("Google login failed", loginError);
       setError(loginMessage(loginError));
