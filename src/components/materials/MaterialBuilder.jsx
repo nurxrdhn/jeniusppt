@@ -84,6 +84,7 @@ export default function MaterialBuilder({
       </div>
 
       {tab === "Info" && (
+        <div className="info-certificate-layout">
         <div className="info-form">
           <h1>Info Materi</h1>
 
@@ -294,10 +295,11 @@ export default function MaterialBuilder({
                     }
                   />
                 </label>
-                <CertificateStudio material={material} updateMaterial={updateMaterial}/>
               </>
             )}
           </div>
+        </div>
+        {material.certificateEnabled && <CertificateStudio material={material} updateMaterial={updateMaterial}/>} 
         </div>
       )}
 

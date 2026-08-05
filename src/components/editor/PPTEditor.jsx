@@ -33,6 +33,8 @@ import {
   ChevronDown,
   RotateCw,
   Presentation,
+  Search,
+  Command,
 } from "lucide-react";
 import { SLIDE_SIZES, ratioStyle } from "../../utils/slideSizes";
 import SolidSelect from "../ui/SolidSelect";
@@ -621,7 +623,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           <div className="mobile-ribbon-more">
             <button
               type="button"
-              className={["file","draw","design","transition","slideshow","record","review","view","templates","help"].includes(ribbonTab) ? "active" : ""}
+              className={["file","tools","draw","design","transition","slideshow","record","review","view","templates","help"].includes(ribbonTab) ? "active" : ""}
               aria-expanded={mobileRibbonMore}
               onClick={() => setMobileRibbonMore((value) => !value)}
             >
@@ -630,7 +632,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             </button>
             {mobileRibbonMore && (
               <div className="mobile-ribbon-menu" role="menu">
-                {[["file","Berkas"],["draw","Gambar"],["design","Desain"],["transition","Animasi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["templates","Template"],["help","Bantuan"]].map(([key,label]) => (
+                {[["file","Berkas"],["tools","100+ Alat"],["draw","Gambar"],["design","Desain"],["transition","Animasi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["templates","Template"],["help","Bantuan"]].map(([key,label]) => (
                   <button
                     key={key}
                     type="button"
@@ -646,7 +648,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           </div>
         </nav>
         <nav className="editor-ribbon-tabs" aria-label="Menu editor slide" data-tour="editor-ribbon">
-          {[["file","Berkas"],["home","Beranda"],["insert","Sisipkan"],["draw","Gambar"],["elements","Elemen"],["design","Desain"],["transition","Transisi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["templates","Template"],["help","Bantuan"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
+          {[["file","Berkas"],["home","Beranda"],["insert","Sisipkan"],["draw","Gambar"],["elements","Elemen"],["design","Desain"],["transition","Transisi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["templates","Template"],["tools","100+ Alat"],["help","Bantuan"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
         </nav>
         <div className="editor-toolbar">
           <div className="history-controls">
@@ -766,6 +768,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           {ribbonTab === "help" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button onClick={() => window.open("/downloads/panduan-lengkap-jeniusppt.pdf", "_blank")}><FileInput size={17}/>Buku PDF</button><button onClick={() => window.open("/downloads/video-tutorial-jeniusppt.mp4", "_blank")}><Video size={17}/>Video tutorial</button></div><small>Bantuan JeniusPPT</small></div></div>}
         </div>
         {ribbonTab === "home" && <div className="desktop-ribbon-content"><TextToolbar target={textTarget} onTarget={setTextTarget} style={currentTextStyle} onChange={updateTextStyle} hasSelectedText={selected?.type === "text"}/></div>}
+        {ribbonTab === "tools" && <div className="desktop-ribbon-content"><CommandCenter currentTextStyle={currentTextStyle} updateTextStyle={updateTextStyle} active={active} selected={selected} updateSlide={updateSlide} updateElement={updateElement} addElement={addElement} addSlide={addSlide} copySlide={copySlide} deleteSlide={deleteSlide} saveNow={saveNow} swapOrientation={swapOrientation} undo={undo} redo={redo} historyStatus={historyStatus} duplicateElement={duplicateElement} toggleElementLock={toggleElementLock} reorderElement={reorderElement} shiftElement={shiftElement} deleteElement={deleteElement} slides={slides}/></div>}
         {ribbonTab === "elements" && <div className="desktop-ribbon-content element-library">
           <button onClick={() => addElement("shape", { text: "Bentuk", background: "#14b8a6" })}><Shapes/><span>Shapes</span></button>
           <button onClick={() => setShowStickers(true)}><GalleryHorizontal/><span>Graphics</span></button>
@@ -1285,6 +1288,7 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
             color: item.color,
             background: item.type === "shape" ? item.background : "transparent",
             transform: `rotate(${item.rotation || 0}deg)`,
+            opacity: item.opacity ?? 1,
             ...(item.type === "text"
               ? textStyle(
                   item.style || {
