@@ -604,7 +604,7 @@ export default function PPTEditor({ material, updateMaterial }) {
     <div className="ppt-editor">
       <main className="slide-stage">
         <nav ref={mobileRibbonRef} className="mobile-ribbon-tabs" aria-label="Menu editor slide di HP">
-          {[["home","Beranda"],["elements","Elemen"],["insert","Sisipkan"]].map(([key,label]) => (
+          {[["home","Beranda"],["insert","Sisipkan"],["elements","Elemen"]].map(([key,label]) => (
             <button
               key={key}
               type="button"
@@ -618,7 +618,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           <div className="mobile-ribbon-more">
             <button
               type="button"
-              className={["design","transition","templates"].includes(ribbonTab) ? "active" : ""}
+              className={["file","draw","design","transition","view","templates"].includes(ribbonTab) ? "active" : ""}
               aria-expanded={mobileRibbonMore}
               onClick={() => setMobileRibbonMore((value) => !value)}
             >
@@ -627,7 +627,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             </button>
             {mobileRibbonMore && (
               <div className="mobile-ribbon-menu" role="menu">
-                {[["design","Desain"],["transition","Transisi"],["templates","Template"]].map(([key,label]) => (
+                {[["file","Berkas"],["draw","Gambar"],["design","Desain"],["transition","Animasi"],["view","Tampilan"],["templates","Template"]].map(([key,label]) => (
                   <button
                     key={key}
                     type="button"
@@ -643,7 +643,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           </div>
         </nav>
         <nav className="editor-ribbon-tabs" aria-label="Menu editor slide" data-tour="editor-ribbon">
-          {[["home","Beranda"],["elements","Elemen"],["insert","Sisipkan"],["design","Desain"],["transition","Transisi"],["templates","Template"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
+          {[["file","Berkas"],["home","Beranda"],["insert","Sisipkan"],["draw","Gambar"],["elements","Elemen"],["design","Desain"],["transition","Animasi"],["view","Tampilan"],["templates","Template"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
         </nav>
         <div className="editor-toolbar">
           <div className="history-controls">
@@ -694,7 +694,10 @@ export default function PPTEditor({ material, updateMaterial }) {
               Lapisan
             </button>
           </div>
-          {ribbonTab === "insert" && <div className="desktop-editor-tools ribbon-group">
+          {ribbonTab === "file" && <div className="desktop-editor-tools ribbon-group word-command-strip">
+            <div className="word-command-group"><div><button onClick={saveNow}><Save size={17}/>Simpan</button><button onClick={copySlide}><Copy size={17}/>Duplikat</button><button className="danger" disabled={slides.length <= 1} onClick={deleteSlide}><Trash2 size={17}/>Hapus</button></div><small>Berkas slide</small></div>
+          </div>}
+          {ribbonTab === "insert" && <div className="desktop-editor-tools ribbon-group word-command-strip">
           <button onClick={copySlide}>
             <Copy size={16} />
             Copy
@@ -730,6 +733,10 @@ export default function PPTEditor({ material, updateMaterial }) {
             onChange={uploadSticker}
           />
           </div>}
+          {ribbonTab === "draw" && <div className="desktop-editor-tools ribbon-group word-command-strip">
+            <div className="word-command-group"><div><button onClick={() => addElement("shape", { text: "Garis", w: 38, h: 2, background: "#ff641e" })}><Shapes size={17}/>Garis</button><button onClick={() => addElement("shape", { text: "Panah", w: 34, h: 4, background: "#ff641e" })}><Shapes size={17}/>Panah</button><button onClick={() => addElement("text", { text: "Catatan", style: { fontFamily: "Caveat", fontSize: 34, color: "#172033" }, color: "#172033" })}><Type size={17}/>Tulis</button></div><small>Alat gambar</small></div>
+            <div className="word-command-group"><div><button onClick={() => setShowStickers(true)}><Sticker size={17}/>Stiker</button><button onClick={() => imageRef.current?.click()}><ImagePlus size={17}/>Gambar</button></div><small>Tambahkan</small></div>
+          </div>}
           {ribbonTab === "design" && <div className="desktop-editor-tools ribbon-group"><span className="ribbon-label">Ukuran slide</span><SolidSelect
             value={
               Object.keys(SLIDE_SIZES).find(
@@ -746,6 +753,10 @@ export default function PPTEditor({ material, updateMaterial }) {
           </SolidSelect>
           <button onClick={swapOrientation}>Putar</button></div>}
           {ribbonTab === "transition" && <div className="desktop-editor-tools ribbon-group"><span className="ribbon-label">Animasi</span><SolidSelect value={active?.transition || "fade"} onChange={(e) => updateSlide({ transition: e.target.value })}>{animations.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</SolidSelect><span className="ribbon-label">Durasi</span><SolidSelect value={active?.duration || 700} onChange={(e) => updateSlide({ duration: Number(e.target.value) })}><option value={400}>Cepat</option><option value={700}>Normal</option><option value={1100}>Lembut</option><option value={1600}>Dramatis</option></SolidSelect></div>}
+          {ribbonTab === "view" && <div className="desktop-editor-tools ribbon-group word-command-strip">
+            <div className="word-command-group"><div><button onClick={() => { setMobileSheet("layers"); document.querySelector(".desktop-layer-wrapper")?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }}><Layers3 size={17}/>Lapisan</button><button onClick={() => { setMobileSheet("settings"); document.querySelector(".properties-panel")?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }}><Settings2 size={17}/>Properti</button></div><small>Panel editor</small></div>
+            <div className="word-command-group"><div><button onClick={() => setSelectedElement(null)}><Eye size={17}/>Kanvas bersih</button><button onClick={() => updateSlide({ showGuides: active?.showGuides === false })}><GalleryHorizontal size={17}/>{active?.showGuides === false ? "Panduan aktif" : "Panduan nonaktif"}</button></div><small>Tampilan kanvas</small></div>
+          </div>}
         </div>
         {ribbonTab === "home" && <div className="desktop-ribbon-content"><TextToolbar target={textTarget} onTarget={setTextTarget} style={currentTextStyle} onChange={updateTextStyle} hasSelectedText={selected?.type === "text"}/></div>}
         {ribbonTab === "elements" && <div className="desktop-ribbon-content element-library">
@@ -816,8 +827,8 @@ export default function PPTEditor({ material, updateMaterial }) {
             className="slide-canvas editor-template-preview"
             style={canvasStyle}
           >
-            {smartGuides.x !== null && <div className="smart-guide vertical" style={{ left: `${smartGuides.x}%` }}><span>{Math.round(smartGuides.x)}%</span></div>}
-            {smartGuides.y !== null && <div className="smart-guide horizontal" style={{ top: `${smartGuides.y}%` }}><span>{Math.round(smartGuides.y)}%</span></div>}
+            {active?.showGuides !== false && smartGuides.x !== null && <div className="smart-guide vertical" style={{ left: `${smartGuides.x}%` }}><span>{Math.round(smartGuides.x)}%</span></div>}
+            {active?.showGuides !== false && smartGuides.y !== null && <div className="smart-guide horizontal" style={{ top: `${smartGuides.y}%` }}><span>{Math.round(smartGuides.y)}%</span></div>}
             <div
               className={`movable-text title-box ${titleBox.locked ? "locked" : ""}`}
               onPointerDown={(e) => moveTextBoxFromZone(e, "titleBox", titleBox)}
