@@ -1,7 +1,13 @@
 /* Ribbon Word modern, kanvas Canva, dan proporsi desktop/mobile v8.9. */
 @media(min-width:761px){
-  .page>.material-grid{width:min(100%,1080px)!important;margin-inline:auto!important}
-  .material-card{padding:20px 22px!important}
+  .page>.material-grid{width:min(100%,690px)!important;max-width:690px!important;margin-left:0!important;margin-right:auto!important}
+  .material-card{padding:18px!important}
+  .certificate-assets{width:min(100%,720px)!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:8px!important;margin-right:auto!important}
+  .certificate-assets label,.certificate-assets .certificate-draw-button,.certificate-assets .certificate-frame-button{min-height:82px!important;padding:8px 6px!important;border-radius:11px!important}
+  .certificate-assets span{width:34px!important;height:34px!important}
+  .certificate-assets b{font-size:10px!important}.certificate-assets small{font-size:8px!important}
+  .signature-pad-dialog{width:min(520px,100%)!important;padding:15px!important}
+  .signature-pad-dialog canvas{aspect-ratio:4/1!important}
   .ppt-editor{max-width:1540px;margin-inline:auto}
   .ppt-editor .slide-stage{min-width:0;background:#eef1f5;border:1px solid #d9e0e8;border-radius:16px;overflow:hidden}
   .ppt-editor .editor-ribbon-tabs{position:sticky;top:0;z-index:32;gap:0!important;padding:6px 12px 0!important;border:0!important;border-bottom:1px solid #d9e0e8!important;border-radius:0!important;background:#fff!important;overflow-x:auto;scrollbar-width:thin}

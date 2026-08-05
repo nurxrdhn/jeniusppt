@@ -35,6 +35,7 @@ import { JeniusDialog, JeniusToast } from "./components/ui/JeniusNotice";
 import { jeniusConfirm } from "./utils/jeniusDialog";
 import ProductTour from "./components/ui/ProductTour";
 import ProductivityHub from "./components/dashboard/ProductivityHub";
+import InnovationCenter from "./components/dashboard/InnovationCenter";
 import { translateVisiblePage } from "./services/translationService";
 import { auth } from "./firebase/config";
 import {
@@ -654,7 +655,9 @@ export default function App() {
                 : page === "question_bank"
                   ? "Bank Soal"
                   : page === "guide"
-                    ? "Panduan & Tutorial"
+                  ? "Panduan & Tutorial"
+                  : page === "innovation"
+                    ? "JP Inovasi"
                   : page === "creator_market"
                     ? "Galeri Kreator"
               : page === "trash"
@@ -769,6 +772,8 @@ export default function App() {
           />
         )}
 
+        {page === "innovation" && <InnovationCenter materials={state.materials} updateMaterial={updateMaterial} notify={notify} onNavigate={setPage} />}
+
         {page === "question_bank" && (
           <ProductivityHub state={state} setState={setState} user={user} notify={notify} onNavigate={setPage} initialActive="questions" onStartTour={() => setShowTour(true)} />
         )}
@@ -833,6 +838,7 @@ export default function App() {
           "ai",
           "feedback",
           "productivity",
+          "innovation",
           "settings",
           "subscription",
           "trash",

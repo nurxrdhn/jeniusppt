@@ -12,6 +12,7 @@ import {
   Store,
   Settings,
   Sparkles,
+  Rocket,
   Trash2,
   Users,
   X,
@@ -31,6 +32,7 @@ const menu = [
   ["guide", BookOpen, "Panduan & Tutorial"],
   ["creator_market", Store, "Galeri Kreator"],
   ["productivity", PanelsTopLeft, "Pusat Produktivitas"],
+  ["innovation", Rocket, "JP Inovasi"],
   ["feedback", MessageSquareHeart, "Saran & Kritik"],
   ["settings", Settings, "Pengaturan"],
 ];
