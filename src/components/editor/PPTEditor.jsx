@@ -31,6 +31,7 @@ import {
   EyeOff,
   ChevronUp,
   ChevronDown,
+  RotateCw,
 } from "lucide-react";
 import { SLIDE_SIZES, ratioStyle } from "../../utils/slideSizes";
 import SolidSelect from "../ui/SolidSelect";
@@ -89,6 +90,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   const [ribbonTab, setRibbonTab] = useState("home");
   const [mobileRibbonMore, setMobileRibbonMore] = useState(false);
   const [textBoxMenu, setTextBoxMenu] = useState(null);
+  const [smartGuides, setSmartGuides] = useState({ x: null, y: null });
   const [historyStatus, setHistoryStatus] = useState({
     canUndo: false,
     canRedo: false,
@@ -494,32 +496,37 @@ export default function PPTEditor({ material, updateMaterial }) {
     if (start.locked) return;
     const startX = event.clientX,
       startY = event.clientY;
-    const move = (e) =>
+    const move = (e) => {
+      const rawX = Math.max(0, Math.min(100 - start.w, start.x + ((e.clientX - startX) / canvas.width) * 100));
+      const rawY = Math.max(0, Math.min(100 - start.h, start.y + ((e.clientY - startY) / canvas.height) * 100));
+      const snapped = snapToCanvas(rawX, rawY, start.w, start.h);
+      setSmartGuides(snapped.guides);
       updateSlide({
         [key]: {
           ...start,
-          x: Math.max(
-            0,
-            Math.min(
-              100 - start.w,
-              start.x + ((e.clientX - startX) / canvas.width) * 100,
-            ),
-          ),
-          y: Math.max(
-            0,
-            Math.min(
-              100 - start.h,
-              start.y + ((e.clientY - startY) / canvas.height) * 100,
-            ),
-          ),
+          x: snapped.x,
+          y: snapped.y,
         },
       });
+    };
     const stop = () => {
+      setSmartGuides({ x: null, y: null });
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", stop);
+  }
+  function snapToCanvas(x, y, w, h) {
+    const threshold = 1.35;
+    let nextX = x, nextY = y, guideX = null, guideY = null;
+    const xPoints = [{ value: x, target: 0, result: 0 }, { value: x + w / 2, target: 50, result: 50 - w / 2 }, { value: x + w, target: 100, result: 100 - w }];
+    const yPoints = [{ value: y, target: 0, result: 0 }, { value: y + h / 2, target: 50, result: 50 - h / 2 }, { value: y + h, target: 100, result: 100 - h }];
+    const hitX = xPoints.find((point) => Math.abs(point.value - point.target) <= threshold);
+    const hitY = yPoints.find((point) => Math.abs(point.value - point.target) <= threshold);
+    if (hitX) { nextX = hitX.result; guideX = hitX.target; }
+    if (hitY) { nextY = hitY.result; guideY = hitY.target; }
+    return { x: nextX, y: nextY, guides: { x: guideX, y: guideY } };
   }
   function moveTextBoxFromZone(event, key, fallback) {
     if (event.button !== undefined && event.button !== 0) return;
@@ -809,6 +816,8 @@ export default function PPTEditor({ material, updateMaterial }) {
             className="slide-canvas editor-template-preview"
             style={canvasStyle}
           >
+            {smartGuides.x !== null && <div className="smart-guide vertical" style={{ left: `${smartGuides.x}%` }}><span>{Math.round(smartGuides.x)}%</span></div>}
+            {smartGuides.y !== null && <div className="smart-guide horizontal" style={{ top: `${smartGuides.y}%` }}><span>{Math.round(smartGuides.y)}%</span></div>}
             <div
               className={`movable-text title-box ${titleBox.locked ? "locked" : ""}`}
               onPointerDown={(e) => moveTextBoxFromZone(e, "titleBox", titleBox)}
@@ -912,6 +921,8 @@ export default function PPTEditor({ material, updateMaterial }) {
               duplicate={duplicateElement}
               reorder={reorderElement}
               toggleLock={toggleElementLock}
+              onGuides={setSmartGuides}
+              snap={snapToCanvas}
             />
           </div>
         </section>
@@ -1144,7 +1155,7 @@ function LayerPanel({ slide, selected, select, updateTextLayer, updateElement, s
   );
 }
 
-function ElementLayer({ elements, selected, select, update, remove, duplicate, reorder, toggleLock }) {
+function ElementLayer({ elements, selected, select, update, remove, duplicate, reorder, toggleLock, onGuides, snap }) {
   const [contextMenu, setContextMenu] = useState(null);
   const clipboardRef = useRef(null);
 
@@ -1193,29 +1204,48 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
       startY = event.clientY,
       originX = item.x,
       originY = item.y;
-    const move = (e) =>
-      update(item.id, {
-        x: Math.max(
-          0,
-          Math.min(
-            100 - item.w,
-            originX + ((e.clientX - startX) / canvas.width) * 100,
-          ),
-        ),
-        y: Math.max(
-          0,
-          Math.min(
-            100 - item.h,
-            originY + ((e.clientY - startY) / canvas.height) * 100,
-          ),
-        ),
-      });
+    const move = (e) => {
+      const rawX = Math.max(0, Math.min(100 - item.w, originX + ((e.clientX - startX) / canvas.width) * 100));
+      const rawY = Math.max(0, Math.min(100 - item.h, originY + ((e.clientY - startY) / canvas.height) * 100));
+      const result = snap(rawX, rawY, item.w, item.h);
+      onGuides(result.guides);
+      update(item.id, { x: result.x, y: result.y });
+    };
     const stop = () => {
+      onGuides({ x: null, y: null });
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", stop);
+  }
+  function startResize(event, item, corner) {
+    event.preventDefault(); event.stopPropagation();
+    if (item.locked) return;
+    const canvas = event.currentTarget.closest(".slide-canvas").getBoundingClientRect();
+    const startX = event.clientX, startY = event.clientY;
+    const origin = { x: item.x, y: item.y, w: item.w, h: item.h };
+    const move = (e) => {
+      const dx = ((e.clientX - startX) / canvas.width) * 100;
+      const dy = ((e.clientY - startY) / canvas.height) * 100;
+      let { x, y, w, h } = origin;
+      if (corner.includes("e")) w = Math.max(4, Math.min(100 - x, origin.w + dx));
+      if (corner.includes("s")) h = Math.max(4, Math.min(100 - y, origin.h + dy));
+      if (corner.includes("w")) { const nx = Math.max(0, Math.min(origin.x + origin.w - 4, origin.x + dx)); w = origin.w + origin.x - nx; x = nx; }
+      if (corner.includes("n")) { const ny = Math.max(0, Math.min(origin.y + origin.h - 4, origin.y + dy)); h = origin.h + origin.y - ny; y = ny; }
+      update(item.id, { x, y, w, h });
+    };
+    const stop = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", stop); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", stop);
+  }
+  function startRotate(event, item) {
+    event.preventDefault(); event.stopPropagation();
+    if (item.locked) return;
+    const box = event.currentTarget.closest(".free-element").getBoundingClientRect();
+    const centerX = box.left + box.width / 2, centerY = box.top + box.height / 2;
+    const move = (e) => update(item.id, { rotation: Math.round(Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI + 90) });
+    const stop = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", stop); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", stop);
   }
   return (
     <div className="free-elements-layer">
@@ -1232,6 +1262,7 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
             height: `${item.h}%`,
             color: item.color,
             background: item.type === "shape" ? item.background : "transparent",
+            transform: `rotate(${item.rotation || 0}deg)`,
             ...(item.type === "text"
               ? textStyle(
                   item.style || {
@@ -1258,6 +1289,8 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
             <button className="element-move-handle" title="Geser elemen" aria-label="Geser elemen" onPointerDown={(event) => startDrag(event, item)}>+</button>
             <button className="element-quick-more" title="Pilihan elemen" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => openMenu(event, item)}><MoreHorizontal size={16}/></button>
             <button className="element-quick-delete" title="Hapus elemen" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => { event.stopPropagation(); remove(item.id); }}><Trash2 size={15}/></button>
+            {!item.locked && ["nw","ne","sw","se"].map((corner) => <button key={corner} className={`element-resize-handle ${corner}`} aria-label={`Ubah ukuran ${corner}`} onPointerDown={(event) => startResize(event, item, corner)} />)}
+            {!item.locked && <button className="element-rotate-handle" title="Putar elemen" aria-label="Putar elemen" onPointerDown={(event) => startRotate(event, item)}><RotateCw size={13}/></button>}
           </>}
         </div>
       ))}

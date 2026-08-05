@@ -1,0 +1,46 @@
+/* JeniusPPT v8.8: Materi tunggal, kontrol kanvas, dan penggaris pintar. */
+.material-grid{grid-template-columns:1fr!important;gap:14px!important}
+.material-card{width:100%;min-width:0;padding:18px!important}
+.material-card>h2{margin:10px 0 4px;font-size:clamp(18px,2vw,24px)}
+.material-state-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.material-state{min-width:0;padding:12px;border:1px solid var(--jp-line);border-radius:12px;background:#f8fafc;color:var(--jp-ink)}
+.material-state>header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+.material-state>header span{font-size:10px;font-weight:900;letter-spacing:.1em;color:var(--jp-accent)}
+.material-state>header small{min-width:0;color:var(--jp-muted);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.material-state .card-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+.publish-state .card-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.material-state .card-actions button,.material-state .card-actions a{min-width:0;min-height:40px;display:flex;align-items:center;justify-content:center;gap:6px;padding:7px;border:1px solid var(--jp-line);border-radius:9px;background:#fff;color:var(--jp-ink);font-size:11px;font-weight:800;text-decoration:none}
+.material-state .card-actions button:hover,.material-state .card-actions a:hover{border-color:var(--jp-accent);color:var(--jp-accent);background:#fff7f1}
+.material-delete{width:max-content;margin:10px 0 0 auto!important;display:flex;align-items:center;gap:6px;padding:7px 10px!important;border:1px solid #fecaca!important;border-radius:9px!important;background:#fff!important;color:var(--jp-danger)!important;font-size:10px!important;font-weight:800!important}
+
+.slide-canvas{overflow:visible!important}
+.smart-guide{position:absolute;z-index:70;pointer-events:none;background:#0ea5e9;box-shadow:0 0 0 1px rgba(255,255,255,.8)}
+.smart-guide.vertical{top:-12px;bottom:-12px;width:1px}
+.smart-guide.horizontal{left:-12px;right:-12px;height:1px}
+.smart-guide span{position:absolute;padding:2px 5px;border-radius:5px;background:#0c4a6e;color:#fff;font:800 9px/1.2 Manrope,sans-serif;white-space:nowrap}
+.smart-guide.vertical span{top:3px;left:5px}.smart-guide.horizontal span{top:5px;left:3px}
+.free-element.selected{outline:1.5px solid #0ea5e9!important;box-shadow:none!important}
+.element-resize-handle{position:absolute!important;z-index:90!important;width:12px!important;height:12px!important;min-width:12px!important;padding:0!important;border:2px solid #fff!important;border-radius:50%!important;background:#0ea5e9!important;box-shadow:0 1px 4px rgba(15,23,42,.35)!important}
+.element-resize-handle.nw{left:-7px;top:-7px;cursor:nwse-resize}.element-resize-handle.ne{right:-7px;top:-7px;cursor:nesw-resize}.element-resize-handle.sw{left:-7px;bottom:-7px;cursor:nesw-resize}.element-resize-handle.se{right:-7px;bottom:-7px;cursor:nwse-resize}
+.element-rotate-handle{position:absolute!important;z-index:91!important;left:50%!important;top:-34px!important;width:25px!important;height:25px!important;min-width:25px!important;padding:0!important;display:grid!important;place-items:center!important;transform:translateX(-50%)!important;border:2px solid #fff!important;border-radius:50%!important;background:#0ea5e9!important;color:#fff!important;box-shadow:0 2px 7px rgba(15,23,42,.3)!important;cursor:grab!important}
+.element-rotate-handle::after{content:"";position:absolute;top:23px;left:11px;width:1px;height:10px;background:#0ea5e9}
+.layer-row{grid-template-columns:minmax(0,1fr);position:relative}
+.layer-row::before{content:"⠿";position:absolute;left:-2px;top:11px;color:#9aa4b2;font-size:13px;opacity:.7}
+.layer-main{padding-left:10px!important}
+
+html[data-theme="dark"] .material-state{background:#242a33;color:#f4f7fb;border-color:#445063}
+html[data-theme="dark"] .material-state .card-actions button,html[data-theme="dark"] .material-state .card-actions a{background:#1b2028;color:#f4f7fb;border-color:#445063}
+
+@media(max-width:760px){
+  .material-grid{grid-template-columns:1fr!important;gap:10px!important}
+  .material-card{padding:12px!important}
+  .material-state-grid{grid-template-columns:1fr!important;gap:8px!important}
+  .material-state{padding:9px!important}
+  .material-state .card-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .publish-state .card-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .material-state .card-actions button,.material-state .card-actions a{min-height:42px!important;font-size:10px!important}
+  .element-resize-handle{width:17px!important;height:17px!important;min-width:17px!important}
+  .element-resize-handle.nw{left:-9px;top:-9px}.element-resize-handle.ne{right:-9px;top:-9px}.element-resize-handle.sw{left:-9px;bottom:-9px}.element-resize-handle.se{right:-9px;bottom:-9px}
+  .element-rotate-handle{top:-40px!important;width:29px!important;height:29px!important;min-width:29px!important}
+  .smart-guide span{font-size:8px}
+}

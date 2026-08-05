@@ -1027,40 +1027,24 @@ function Materials({
                 </span>
               </div>
 
-              <div className="card-actions">
-                <button onClick={() => editMaterial(m)}>
-                  <Edit3 size={16} />
-                  Edit
-                </button>
-
-                <button onClick={() => openShare(m)}>
-                  <Share2 size={16} />
-                  Share
-                </button>
-
-                <a href={`/play/${m.shareCode}`} target="_blank">
-                  <Eye size={16} />
-                  Preview
-                </a>
-
-                <button onClick={() => duplicateMaterial(m)}>
-                  <Copy size={16} />
-                  Copy
-                </button>
-
-                <button
-                  className="participants-button"
-                  onClick={() => openParticipants(m)}
-                >
-                  <Users size={16} />
-                  Peserta
-                </button>
-
-                <button className="danger" onClick={() => deleteMaterial(m)}>
-                  <Trash2 size={16} />
-                  Hapus
-                </button>
+              <div className="material-state-grid">
+                <section className="material-state draft-state">
+                  <header><span>DRAFT</span><small>Ruang kerja</small></header>
+                  <div className="card-actions">
+                    <button onClick={() => editMaterial(m)}><Edit3 size={16} />Edit</button>
+                    <button onClick={() => duplicateMaterial(m)}><Copy size={16} />Salin</button>
+                  </div>
+                </section>
+                <section className="material-state publish-state">
+                  <header><span>TERBIT</span><small>{m.status === "Published" ? "Sudah dibagikan" : "Belum diterbitkan"}</small></header>
+                  <div className="card-actions">
+                    <button onClick={() => openShare(m)}><Share2 size={16} />Bagikan</button>
+                    <a href={`/play/${m.shareCode}`} target="_blank"><Eye size={16} />Pratinjau</a>
+                    <button className="participants-button" onClick={() => openParticipants(m)}><Users size={16} />Peserta</button>
+                  </div>
+                </section>
               </div>
+              <button className="material-delete danger" onClick={() => deleteMaterial(m)}><Trash2 size={16} />Hapus materi</button>
             </article>
           ))}
         </div>
