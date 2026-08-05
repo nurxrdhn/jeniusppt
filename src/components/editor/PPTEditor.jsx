@@ -32,6 +32,7 @@ import {
   ChevronUp,
   ChevronDown,
   RotateCw,
+  Presentation,
 } from "lucide-react";
 import { SLIDE_SIZES, ratioStyle } from "../../utils/slideSizes";
 import SolidSelect from "../ui/SolidSelect";
@@ -90,6 +91,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   const [ribbonTab, setRibbonTab] = useState("home");
   const [mobileRibbonMore, setMobileRibbonMore] = useState(false);
   const [textBoxMenu, setTextBoxMenu] = useState(null);
+  const [spellcheck, setSpellcheck] = useState(true);
   const [smartGuides, setSmartGuides] = useState({ x: null, y: null });
   const [historyStatus, setHistoryStatus] = useState({
     canUndo: false,
@@ -603,6 +605,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   return (
     <div className="ppt-editor">
       <main className="slide-stage">
+        <header className="powerpoint-titlebar"><span>JP</span><b>{material.title || "Presentasi tanpa judul"}</b><small>JeniusPPT Editor</small></header>
         <nav ref={mobileRibbonRef} className="mobile-ribbon-tabs" aria-label="Menu editor slide di HP">
           {[["home","Beranda"],["insert","Sisipkan"],["elements","Elemen"]].map(([key,label]) => (
             <button
@@ -618,7 +621,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           <div className="mobile-ribbon-more">
             <button
               type="button"
-              className={["file","draw","design","transition","view","templates"].includes(ribbonTab) ? "active" : ""}
+              className={["file","draw","design","transition","slideshow","record","review","view","templates","help"].includes(ribbonTab) ? "active" : ""}
               aria-expanded={mobileRibbonMore}
               onClick={() => setMobileRibbonMore((value) => !value)}
             >
@@ -627,7 +630,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             </button>
             {mobileRibbonMore && (
               <div className="mobile-ribbon-menu" role="menu">
-                {[["file","Berkas"],["draw","Gambar"],["design","Desain"],["transition","Animasi"],["view","Tampilan"],["templates","Template"]].map(([key,label]) => (
+                {[["file","Berkas"],["draw","Gambar"],["design","Desain"],["transition","Animasi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["templates","Template"],["help","Bantuan"]].map(([key,label]) => (
                   <button
                     key={key}
                     type="button"
@@ -643,7 +646,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           </div>
         </nav>
         <nav className="editor-ribbon-tabs" aria-label="Menu editor slide" data-tour="editor-ribbon">
-          {[["file","Berkas"],["home","Beranda"],["insert","Sisipkan"],["draw","Gambar"],["elements","Elemen"],["design","Desain"],["transition","Animasi"],["view","Tampilan"],["templates","Template"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
+          {[["file","Berkas"],["home","Beranda"],["insert","Sisipkan"],["draw","Gambar"],["elements","Elemen"],["design","Desain"],["transition","Transisi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["templates","Template"],["help","Bantuan"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
         </nav>
         <div className="editor-toolbar">
           <div className="history-controls">
@@ -757,6 +760,10 @@ export default function PPTEditor({ material, updateMaterial }) {
             <div className="word-command-group"><div><button onClick={() => { setMobileSheet("layers"); document.querySelector(".desktop-layer-wrapper")?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }}><Layers3 size={17}/>Lapisan</button><button onClick={() => { setMobileSheet("settings"); document.querySelector(".properties-panel")?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }}><Settings2 size={17}/>Properti</button></div><small>Panel editor</small></div>
             <div className="word-command-group"><div><button onClick={() => setSelectedElement(null)}><Eye size={17}/>Kanvas bersih</button><button onClick={() => updateSlide({ showGuides: active?.showGuides === false })}><GalleryHorizontal size={17}/>{active?.showGuides === false ? "Panduan aktif" : "Panduan nonaktif"}</button></div><small>Tampilan kanvas</small></div>
           </div>}
+          {ribbonTab === "slideshow" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button onClick={() => window.open(`/play/${material.shareCode}`, "_blank")}><Eye size={17}/>Dari awal</button><button onClick={() => window.open(`/play/${material.shareCode}?slide=${activeIndex}`, "_blank")}><Presentation size={17}/>Slide aktif</button></div><small>Mulai presentasi</small></div></div>}
+          {ribbonTab === "record" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button onClick={() => addMediaLink("audio")}><Volume2 size={17}/>Rekam narasi</button><button onClick={() => audioRef.current?.click()}><Volume2 size={17}/>Audio lokal</button><button onClick={() => videoRef.current?.click()}><Video size={17}/>Video lokal</button></div><small>Rekaman dan media</small></div></div>}
+          {ribbonTab === "review" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button className={spellcheck ? "active" : ""} onClick={() => setSpellcheck((value) => !value)}><FileInput size={17}/>{spellcheck ? "Ejaan aktif" : "Ejaan nonaktif"}</button><button onClick={() => setMobileSheet("layers")}><Layers3 size={17}/>Periksa objek</button></div><small>Pemeriksaan</small></div></div>}
+          {ribbonTab === "help" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button onClick={() => window.open("/downloads/panduan-lengkap-jeniusppt.pdf", "_blank")}><FileInput size={17}/>Buku PDF</button><button onClick={() => window.open("/downloads/video-tutorial-jeniusppt.mp4", "_blank")}><Video size={17}/>Video tutorial</button></div><small>Bantuan JeniusPPT</small></div></div>}
         </div>
         {ribbonTab === "home" && <div className="desktop-ribbon-content"><TextToolbar target={textTarget} onTarget={setTextTarget} style={currentTextStyle} onChange={updateTextStyle} hasSelectedText={selected?.type === "text"}/></div>}
         {ribbonTab === "elements" && <div className="desktop-ribbon-content element-library">
@@ -821,6 +828,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             </button>
           </div>
         )}
+        <div className="powerpoint-workspace">
         <section className="slide-canvas-wrap" data-tour="slide-canvas">
           <div
             key={`${activeIndex}-${active?.templateName || "custom"}`}
@@ -871,6 +879,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 onFocus={() => setTextTarget("title")}
                 className="slide-title-input"
                 placeholder="Judul"
+                spellCheck={spellcheck}
               />
             </div>
             <div
@@ -914,6 +923,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 onFocus={() => setTextTarget("body")}
                 className="slide-body-input"
                 placeholder="Mulai mengetik..."
+                spellCheck={spellcheck}
               />
             </div>
             <ElementLayer
@@ -980,6 +990,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             </button>
           </div>
         </section>
+        </div>
       </main>
       <div className={`mobile-sheet layers-sheet ${mobileSheet === "layers" ? "open" : ""}`}>
         <div className="mobile-sheet-head"><b>Lapisan Slide</b><button onClick={() => setMobileSheet(null)} aria-label="Tutup lapisan"><X size={20}/></button></div>

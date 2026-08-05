@@ -81,6 +81,7 @@ export default function CertificateStudio({ material, updateMaterial }) {
   return (
     <section className="certificate-studio">
       <header><div><small>STUDIO SERTIFIKAT</small><h2>Pratinjau langsung</h2><p>Perubahan teks, warna, dan gambar langsung terlihat.</p></div><div><button onClick={downloadJpg}><Download size={16}/>JPG</button><button onClick={downloadPdf}><Download size={16}/>PDF</button></div></header>
+      <div className="certificate-workspace">
       <div className="certificate-assets">
         {assets.map(([field,Icon,label]) => <label key={field}><span><Icon size={22}/></span><b>{label}</b><small>{material[field] ? "Ganti gambar" : "Tambah gambar"}</small><input hidden type="file" accept="image/*" onChange={(event) => upload(event,field)}/></label>)}
         <button className="certificate-draw-button" onClick={() => setSignaturePadOpen(true)}><span><PenLine size={22}/></span><b>Tulis TTD</b><small>Pakai pena atau jari</small></button>
@@ -98,6 +99,7 @@ export default function CertificateStudio({ material, updateMaterial }) {
           <strong>{material.title || "Materi Pembelajaran"}</strong>
           <footer><div><span>Nilai Minimum</span><b>{material.passingScore ?? 75}</b></div><div className="certificate-signature">{material.certificateSignature && <img src={material.certificateSignature} alt="Tanda tangan"/>}<i/><b>{material.certificateSigner || "Guru / Pengajar"}</b><span>Penandatangan</span></div></footer>
         </div>
+      </div>
       </div>
       {signaturePadOpen && <div className="signature-pad-backdrop" role="dialog" aria-modal="true" aria-label="Tulis tanda tangan">
         <section className="signature-pad-dialog">

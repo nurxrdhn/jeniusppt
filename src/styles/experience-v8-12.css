@@ -1,0 +1,27 @@
+/* Editor PowerPoint-style dan sertifikat tanpa gulir horizontal. */
+.powerpoint-titlebar{min-height:42px;padding:6px 14px;display:flex;align-items:center;gap:10px;background:var(--jp-accent);color:#fff}
+.powerpoint-titlebar>span{width:29px;height:29px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.7);border-radius:7px;font-size:10px;font-weight:900}.powerpoint-titlebar>b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.powerpoint-titlebar>small{margin-left:auto;color:#fff;font-size:9px;font-weight:700}
+.certificate-workspace{display:grid;grid-template-columns:minmax(250px,320px) minmax(0,1fr);align-items:start;gap:14px}
+.certificate-workspace .certificate-assets{width:100%!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;margin:0!important}
+.certificate-workspace .certificate-preview-shell{width:100%;min-width:0;padding:10px!important;overflow:hidden!important}
+.certificate-workspace .certificate-preview{width:100%!important;min-width:0!important;max-width:100%!important;aspect-ratio:297/210!important;height:auto!important;padding:7% 7% 4%!important}
+.certificate-workspace .certificate-preview>h3{font-size:clamp(20px,2.6vw,38px)!important}.certificate-workspace .certificate-preview>h2{font-size:clamp(15px,1.7vw,26px)!important;margin:8px 0 4px!important}.certificate-workspace .certificate-preview>p{font-size:clamp(8px,.9vw,12px)!important}.certificate-workspace .certificate-photo{width:clamp(42px,5vw,64px)!important;height:clamp(42px,5vw,64px)!important}
+@media(min-width:761px){
+  .ppt-editor{grid-template-columns:minmax(0,1fr) 282px!important}
+  .ppt-editor .slide-stage{display:block!important}
+  .ppt-editor .powerpoint-workspace{min-height:620px;display:grid;grid-template-columns:224px minmax(0,1fr);background:#e8e8e8}
+  .ppt-editor .slide-strip{grid-column:1;grid-row:1;min-width:0!important;width:224px!important;margin:0!important;padding:10px!important;border:0!important;border-right:1px solid #cfd4da!important;border-radius:0!important;background:#f3f3f3!important;overflow:hidden}
+  .ppt-editor .slide-strip-head{display:grid!important;gap:7px}.ppt-editor .slide-strip-scroll{display:flex!important;flex-direction:column!important;gap:9px!important;max-height:calc(100vh - 260px)!important;overflow-y:auto!important;overflow-x:hidden!important;padding:2px!important}
+  .ppt-editor .slide-thumb-card{flex:0 0 auto!important;width:100%!important;min-width:0!important;padding:5px!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;border:1px solid transparent!important;border-radius:7px!important;background:transparent!important}
+  .ppt-editor .slide-thumb-card.active{border-color:var(--jp-accent)!important;background:#fff!important;box-shadow:0 0 0 1px var(--jp-accent)!important}.ppt-editor .slide-thumb-select{min-width:0!important}.ppt-editor .slide-strip-thumb{width:100%!important;min-width:0!important}
+  .ppt-editor .slide-canvas-wrap{grid-column:2;grid-row:1;min-width:0;padding:28px!important;display:grid;place-items:center;background:#e8e8e8!important;overflow:auto!important}
+  .ppt-editor .slide-canvas{width:min(100%,1040px)!important;max-height:calc(100vh - 250px);margin:auto!important}
+  .ppt-editor .editor-ribbon-tabs{background:#fff!important}.ppt-editor .editor-ribbon-tabs button{font-size:11px!important;padding-inline:11px!important}
+}
+@media(max-width:1050px) and (min-width:761px){.certificate-workspace{grid-template-columns:260px minmax(0,1fr)}.certificate-workspace .certificate-assets{grid-template-columns:1fr!important}}
+@media(max-width:760px){
+  .powerpoint-titlebar{min-height:38px;padding:5px 9px}.powerpoint-titlebar>small{display:none}
+  .ppt-editor .powerpoint-workspace{display:flex;flex-direction:column;background:#eef1f5}.ppt-editor .slide-canvas-wrap{order:1}.ppt-editor .slide-strip{order:2}
+  .certificate-workspace{display:grid;grid-template-columns:1fr;gap:9px}.certificate-workspace .certificate-assets{grid-template-columns:repeat(2,minmax(0,1fr))!important}.certificate-workspace .certificate-preview-shell{padding:5px!important;overflow:hidden!important}.certificate-workspace .certificate-preview{width:100%!important;min-width:0!important;aspect-ratio:297/210!important;padding:10% 5% 3%!important;border-width:4px!important}.certificate-workspace .certificate-preview>h3{font-size:clamp(14px,5vw,24px)!important}.certificate-workspace .certificate-preview>h2{font-size:clamp(10px,3.2vw,17px)!important}.certificate-workspace .certificate-preview>p{font-size:6.5px!important;max-width:90%!important}.certificate-workspace .certificate-signature{width:82px!important}
+}
+html[data-theme="dark"] .powerpoint-titlebar{background:var(--jp-accent)!important;color:#fff!important}html[data-theme="dark"] .ppt-editor .powerpoint-workspace,html[data-theme="dark"] .ppt-editor .slide-canvas-wrap{background:#11161d!important}html[data-theme="dark"] .ppt-editor .slide-strip{background:#1b2028!important;border-color:#394351!important}
