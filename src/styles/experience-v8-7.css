@@ -1,0 +1,130 @@
+:root{
+  --jp-accent:var(--fresh-orange,#ff641e);
+  --jp-ink:#172033;
+  --jp-muted:#5e6b7e;
+  --jp-line:#dfe5ec;
+  --jp-soft:#f5f7fa;
+  --jp-surface:#fff;
+  --jp-danger:#c81e1e;
+  --jp-radius:14px;
+  --jp-shadow:0 10px 28px rgba(23,32,51,.08);
+}
+html,body,button,input,textarea,select{font-family:"Manrope","Segoe UI",sans-serif!important}
+h1,h2,h3,h4,.page-title,.brand-name{font-family:"Archivo","Manrope",sans-serif!important;letter-spacing:-.025em}
+body{color:var(--jp-ink);background:#f5f7fa}
+button,input,textarea,.solid-select-trigger{transition:border-color .18s ease,background-color .18s ease,color .18s ease,transform .18s ease,box-shadow .18s ease}
+button:active{transform:translateY(1px)}
+
+/* Solid, readable application surfaces. */
+.page article:not(.welcome-card):not(.dashboard-ai),.tool-card,.material-card,.info-form,.properties-panel,.editor-toolbar,.desktop-ribbon-content,.question-list,.quiz-stage,.question-bank-panel,.publish-card,.workspace-item,.creator-upload,.creator-gallery,.hub-feature,.guide-option,.certificate-studio,.question-drive,.media-form{
+  background:var(--jp-surface)!important;background-image:none!important;color:var(--jp-ink)!important;border:1px solid var(--jp-line)!important;border-radius:var(--jp-radius)!important;box-shadow:var(--jp-shadow)!important;
+}
+.page article p,.tool-card p,.material-card p,.properties-panel p,.question-bank-panel p,.hub-feature p{color:var(--jp-muted)!important}
+.page article h1,.page article h2,.page article h3,.tool-card h2,.material-card h3,.properties-panel h3,.question-bank-panel h3{color:var(--jp-ink)!important}
+.primary-button,.topbar-create,.editor-toolbar button.active,.word-toolbar button.active,.mobile-ribbon-tabs button.active,.editor-ribbon-tabs button.active{background:var(--jp-accent)!important;background-image:none!important;color:#fff!important;border-color:var(--jp-accent)!important}
+.outline-button,.secondary-button,.editor-toolbar button,.desktop-editor-tools button{background:#fff!important;background-image:none!important;color:var(--jp-ink)!important;border-color:var(--jp-line)!important}
+.outline-button:hover,.secondary-button:hover,.editor-toolbar button:hover,.desktop-editor-tools button:hover{border-color:var(--jp-accent)!important;color:var(--jp-accent)!important;background:#fff7f1!important}
+input,textarea,.solid-select-trigger{background:#fff!important;color:#172033!important;border:1px solid #cfd7e3!important;border-radius:11px!important}
+input::placeholder,textarea::placeholder{color:#7b8798!important}
+input:focus,textarea:focus,.solid-select.open .solid-select-trigger{outline:0!important;border-color:var(--jp-accent)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--jp-accent) 16%,transparent)!important}
+
+/* Friendly custom dropdown. */
+.solid-select-menu{padding:7px!important;border:1px solid var(--jp-line)!important;border-radius:13px!important;background:#fff!important;color:var(--jp-ink)!important;box-shadow:0 18px 44px rgba(23,32,51,.18)!important;animation:jpMenuIn .16s ease-out}
+.solid-select-menu>button{min-height:42px!important;padding:9px 11px!important;border:0!important;border-radius:9px!important;background:#fff!important;color:var(--jp-ink)!important}
+.solid-select-menu>button:hover{background:#fff2e9!important;color:#b93800!important}
+.solid-select-menu>button[aria-selected="true"]{background:var(--jp-accent)!important;color:#fff!important}
+@keyframes jpMenuIn{from{opacity:0;transform:translateY(-5px) scale(.985)}to{opacity:1;transform:none}}
+
+/* Branded confirmations and notifications. */
+.jp-dialog-backdrop{background:rgba(15,23,42,.54)!important;backdrop-filter:blur(4px)}
+.jp-dialog{width:min(440px,calc(100vw - 28px))!important;padding:24px!important;border:1px solid var(--jp-line)!important;border-radius:20px!important;background:#fff!important;color:var(--jp-ink)!important;box-shadow:0 26px 70px rgba(15,23,42,.25)!important;animation:jpDialogIn .2s ease-out}
+.jp-dialog-symbol{background:#fff0e8!important;color:var(--jp-accent)!important;border:1px solid #ffd3bc!important}
+.jp-dialog.is-danger .jp-dialog-symbol{background:#fff1f2!important;color:var(--jp-danger)!important;border-color:#fecaca!important}
+.jp-dialog h2{color:var(--jp-ink)!important}.jp-dialog p{color:var(--jp-muted)!important}
+.jp-dialog-actions{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(112px,1fr))!important;gap:8px!important}
+.jp-dialog-actions button{min-height:44px!important;border-radius:11px!important;font-weight:800!important}
+.jp-toast{border:1px solid var(--jp-line)!important;border-radius:15px!important;background:#fff!important;color:var(--jp-ink)!important;box-shadow:0 18px 44px rgba(15,23,42,.18)!important}
+.jp-toast p{color:var(--jp-muted)!important}
+@keyframes jpDialogIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+
+/* Layer manager. */
+.layer-panel{display:grid;gap:10px;color:var(--jp-ink)}
+.layer-panel>header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.layer-panel>header small{color:var(--jp-accent);font-size:9px;font-weight:900;letter-spacing:.11em}
+.layer-panel>header h3{margin:2px 0 0;display:flex;align-items:center;gap:7px;font-size:17px!important}
+.layer-panel>header>span{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:var(--jp-accent);color:#fff;font-size:11px;font-weight:900}
+.layer-panel>p{margin:0!important;font-size:10px!important;color:var(--jp-muted)!important}
+.layer-list{display:grid;gap:7px;max-height:360px;overflow:auto;padding-right:2px}
+.layer-row{padding:7px;display:grid;gap:6px;border:1px solid var(--jp-line);border-radius:11px;background:#fff}
+.layer-row.active{border-color:var(--jp-accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--jp-accent) 12%,transparent)}
+.layer-row.is-hidden{opacity:.58}
+.layer-main{width:100%;min-width:0;padding:0;display:grid;grid-template-columns:27px minmax(0,1fr);align-items:center;gap:8px;border:0;background:transparent;color:var(--jp-ink);text-align:left}
+.layer-main>span{width:27px;height:27px;display:grid;place-items:center;border-radius:8px;background:#eef2f6;color:#475467;font-size:10px;font-weight:900}
+.layer-main div{min-width:0}.layer-main b,.layer-main small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.layer-main b{font-size:11px}.layer-main small{color:var(--jp-muted);font-size:8px;text-transform:capitalize}
+.layer-actions{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.text-layer .layer-actions{grid-template-columns:repeat(3,1fr)}
+.layer-actions button{height:30px;min-width:0;padding:0;display:grid;place-items:center;border:1px solid var(--jp-line);border-radius:8px;background:#f8fafc;color:#475467}
+.layer-actions button:hover{border-color:var(--jp-accent);color:var(--jp-accent);background:#fff3eb}.layer-actions button.danger{color:var(--jp-danger)}.layer-actions button:disabled{opacity:.3}
+.desktop-layer-wrapper{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--jp-line)}
+
+@media(min-width:761px){
+  .ppt-editor{grid-template-columns:minmax(0,1fr) 294px!important;gap:14px!important;align-items:start}
+  .ppt-editor .properties-panel{width:294px!important;max-height:calc(100vh - 24px)!important;padding:14px!important}
+  .ppt-editor .layers-sheet{display:none!important}
+  .element-library{position:relative;z-index:4;margin-bottom:8px!important;min-height:104px!important}
+}
+
+@media(max-width:760px){
+  body{font-size:13px}
+  .page{padding:10px!important}
+  .page-header{gap:8px!important}.page-header h1{font-size:23px!important}
+  .material-grid,.file-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .material-card,.file-grid .tool-card{min-width:0!important;padding:10px!important;border-radius:12px!important}
+  .material-card h3,.file-grid .tool-card h2{font-size:14px!important;line-height:1.25!important;overflow-wrap:anywhere}
+  .material-card p,.file-grid .tool-card p{font-size:10px!important;line-height:1.4!important;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .material-card .card-actions,.file-grid .export-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important}
+  .material-card button,.file-grid button{min-width:0!important;min-height:38px!important;padding:6px 4px!important;font-size:9px!important;white-space:normal!important}
+
+  .quiz-editor{width:100%!important;min-width:0!important;overflow:visible!important;gap:8px!important}
+  .question-list{width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding:7px!important}
+  .quiz-stage{width:100%!important;min-width:0!important;overflow:visible!important}
+  .quiz-stage .editor-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .quiz-canvas{width:100%!important;min-width:0!important;padding:12px!important;overflow:visible!important}
+  .quiz-question-input{min-height:104px!important;font-size:14px!important;overflow:auto!important}
+  .answer-grid,.tf-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+  .answer-grid button,.tf-grid button{min-width:0!important;min-height:72px!important;padding:8px!important;align-items:center!important;overflow:hidden!important}
+  .answer-grid input{min-width:0!important;width:100%!important;padding:7px!important;font-size:11px!important;text-overflow:ellipsis}
+  .answer-grid button>b{flex:0 0 25px!important}.answer-grid button>em{position:absolute;right:5px;top:5px}
+  .question-bank-panel{width:100%!important;max-width:100%!important;padding:12px!important;overflow:visible!important}
+  .question-bank-panel input,.question-bank-panel .solid-select{width:100%!important;min-width:0!important}
+
+  .ppt-editor .mobile-editor-actions{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}
+  .ppt-editor .mobile-editor-actions button{min-width:0!important;padding:5px 2px!important;font-size:9px!important;gap:3px!important}
+  .ppt-editor .desktop-layer-wrapper{display:none!important}
+  .ppt-editor .layers-sheet{padding:12px!important;background:#fff!important;color:var(--jp-ink)!important}
+  .ppt-editor .layers-sheet .layer-list{max-height:52dvh}
+  .ppt-editor .desktop-ribbon-content.element-library{display:grid!important;grid-template-columns:repeat(5,minmax(68px,1fr))!important;gap:7px!important;overflow-x:auto!important;padding:8px!important;position:relative!important;top:auto!important}
+  .ppt-editor .desktop-ribbon-content.element-library>button{min-width:68px!important;min-height:70px!important;padding:6px 3px!important}
+  .ppt-editor .desktop-ribbon-content.element-library>button span{font-size:9px!important}
+  .ppt-editor .properties-panel{display:none!important}
+  .ppt-editor .properties-panel.open{display:block!important}
+  .ppt-editor .mobile-sheet{width:calc(100vw - 12px)!important;max-width:none!important;left:6px!important;right:6px!important;bottom:max(6px,env(safe-area-inset-bottom))!important;border-radius:18px!important}
+  .solid-select-menu{left:8px!important;right:8px!important;width:auto!important;max-height:58dvh!important}
+  .jp-toast{left:10px!important;right:10px!important;width:auto!important;max-width:none!important}
+}
+
+@media(max-width:360px){
+  .material-grid,.file-grid{gap:6px!important}.material-card,.file-grid .tool-card{padding:8px!important}
+  .answer-grid{gap:5px!important}.answer-grid button{padding:6px!important}.answer-grid input{padding:5px!important;font-size:10px!important}
+  .ppt-editor .mobile-editor-actions button svg{width:15px;height:15px}
+}
+
+html[data-theme="dark"]{
+  --jp-ink:#f4f7fb;--jp-muted:#b7c0ce;--jp-line:#394351;--jp-soft:#242a33;--jp-surface:#1b2028;--jp-shadow:none;
+}
+html[data-theme="dark"] body{background:#101318!important;color:#f4f7fb!important}
+html[data-theme="dark"] .page article:not(.welcome-card):not(.dashboard-ai),html[data-theme="dark"] .tool-card,html[data-theme="dark"] .material-card,html[data-theme="dark"] .properties-panel,html[data-theme="dark"] .editor-toolbar,html[data-theme="dark"] .desktop-ribbon-content,html[data-theme="dark"] .question-list,html[data-theme="dark"] .quiz-stage,html[data-theme="dark"] .question-bank-panel,html[data-theme="dark"] .layer-row,html[data-theme="dark"] .jp-dialog,html[data-theme="dark"] .jp-toast,html[data-theme="dark"] .solid-select-menu{background:#1b2028!important;background-image:none!important;color:#f4f7fb!important;border-color:#394351!important}
+html[data-theme="dark"] input,html[data-theme="dark"] textarea,html[data-theme="dark"] .solid-select-trigger,html[data-theme="dark"] .solid-select-menu>button{background:#242a33!important;color:#f4f7fb!important;border-color:#445063!important}
+html[data-theme="dark"] .solid-select-menu>button:hover{background:#34251e!important;color:#ffb184!important}
+html[data-theme="dark"] .layer-main,html[data-theme="dark"] .layer-panel h3,html[data-theme="dark"] .jp-dialog h2{color:#f4f7fb!important}
+html[data-theme="dark"] .layer-main>span,html[data-theme="dark"] .layer-actions button{background:#242a33!important;color:#d0d7e2!important;border-color:#445063!important}

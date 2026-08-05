@@ -26,6 +26,11 @@ import {
   Unlock,
   CopyPlus,
   MoreHorizontal,
+  Layers3,
+  Eye,
+  EyeOff,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { SLIDE_SIZES, ratioStyle } from "../../utils/slideSizes";
 import SolidSelect from "../ui/SolidSelect";
@@ -460,6 +465,25 @@ export default function PPTEditor({ material, updateMaterial }) {
     const item = (active.elements || []).find((entry) => entry.id === elementId);
     if (item) updateElement(elementId, { locked: !item.locked });
   }
+  function toggleElementVisibility(elementId) {
+    const item = (active.elements || []).find((entry) => entry.id === elementId);
+    if (item) updateElement(elementId, { hidden: !item.hidden });
+  }
+  function shiftElement(elementId, direction) {
+    const items = [...(active.elements || [])];
+    const index = items.findIndex((item) => item.id === elementId);
+    const target = direction === "up" ? index + 1 : index - 1;
+    if (index < 0 || target < 0 || target >= items.length) return;
+    [items[index], items[target]] = [items[target], items[index]];
+    updateSlide({ elements: items });
+  }
+  function updateTextLayer(key, patch) {
+    const boxKey = key === "title" ? "titleBox" : "bodyBox";
+    const fallback = key === "title"
+      ? { x: 8, y: 12, w: 84, h: 20 }
+      : { x: 8, y: 36, w: 84, h: 42 };
+    updateSlide({ [boxKey]: { ...(active?.[boxKey] || fallback), ...patch } });
+  }
   function moveTextBox(event, key, fallback) {
     event.preventDefault();
     event.stopPropagation();
@@ -467,6 +491,7 @@ export default function PPTEditor({ material, updateMaterial }) {
       .closest(".slide-canvas")
       .getBoundingClientRect();
     const start = active?.[key] || fallback;
+    if (start.locked) return;
     const startX = event.clientX,
       startY = event.clientY;
     const move = (e) =>
@@ -501,6 +526,7 @@ export default function PPTEditor({ material, updateMaterial }) {
     if (event.target.closest("button")) return;
     const canvas = event.currentTarget.closest(".slide-canvas").getBoundingClientRect();
     const start = active?.[key] || fallback;
+    if (start.locked) return;
     const startX = event.clientX;
     const startY = event.clientY;
     let dragging = false;
@@ -656,6 +682,10 @@ export default function PPTEditor({ material, updateMaterial }) {
               <Settings2 size={17} />
               Slide
             </button>
+            <button onClick={() => setMobileSheet("layers")}>
+              <Layers3 size={17} />
+              Lapisan
+            </button>
           </div>
           {ribbonTab === "insert" && <div className="desktop-editor-tools ribbon-group">
           <button onClick={copySlide}>
@@ -780,9 +810,10 @@ export default function PPTEditor({ material, updateMaterial }) {
             style={canvasStyle}
           >
             <div
-              className="movable-text title-box"
+              className={`movable-text title-box ${titleBox.locked ? "locked" : ""}`}
               onPointerDown={(e) => moveTextBoxFromZone(e, "titleBox", titleBox)}
               style={{
+                display: titleBox.hidden ? "none" : undefined,
                 left: `${titleBox.x}%`,
                 top: `${titleBox.y}%`,
                 width: `${titleBox.w}%`,
@@ -823,9 +854,10 @@ export default function PPTEditor({ material, updateMaterial }) {
               />
             </div>
             <div
-              className="movable-text body-box"
+              className={`movable-text body-box ${bodyBox.locked ? "locked" : ""}`}
               onPointerDown={(e) => moveTextBoxFromZone(e, "bodyBox", bodyBox)}
               style={{
+                display: bodyBox.hidden ? "none" : undefined,
                 left: `${bodyBox.x}%`,
                 top: `${bodyBox.y}%`,
                 width: `${bodyBox.w}%`,
@@ -927,12 +959,39 @@ export default function PPTEditor({ material, updateMaterial }) {
           </div>
         </section>
       </main>
+      <div className={`mobile-sheet layers-sheet ${mobileSheet === "layers" ? "open" : ""}`}>
+        <div className="mobile-sheet-head"><b>Lapisan Slide</b><button onClick={() => setMobileSheet(null)} aria-label="Tutup lapisan"><X size={20}/></button></div>
+        <LayerPanel
+          slide={active}
+          selected={selectedElement}
+          select={setSelectedElement}
+          updateTextLayer={updateTextLayer}
+          updateElement={updateElement}
+          shiftElement={shiftElement}
+          removeElement={deleteElement}
+          clearText={clearTextBox}
+          onTextTarget={setTextTarget}
+        />
+      </div>
       <aside className={`properties-panel mobile-sheet settings-sheet ${mobileSheet === "settings" ? "open" : ""}`}>
         <div className="mobile-sheet-head">
           <b>Pengaturan Slide</b>
           <button onClick={() => setMobileSheet(null)} aria-label="Tutup pengaturan"><X size={20} /></button>
         </div>
         <h3>Pengaturan Slide</h3>
+        <div className="desktop-layer-wrapper">
+          <LayerPanel
+            slide={active}
+            selected={selectedElement}
+            select={setSelectedElement}
+            updateTextLayer={updateTextLayer}
+            updateElement={updateElement}
+            shiftElement={shiftElement}
+            removeElement={deleteElement}
+            clearText={clearTextBox}
+            onTextTarget={setTextTarget}
+          />
+        </div>
         <label>Ukuran</label>
         <SolidSelect
           value={slideSize.label}
@@ -1046,6 +1105,45 @@ export default function PPTEditor({ material, updateMaterial }) {
   );
 }
 
+function LayerPanel({ slide, selected, select, updateTextLayer, updateElement, shiftElement, removeElement, clearText, onTextTarget }) {
+  const elements = slide?.elements || [];
+  const textLayers = [
+    { key: "title", label: "Judul", box: slide?.titleBox || {}, empty: !slide?.title },
+    { key: "body", label: "Isi paragraf", box: slide?.bodyBox || {}, empty: !slide?.body },
+  ];
+  const nameOf = (item) => item.type === "image" ? "Gambar" : item.type === "video" ? "Video" : item.type === "audio" ? "Audio" : item.type === "sticker" ? "Stiker" : item.type === "shape" ? (item.text || "Bentuk") : (item.text || "Teks tambahan");
+  return (
+    <section className="layer-panel" aria-label="Daftar lapisan slide">
+      <header><div><small>URUTAN OBJEK</small><h3><Layers3 size={18}/> Lapisan</h3></div><span>{elements.length + 2}</span></header>
+      <p>Lapisan paling atas tampil paling depan.</p>
+      <div className="layer-list">
+        {[...elements].map((item, sourceIndex) => ({ item, sourceIndex })).reverse().map(({ item, sourceIndex }, order) => (
+          <article key={item.id} className={`layer-row ${selected === item.id ? "active" : ""} ${item.hidden ? "is-hidden" : ""}`}>
+            <button className="layer-main" onClick={() => select(item.id)}><span>{elements.length - order + 2}</span><div><b>{nameOf(item)}</b><small>{item.type}</small></div></button>
+            <div className="layer-actions">
+              <button title={item.hidden ? "Tampilkan" : "Sembunyikan"} onClick={() => updateElement(item.id, { hidden: !item.hidden })}>{item.hidden ? <EyeOff size={14}/> : <Eye size={14}/>}</button>
+              <button title={item.locked ? "Buka kunci" : "Kunci"} onClick={() => updateElement(item.id, { locked: !item.locked })}>{item.locked ? <Unlock size={14}/> : <Lock size={14}/>}</button>
+              <button title="Naik satu lapisan" disabled={sourceIndex === elements.length - 1} onClick={() => shiftElement(item.id, "up")}><ChevronUp size={14}/></button>
+              <button title="Turun satu lapisan" disabled={sourceIndex === 0} onClick={() => shiftElement(item.id, "down")}><ChevronDown size={14}/></button>
+              <button className="danger" title="Hapus" onClick={() => removeElement(item.id)}><Trash2 size={14}/></button>
+            </div>
+          </article>
+        ))}
+        {textLayers.map((layer, index) => (
+          <article key={layer.key} className={`layer-row text-layer ${layer.box.hidden ? "is-hidden" : ""}`}>
+            <button className="layer-main" onClick={() => onTextTarget(layer.key)}><span>{2 - index}</span><div><b>{layer.label}</b><small>Teks utama</small></div></button>
+            <div className="layer-actions">
+              <button title={layer.box.hidden ? "Tampilkan" : "Sembunyikan"} onClick={() => updateTextLayer(layer.key, { hidden: !layer.box.hidden })}>{layer.box.hidden ? <EyeOff size={14}/> : <Eye size={14}/>}</button>
+              <button title={layer.box.locked ? "Buka kunci" : "Kunci"} onClick={() => updateTextLayer(layer.key, { locked: !layer.box.locked })}>{layer.box.locked ? <Unlock size={14}/> : <Lock size={14}/>}</button>
+              <button className="danger" title="Hapus teks" disabled={layer.empty} onClick={() => clearText(layer.key)}><Trash2 size={14}/></button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ElementLayer({ elements, selected, select, update, remove, duplicate, reorder, toggleLock }) {
   const [contextMenu, setContextMenu] = useState(null);
   const clipboardRef = useRef(null);
@@ -1121,7 +1219,7 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
   }
   return (
     <div className="free-elements-layer">
-      {elements.map((item) => (
+      {elements.map((item) => item.hidden ? null : (
         <div
           key={item.id}
           onPointerDown={(event) => startDrag(event, item)}

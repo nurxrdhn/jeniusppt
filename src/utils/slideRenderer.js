@@ -49,24 +49,15 @@ export async function renderSlideToDataUrl(slide, slideSize) {
     );
     root.appendChild(node);
   };
-  addText(
-    slide.title,
-    titleBox,
-    slide.titleColor || "#fff",
-    62,
-    800,
-    slide.titleStyle,
+  if (!slide.titleBox?.hidden) addText(
+    slide.title, titleBox, slide.titleColor || "#fff", 62, 800, slide.titleStyle,
   );
-  addText(
-    slide.body,
-    bodyBox,
-    slide.bodyColor || "#fff7ed",
-    30,
-    400,
-    slide.bodyStyle,
+  if (!slide.bodyBox?.hidden) addText(
+    slide.body, bodyBox, slide.bodyColor || "#fff7ed", 30, 400, slide.bodyStyle,
   );
 
   for (const element of slide.elements || []) {
+    if (element.hidden) continue;
     const node = document.createElement("div");
     node.style.cssText = `position:absolute;left:${element.x}%;top:${element.y}%;width:${element.w}%;height:${element.h}%;display:flex;align-items:center;justify-content:center;overflow:hidden;color:${element.color || "#fff"};font-size:${element.type === "sticker" ? 72 : 30}px;font-weight:700;text-align:center;`;
     if (element.type === "text") {

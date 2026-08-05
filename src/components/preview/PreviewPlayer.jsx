@@ -6,7 +6,7 @@ import { textStyle } from "../../utils/fonts";
 function SlideElements({ elements }) {
   return (
     <div className="free-elements-layer preview-elements">
-      {elements.map((item) => (
+      {elements.map((item) => item.hidden ? null : (
         <div
           key={item.id}
           className={`free-element ${item.type}`}
@@ -130,6 +130,7 @@ export default function PreviewPlayer({ material, teacher = true }) {
                 top: `${current.item.titleBox?.y ?? 12}%`,
                 width: `${current.item.titleBox?.w ?? 84}%`,
                 height: `${current.item.titleBox?.h ?? 20}%`,
+                display: current.item.titleBox?.hidden ? "none" : undefined,
               }}
             >
               {current.item.title}
@@ -150,6 +151,7 @@ export default function PreviewPlayer({ material, teacher = true }) {
                 top: `${current.item.bodyBox?.y ?? 36}%`,
                 width: `${current.item.bodyBox?.w ?? 84}%`,
                 height: `${current.item.bodyBox?.h ?? 42}%`,
+                display: current.item.bodyBox?.hidden ? "none" : undefined,
               }}
             >
               {current.item.body}
