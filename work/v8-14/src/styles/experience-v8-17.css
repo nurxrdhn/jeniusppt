@@ -1,0 +1,15 @@
+/* Kanvas desktop menyesuaikan ruang drawer Lapisan/Properti. */
+@media (min-width:761px){
+  .ppt-editor .slide-canvas-wrap{transition:padding-right .22s ease!important}
+  .ppt-editor:has(>.layers-sheet.open) .slide-canvas-wrap,
+  .ppt-editor:has(>.properties-panel.open) .slide-canvas-wrap{padding-right:356px!important}
+  .ppt-editor:has(>.layers-sheet.open) .slide-canvas,
+  .ppt-editor:has(>.properties-panel.open) .slide-canvas{max-width:calc(100vw - 620px)!important;margin-left:auto!important;margin-right:auto!important;transition:max-width .22s ease!important}
+}
+@media (min-width:761px) and (max-width:1180px){
+  .ppt-editor:has(>.layers-sheet.open) .slide-canvas-wrap,
+  .ppt-editor:has(>.properties-panel.open) .slide-canvas-wrap{padding-right:326px!important}
+  .ppt-editor>.layers-sheet,.ppt-editor>.properties-panel{width:292px!important}
+  .ppt-editor:has(>.layers-sheet.open) .slide-canvas,
+  .ppt-editor:has(>.properties-panel.open) .slide-canvas{max-width:calc(100vw - 550px)!important}
+}
