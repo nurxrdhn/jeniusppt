@@ -82,6 +82,16 @@ const builtInStickers = [
   "🔬",
   "🎨",
 ];
+const shapeLibrary = [
+  ["Kotak","rectangle",30,22],["Kotak bulat","rounded",30,22],["Lingkaran","circle",22,22],["Oval","oval",32,20],
+  ["Segitiga","triangle",26,24],["Belah ketupat","diamond",25,25],["Trapesium","trapezoid",32,22],["Jajar genjang","parallelogram",32,22],
+  ["Pentagon","pentagon",26,26],["Hexagon","hexagon",30,26],["Oktagon","octagon",28,28],["Bintang","star",28,28],
+  ["Hati","heart",28,25],["Awan","cloud",34,22],["Balon bicara","speech",35,23],["Plus","plus",25,25],
+  ["Panah kanan","arrow-right",36,18],["Panah kiri","arrow-left",36,18],["Panah atas","arrow-up",18,32],["Panah bawah","arrow-down",18,32],
+  ["Panah dua arah","arrow-both",40,16],["Garis","line",40,2],["Garis vertikal","line-vertical",2,34],["Chevron","chevron",32,18],
+  ["Pita","ribbon",36,18],["Lencana","badge",26,28],["Dokumen","document",26,32],["Bingkai","frame",38,30],
+  ["Kurung kiri","bracket-left",12,32],["Kurung kanan","bracket-right",12,32],["Setengah lingkaran","semicircle",30,18],["Silinder","cylinder",28,30],
+];
 export default function PPTEditor({ material, updateMaterial }) {
   const slides = material.slides || [];
   const activeIndex = material.activeSlide || 0;
@@ -95,6 +105,8 @@ export default function PPTEditor({ material, updateMaterial }) {
   const [mobileRibbonMore, setMobileRibbonMore] = useState(false);
   const [textBoxMenu, setTextBoxMenu] = useState(null);
   const [slideMenu, setSlideMenu] = useState(null);
+  const [draggedSlide, setDraggedSlide] = useState(null);
+  const [slideDropTarget, setSlideDropTarget] = useState(null);
   const [spellcheck, setSpellcheck] = useState(true);
   const [smartGuides, setSmartGuides] = useState({ x: null, y: null });
   const [historyStatus, setHistoryStatus] = useState({
@@ -287,6 +299,31 @@ export default function PPTEditor({ material, updateMaterial }) {
     updateMaterial(material.id, { activeSlide: Math.max(0, Math.min(index - 1, next.length - 1)) });
   }
   function deleteSlide() { deleteSlideAt(activeIndex); }
+  function moveSlide(from, to) {
+    if (from === to || from < 0 || to < 0 || from >= slides.length || to >= slides.length) return;
+    const next = [...slides];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    setSlides(next);
+    const nextActive = activeIndex === from ? to : activeIndex > from && activeIndex <= to ? activeIndex - 1 : activeIndex < from && activeIndex >= to ? activeIndex + 1 : activeIndex;
+    updateMaterial(material.id, { activeSlide: nextActive });
+  }
+  function startSlideDrag(event, index) {
+    if (event.button !== undefined && event.button !== 0) return;
+    event.preventDefault();
+    let target = index;
+    setDraggedSlide(index); setSlideDropTarget(index);
+    const move = (e) => {
+      const card = document.elementFromPoint(e.clientX, e.clientY)?.closest?.("[data-slide-index]");
+      if (card) { target = Number(card.dataset.slideIndex); setSlideDropTarget(target); }
+    };
+    const stop = () => {
+      if (target !== index) moveSlide(index, target);
+      setDraggedSlide(null); setSlideDropTarget(null);
+      window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", stop);
+    };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", stop);
+  }
   function setSizeKey(key) {
     updateMaterial(material.id, { slideSize: SLIDE_SIZES[key] });
   }
@@ -513,13 +550,14 @@ export default function PPTEditor({ material, updateMaterial }) {
     updateSlide({ [boxKey]: { ...current, ...patch } });
   }
   function moveLayer(sourceId, targetId) {
-    const items = [...(active.elements || [])];
-    const from = items.findIndex((item) => item.id === sourceId);
-    const to = items.findIndex((item) => item.id === targetId);
-    if (from < 0 || to < 0 || items[from].locked || from === to) return;
-    const [moved] = items.splice(from, 1);
-    items.splice(to, 0, moved);
-    updateSlide({ elements: items });
+    const valid = ["__title", "__body", ...(active.elements || []).map((item) => item.id)];
+    const order = [...new Set([...(active.layerOrder || []).filter((id) => valid.includes(id)), ...valid])];
+    const from = order.indexOf(sourceId), to = order.indexOf(targetId);
+    const sourceLocked = sourceId === "__title" ? active?.titleBox?.locked : sourceId === "__body" ? active?.bodyBox?.locked : (active.elements || []).find((item) => item.id === sourceId)?.locked;
+    if (from < 0 || to < 0 || sourceLocked || from === to) return;
+    const [moved] = order.splice(from, 1);
+    order.splice(to, 0, moved);
+    updateSlide({ layerOrder: order });
   }
   function alignObjects(mode) {
     const items = (active.elements || []).filter((item) => !item.locked && !item.hidden);
@@ -643,6 +681,9 @@ export default function PPTEditor({ material, updateMaterial }) {
   };
   const titleBox = active?.titleBox || { x: 8, y: 12, w: 84, h: 20 };
   const bodyBox = active?.bodyBox || { x: 8, y: 36, w: 84, h: 42 };
+  const validLayerIds = ["__title", "__body", ...(active?.elements || []).map((item) => item.id)];
+  const layerOrder = [...new Set([...(active?.layerOrder || []).filter((id) => validLayerIds.includes(id)), ...validLayerIds])];
+  const layerZ = (id) => 20 + layerOrder.indexOf(id);
   const currentTextStyle =
     textTarget === "title"
       ? active?.titleStyle || {
@@ -835,8 +876,11 @@ export default function PPTEditor({ material, updateMaterial }) {
           {ribbonTab === "help" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button onClick={() => window.open("/downloads/panduan-lengkap-jeniusppt.pdf", "_blank")}><FileInput size={17}/>Buku PDF</button><button onClick={() => window.open("/downloads/video-tutorial-jeniusppt.mp4", "_blank")}><Video size={17}/>Video tutorial</button></div><small>Bantuan JeniusPPT</small></div></div>}
         </div>
         {ribbonTab === "home" && <div className="desktop-ribbon-content"><TextToolbar target={textTarget} onTarget={setTextTarget} style={currentTextStyle} onChange={updateTextStyle} hasSelectedText={selected?.type === "text"}/></div>}
-        {ribbonTab === "elements" && <div className="desktop-ribbon-content element-library">
-          <button onClick={() => addElement("shape", { text: "Bentuk", background: "#14b8a6" })}><Shapes/><span>Shapes</span></button>
+        {ribbonTab === "elements" && <div className="desktop-ribbon-content element-library complete-element-library">
+          <section className="element-library-section"><header><Shapes size={18}/><div><b>Bentuk lengkap</b><small>Klik bentuk untuk menambahkannya</small></div></header><div className="shape-library-grid">
+            {shapeLibrary.map(([label,kind,w,h]) => <button key={kind} title={label} onClick={() => addElement("shape", { text: label, kind, background: "#ff641e", w, h })}><i className={`shape-preview ${kind}`}/><span>{label}</span></button>)}
+          </div></section>
+          <section className="element-library-section"><header><ImagePlus size={18}/><div><b>Media dan data</b><small>Tambahkan konten pendukung</small></div></header><div className="element-media-grid">
           <button onClick={() => setShowStickers(true)}><GalleryHorizontal/><span>Graphics</span></button>
           <button onClick={() => imageRef.current?.click()}><ImagePlus/><span>Photos</span></button>
           <button onClick={() => videoRef.current?.click()}><Video/><span>Videos</span></button>
@@ -846,6 +890,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           <button onClick={() => addElement("shape", { kind: "chart", text: "Bagan", background: "#0891b2", w: 36, h: 30 })}><ChartColumn/><span>Charts</span></button>
           <button onClick={() => addElement("shape", { kind: "frame", text: "Bingkai", background: "transparent", w: 38, h: 38 })}><Frame/><span>Frames</span></button>
           <button onClick={() => addElement("shape", { kind: "box", text: "Kotak 3D", background: "#8b5cf6", w: 26, h: 26 })}><Box/><span>3D</span></button>
+          </div></section>
           <input ref={videoRef} hidden type="file" accept="video/*" onChange={(event) => uploadMedia(event,"video")}/>
           <input ref={audioRef} hidden type="file" accept="audio/*" onChange={(event) => uploadMedia(event,"audio")}/>
         </div>}
@@ -914,6 +959,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 top: `${titleBox.y}%`,
                 width: `${titleBox.w}%`,
                 height: `${titleBox.h}%`,
+                zIndex: layerZ("__title"),
               }}
             >
               <button
@@ -961,6 +1007,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 top: `${bodyBox.y}%`,
                 width: `${bodyBox.w}%`,
                 height: `${bodyBox.h}%`,
+                zIndex: layerZ("__body"),
               }}
             >
               <button
@@ -1016,6 +1063,7 @@ export default function PPTEditor({ material, updateMaterial }) {
               toggleLock={toggleElementLock}
               onGuides={setSmartGuides}
               snap={snapToCanvas}
+              layerOrder={layerOrder}
             />
           </div>
         </section>
@@ -1032,7 +1080,8 @@ export default function PPTEditor({ material, updateMaterial }) {
           </div>
           <div className="slide-strip-scroll">
             {slides.map((slide, index) => (
-              <article key={index} className={`slide-thumb-card ${index === activeIndex ? "active" : ""}`}>
+              <article data-slide-index={index} key={index} className={`slide-thumb-card ${index === activeIndex ? "active" : ""} ${draggedSlide === index ? "is-dragging" : ""} ${slideDropTarget === index && draggedSlide !== index ? "is-drop-target" : ""}`}>
+              <button className="slide-drag-handle" title="Tekan dan tarik untuk mengubah urutan slide" aria-label={`Pindahkan slide ${index + 1}`} onPointerDown={(event) => startSlideDrag(event,index)}><GripVertical size={16}/></button>
               <button className="slide-thumb-select" onClick={() => {
                   updateMaterial(material.id, { activeSlide: index });
                   setSelectedElement(null);
@@ -1081,6 +1130,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           clearText={clearTextBox}
           onTextTarget={setTextTarget}
           moveLayer={moveLayer}
+          layerOrder={layerOrder}
         />
       </div>
       <aside className={`properties-panel mobile-sheet settings-sheet ${mobileSheet === "settings" ? "open" : ""}`}>
@@ -1101,6 +1151,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             clearText={clearTextBox}
             onTextTarget={setTextTarget}
             moveLayer={moveLayer}
+            layerOrder={layerOrder}
           />
         </div>
         <label>Ukuran</label>
@@ -1262,7 +1313,7 @@ function CommandCenter({ currentTextStyle, updateTextStyle, active, selected, up
   return <section className="command-center"><header><div><Command size={18}/><b>{commands.length} alat aktif</b></div><label><Search size={16}/><input value={query} onChange={(event)=>setQuery(event.target.value)} placeholder="Cari dari 323 perintah..."/></label></header><div className="command-groups">{groups.map((group)=><section key={group}><h3>{group}</h3><div>{visible.filter(([itemGroup])=>itemGroup===group).map(([_,label,run,disabled,color])=><button key={`${group}-${label}`} disabled={disabled} onClick={run}>{color&&<i style={{background:color}}/>}<span>{label}</span></button>)}</div></section>)}</div></section>;
 }
 
-function LayerPanel({ slide, selected, select, updateTextLayer, updateElement, shiftElement, removeElement, clearText, onTextTarget, moveLayer }) {
+function LayerPanel({ slide, selected, select, updateTextLayer, updateElement, shiftElement, removeElement, clearText, onTextTarget, moveLayer, layerOrder = [] }) {
   const [dragging, setDragging] = useState(null);
   const [dragOver, setDragOver] = useState(null);
   const elements = slide?.elements || [];
@@ -1293,7 +1344,7 @@ function LayerPanel({ slide, selected, select, updateTextLayer, updateElement, s
       <p>Lapisan paling atas tampil paling depan.</p>
       <div className="layer-list">
         {[...elements].map((item, sourceIndex) => ({ item, sourceIndex })).reverse().map(({ item, sourceIndex }, order) => (
-          <article data-layer-id={item.id} key={item.id} className={`layer-row ${selected === item.id ? "active" : ""} ${item.hidden ? "is-hidden" : ""} ${dragging === item.id ? "dragging" : ""} ${dragOver === item.id && dragging !== item.id ? "drag-over" : ""}`}>
+          <article style={{order: layerOrder.length - layerOrder.indexOf(item.id)}} data-layer-id={item.id} key={item.id} className={`layer-row ${selected === item.id ? "active" : ""} ${item.hidden ? "is-hidden" : ""} ${dragging === item.id ? "dragging" : ""} ${dragOver === item.id && dragging !== item.id ? "drag-over" : ""}`}>
             <button className="layer-drag-handle" disabled={item.locked} title={item.locked ? "Buka kunci untuk memindahkan lapisan" : "Tarik ke urutan lapisan lain"} onPointerDown={(event) => startLayerDrag(event,item)}><GripVertical size={17}/></button>
             <button className="layer-main" onClick={() => select(item.id)}><span>{elements.length - order + 2}</span><div><b>{nameOf(item)}</b><small>{item.type}</small></div></button>
             <div className="layer-actions">
@@ -1306,7 +1357,8 @@ function LayerPanel({ slide, selected, select, updateTextLayer, updateElement, s
           </article>
         ))}
         {textLayers.map((layer, index) => (
-          <article key={layer.key} className={`layer-row text-layer ${layer.box.hidden ? "is-hidden" : ""}`}>
+          <article style={{order: layerOrder.length - layerOrder.indexOf(layer.key === "title" ? "__title" : "__body")}} data-layer-id={layer.key === "title" ? "__title" : "__body"} key={layer.key} className={`layer-row text-layer ${layer.box.hidden ? "is-hidden" : ""} ${dragging === (layer.key === "title" ? "__title" : "__body") ? "dragging" : ""} ${dragOver === (layer.key === "title" ? "__title" : "__body") ? "drag-over" : ""}`}>
+            <button className="layer-drag-handle" disabled={layer.box.locked} title={layer.box.locked ? "Buka kunci untuk memindahkan lapisan" : "Tekan dan tarik ke atas atau bawah"} onPointerDown={(event) => startLayerDrag(event,{id:layer.key === "title" ? "__title" : "__body",locked:layer.box.locked})}><GripVertical size={17}/></button>
             <button className="layer-main" onClick={() => onTextTarget(layer.key)}><span>{2 - index}</span><div><b>{layer.label}</b><small>Teks utama</small></div></button>
             <div className="layer-actions">
               <button disabled={layer.box.locked} title={layer.box.hidden ? "Tampilkan" : "Sembunyikan"} onClick={() => updateTextLayer(layer.key, { hidden: !layer.box.hidden })}>{layer.box.hidden ? <EyeOff size={14}/> : <Eye size={14}/>}</button>
@@ -1320,7 +1372,7 @@ function LayerPanel({ slide, selected, select, updateTextLayer, updateElement, s
   );
 }
 
-function ElementLayer({ elements, selected, select, update, remove, duplicate, reorder, toggleLock, onGuides, snap }) {
+function ElementLayer({ elements, selected, select, update, remove, duplicate, reorder, toggleLock, onGuides, snap, layerOrder = [] }) {
   const [contextMenu, setContextMenu] = useState(null);
   const clipboardRef = useRef(null);
 
@@ -1439,6 +1491,7 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
             background: item.type === "shape" ? item.background : "transparent",
             transform: `rotate(${item.rotation || 0}deg)`,
             opacity: item.opacity ?? 1,
+            zIndex: 20 + layerOrder.indexOf(item.id),
             ...(item.type === "text"
               ? textStyle(
                   item.style || {
