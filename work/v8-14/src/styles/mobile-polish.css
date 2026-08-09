@@ -1,0 +1,469 @@
+/* Lapisan responsif final JeniusPPT. Selalu dimuat setelah seluruh tema lama. */
+.builder-mobile-switcher { display:none; }
+
+@media (max-width: 760px) {
+  :root { --mobile-gap:10px; --mobile-radius:14px; }
+  html, body, #root { width:100%; max-width:100%; min-width:0; overflow-x:hidden; }
+  body { background:#f4f6f8 !important; }
+  *, *::before, *::after { box-sizing:border-box; }
+  img, video, canvas, iframe { max-width:100%; }
+  button, input, textarea, select { max-width:100%; font-family:inherit; }
+  input, textarea, select { font-size:16px !important; }
+  h1, h2, h3, h4, p, b, strong, small, span, label { max-width:100%; overflow-wrap:anywhere; }
+
+  .main-area, .page, .builder-page, .ppt-editor, .quiz-editor,
+  .preview-player, .media-manager, .certificate-studio, .question-drive,
+  .ai-workspace, .guide-page, .feedback-page { width:100% !important; min-width:0 !important; max-width:100% !important; }
+  .page { padding:10px !important; }
+  .page > * { min-width:0; }
+  .page-head { gap:10px !important; margin-bottom:14px !important; }
+  .page-head h1 { margin:0 !important; font-size:clamp(24px,7.2vw,32px) !important; line-height:1.12 !important; }
+  .page-head p { margin:4px 0 0 !important; font-size:13px !important; line-height:1.55 !important; }
+  .primary-button, .secondary-button, .outline-btn { min-height:44px !important; justify-content:center; }
+
+  .topbar { min-height:60px !important; padding:8px 10px !important; grid-template-columns:42px minmax(0,1fr) 42px 42px !important; gap:6px !important; }
+  .topbar-title h1 { font-size:16px !important; }
+  .topbar-search { min-height:44px !important; border-radius:12px !important; }
+  .topbar-search input { min-width:0 !important; }
+
+  .welcome-card, .stat-card, .material-card, .tool-card, .data-panel,
+  .analytics-card, .hub-feature, .guide-option, .feedback-form,
+  .feedback-intro, .creator-upload, .creator-gallery, .publish-card,
+  .info-form, .media-form, .certificate-controls {
+    min-width:0 !important;
+    max-width:100% !important;
+    border-radius:var(--mobile-radius) !important;
+    padding:14px !important;
+  }
+  .feature-grid, .material-grid, .recommendation-grid,
+  .pricing-grid, .feedback-layout, .guide-options, .creator-layout,
+  .certificate-studio, .settings-grid { grid-template-columns:minmax(0,1fr) !important; gap:10px !important; }
+  .stats-grid { width:100% !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:8px !important; }
+  .stat-card { min-width:0 !important; min-height:116px !important; padding:12px !important; border-radius:13px !important; box-shadow:none !important; }
+  .stat-card div { width:38px !important; height:38px !important; padding:8px !important; border-radius:10px !important; }
+  .stat-card p { margin:8px 0 2px !important; font-size:10px !important; }
+  .stat-card h2 { font-size:24px !important; }
+
+  .welcome-card, .dashboard-ai, .stat-card, .tool-card, .material-card,
+  .hub-card, .guide-option, .pricing-grid article, .app-card, .accent-card {
+    background-image:none !important;
+    box-shadow:none !important;
+  }
+  .welcome-card::before, .welcome-card::after,
+  .dashboard-ai::before, .dashboard-ai::after { display:none !important; content:none !important; }
+  .welcome-card, .dashboard-ai, .app-card, .accent-card { background-color:var(--fresh-orange) !important; }
+  .material-card h3, .tool-card h3, .hub-card h3 { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .card-actions, .welcome-actions, .report-actions { width:100%; display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:7px !important; }
+  .card-actions > *, .welcome-actions > *, .report-actions > * { width:100% !important; min-width:0 !important; }
+
+  /* Alur Materi: header ringkas dan langkah tidak terpotong. */
+  .builder-page { padding:6px !important; }
+  .builder-top {
+    position:relative !important;
+    top:auto !important;
+    z-index:300 !important;
+    width:100% !important;
+    padding:9px !important;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) auto !important;
+    align-items:center !important;
+    gap:7px !important;
+    border:1px solid #e1e6ed !important;
+    border-radius:14px !important;
+    background:#fff !important;
+    box-shadow:0 5px 16px rgba(15,23,42,.06) !important;
+  }
+  .builder-top > button:first-child { min-width:0 !important; min-height:40px !important; padding:0 10px !important; justify-content:flex-start !important; white-space:nowrap !important; }
+  .builder-top .autosave-status { justify-self:end; min-width:0; font-size:10px !important; white-space:nowrap; }
+  .builder-top .stepper { display:none !important; }
+  .builder-mobile-switcher { position:relative; min-width:0; display:block !important; }
+  .builder-mobile-current {
+    width:100% !important; min-height:48px !important; padding:7px 11px !important;
+    display:flex !important; align-items:center !important; justify-content:space-between !important;
+    border:1px solid #dfe4eb !important; border-radius:11px !important;
+    background:#f7f8fa !important; color:#182230 !important; text-align:left !important;
+  }
+  .builder-mobile-current span { min-width:0; display:grid; gap:2px; }
+  .builder-mobile-current small { color:#667085; font-size:9px; font-weight:750; }
+  .builder-mobile-current b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; }
+  .builder-mobile-current i { flex:0 0 auto; color:var(--fresh-orange); font-size:10px; font-style:normal; }
+  .builder-mobile-menu {
+    position:absolute; z-index:900; top:calc(100% + 6px); left:0; width:min(250px,calc(100vw - 24px));
+    padding:7px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px;
+    border:1px solid #dfe4eb; border-radius:13px; background:#fff; box-shadow:0 15px 34px rgba(15,23,42,.18);
+  }
+  .builder-mobile-menu button { min-width:0; min-height:42px; padding:6px 8px; display:flex; align-items:center; gap:7px; border:0; border-radius:9px; background:#f5f7f9; color:#344054; font-size:11px; font-weight:800; }
+  .builder-mobile-menu button span { flex:0 0 24px; width:24px; height:24px; display:grid; place-items:center; border-radius:7px; background:#e7ebf0; }
+  .builder-mobile-menu button.active { background:#fff0e8; color:#c2410c; }
+  .builder-mobile-menu button.active span { background:var(--fresh-orange); color:#fff; }
+  .builder-top > .primary-button { width:auto !important; min-width:104px !important; min-height:48px !important; padding:0 12px !important; }
+
+  .info-form { width:100% !important; height:auto !important; margin-top:10px !important; padding:16px !important; overflow:visible !important; }
+  .info-form h1 { margin-bottom:14px !important; font-size:25px !important; }
+  .info-form label { margin:11px 0 6px !important; white-space:normal !important; }
+  .info-form input, .info-form textarea, .info-form .solid-select-trigger { width:100% !important; min-width:0 !important; min-height:46px !important; padding:10px 11px !important; }
+  .settings-divider { margin-top:18px !important; padding-top:16px !important; }
+  .settings-divider h2 { font-size:18px !important; }
+  .settings-divider p, .settings-grid small { font-size:11px !important; line-height:1.5 !important; }
+  .toggle-setting { min-height:48px !important; padding:10px !important; display:flex !important; align-items:center !important; gap:9px !important; }
+  .toggle-setting input { flex:0 0 20px !important; width:20px !important; min-height:20px !important; padding:0 !important; }
+
+  /* Editor slide. */
+  .ppt-editor { display:block !important; overflow:visible !important; }
+  .ppt-editor .slide-stage { width:100% !important; min-width:0 !important; overflow:visible !important; border-radius:13px !important; }
+  .ppt-editor .slide-stage > .editor-ribbon-tabs { display:none !important; }
+  .ppt-editor .slide-stage > .mobile-ribbon-tabs {
+    width:100% !important; min-width:0 !important; height:50px !important; min-height:50px !important;
+    padding:3px 5px 0 !important; display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:2px !important; overflow:visible !important; border:1px solid #e1e6ed !important; border-bottom:0 !important;
+  }
+  .ppt-editor .mobile-ribbon-tabs > button,
+  .ppt-editor .mobile-ribbon-more > button { width:100% !important; min-width:0 !important; min-height:46px !important; padding:0 3px !important; font-size:10px !important; }
+  .ppt-editor .editor-toolbar { width:100% !important; min-width:0 !important; padding:7px !important; display:grid !important; gap:6px !important; overflow:visible !important; }
+  .ppt-editor .history-controls, .ppt-editor .mobile-editor-actions { width:100% !important; display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:5px !important; }
+  .ppt-editor .history-controls button, .ppt-editor .mobile-editor-actions button { width:100% !important; min-width:0 !important; min-height:40px !important; padding:5px 3px !important; font-size:10px !important; }
+  .ppt-editor .desktop-editor-tools.ribbon-group { width:100% !important; min-width:0 !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+  .ppt-editor .desktop-ribbon-content { width:100% !important; min-width:0 !important; max-height:min(44dvh,340px) !important; padding:7px !important; overflow-y:auto !important; overflow-x:hidden !important; }
+  .ppt-editor .word-toolbar, .ppt-editor .word-toolbar-row { width:100% !important; min-width:0 !important; overflow:visible !important; }
+  .ppt-editor .word-toolbar-row {
+    display:grid !important;
+    grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+    grid-auto-rows:38px !important;
+    gap:5px !important;
+  }
+  .ppt-editor .word-toolbar-row > .solid-select:first-child { grid-column:1/3 !important; grid-row:1 !important; }
+  .ppt-editor .word-toolbar-row > .solid-select.font-select { grid-column:3/6 !important; grid-row:1 !important; }
+  .ppt-editor .word-toolbar-row > .font-size-input { grid-column:6/7 !important; grid-row:1 !important; }
+  .ppt-editor .word-toolbar-row > button:nth-of-type(1) { grid-column:1 !important; grid-row:2 !important; }
+  .ppt-editor .word-toolbar-row > button:nth-of-type(2) { grid-column:2 !important; grid-row:2 !important; }
+  .ppt-editor .word-toolbar-row > button:nth-of-type(3) { grid-column:3 !important; grid-row:2 !important; }
+  .ppt-editor .word-toolbar-row > button:nth-of-type(4) { grid-column:4 !important; grid-row:2 !important; }
+  .ppt-editor .word-toolbar-row > button:nth-of-type(5) { grid-column:5 !important; grid-row:2 !important; }
+  .ppt-editor .word-toolbar-row > button:nth-of-type(6) { grid-column:6 !important; grid-row:2 !important; }
+  .ppt-editor .word-toolbar-row > button:nth-of-type(7) { grid-column:7 !important; grid-row:2 !important; }
+  .ppt-editor .word-toolbar-row > button.toolbar-more { grid-column:7/8 !important; grid-row:1 !important; width:100% !important; min-width:0 !important; }
+  .ppt-editor .word-toolbar-row > button.toolbar-more span { display:none !important; }
+  .ppt-editor .word-toolbar-row > .solid-select,
+  .ppt-editor .word-toolbar-row > input,
+  .ppt-editor .word-toolbar-row > button,
+  .ppt-editor .word-toolbar-row .solid-select-trigger { width:100% !important; min-width:0 !important; height:38px !important; min-height:38px !important; padding:0 5px !important; }
+  .ppt-editor .word-toolbar-row.compact { grid-template-columns:repeat(2,minmax(0,1fr)) !important; grid-auto-rows:auto !important; }
+  .ppt-editor .element-library { grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+  .ppt-editor .element-library button { min-height:66px !important; }
+  .ppt-editor .slide-canvas-wrap { width:100% !important; padding:8px 0 !important; overflow:hidden !important; }
+  .ppt-editor .slide-canvas { width:100% !important; max-width:100% !important; min-width:0 !important; aspect-ratio:var(--slide-ratio,16/9); overflow:hidden !important; }
+  .ppt-editor .movable-text { max-width:100% !important; overflow:hidden !important; }
+  .ppt-editor .slide-title-input, .ppt-editor .slide-body-input { width:100% !important; height:100% !important; overflow:hidden !important; resize:none !important; }
+  .ppt-editor .slide-strip { width:100% !important; padding:8px !important; overflow:hidden !important; }
+  .ppt-editor .slide-strip-scroll { width:100% !important; display:flex !important; gap:8px !important; overflow-x:auto !important; scroll-snap-type:x proximity; }
+  .ppt-editor .slide-strip-scroll > button { flex:0 0 min(138px,42vw) !important; scroll-snap-align:start; }
+  .ppt-editor .properties-panel { display:none !important; }
+
+  /* Media. */
+  .media-manager { padding:10px 0 !important; }
+  .media-intro { padding:8px 4px 12px !important; }
+  .media-intro h1 { margin:5px 0 !important; font-size:25px !important; }
+  .media-intro p { font-size:12px !important; line-height:1.5 !important; }
+  .media-form { width:100% !important; }
+  .media-type { width:100%; display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:7px !important; }
+  .media-type button { width:100% !important; min-width:0 !important; }
+  .media-url { width:100%; display:grid !important; grid-template-columns:minmax(0,1fr) !important; gap:7px !important; }
+  .media-url input, .media-url button, .media-upload, .voice-record { width:100% !important; min-width:0 !important; min-height:46px !important; }
+  .media-upload, .voice-record { padding:10px !important; white-space:normal !important; line-height:1.35 !important; }
+
+  /* Kuis. */
+  .quiz-editor { display:flex !important; flex-direction:column !important; gap:8px !important; }
+  .question-list { order:1; width:100% !important; padding:8px !important; display:flex !important; align-items:center !important; gap:6px !important; overflow-x:auto !important; border-radius:13px !important; }
+  .question-list .panel-head { flex:0 0 auto; margin:0 !important; }
+  .question-list .panel-head h3 { display:none; }
+  .question-list > button { flex:0 0 58px !important; width:58px !important; min-height:48px !important; margin:0 !important; padding:5px !important; grid-template-columns:24px 1fr !important; gap:4px !important; }
+  .question-list > button.outline-btn { flex-basis:58px !important; }
+  .quiz-stage { order:2; width:100% !important; min-width:0 !important; border-radius:13px !important; }
+  .quiz-stage .editor-toolbar { width:100%; display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:6px !important; padding:8px !important; overflow:visible !important; }
+  .quiz-stage .editor-toolbar button { width:100% !important; min-width:0 !important; min-height:42px !important; padding:6px !important; justify-content:center; font-size:10px !important; }
+  .quiz-canvas { width:100% !important; min-width:0 !important; padding:12px !important; }
+  .quiz-question-input { width:100% !important; min-width:0 !important; min-height:90px !important; }
+  .answer-grid, .tf-grid { width:100% !important; grid-template-columns:minmax(0,1fr) !important; gap:8px !important; }
+  .answer-grid button { width:100% !important; min-width:0 !important; min-height:58px !important; }
+  .answer-grid input { width:100% !important; min-width:0 !important; }
+  .question-bank-panel { order:3; display:block !important; width:100% !important; max-width:100% !important; margin:0 !important; padding:14px !important; border-radius:13px !important; }
+
+  /* Preview dan Publish. */
+  .preview-player { display:flex !important; flex-direction:column !important; gap:8px !important; }
+  .preview-timeline { width:100% !important; padding:7px !important; display:flex !important; gap:6px !important; overflow-x:auto !important; border-radius:13px !important; }
+  .preview-timeline button { flex:0 0 126px !important; width:126px !important; min-height:48px !important; margin:0 !important; padding:6px !important; }
+  .preview-stage { width:100% !important; min-width:0 !important; padding:8px !important; border-radius:13px !important; }
+  .preview-canvas { width:100% !important; max-width:100% !important; min-width:0 !important; overflow:hidden !important; }
+  .preview-question, .preview-finish { width:100% !important; min-width:0 !important; padding:16px !important; }
+  .preview-question h1 { font-size:clamp(20px,6vw,28px) !important; }
+  .preview-controls { width:100% !important; margin-top:8px !important; }
+  .publish-card { width:100% !important; margin-top:10px !important; }
+
+  /* Pusat produktivitas, Bank Soal, AI, peserta, panduan, sertifikat. */
+  .productivity-tabs { grid-template-columns:minmax(0,1fr) !important; }
+  .hub-card-grid, .hub-metrics { grid-template-columns:minmax(0,1fr) !important; }
+  .hub-question-form { grid-template-columns:minmax(0,1fr) !important; }
+  .question-drive { border-radius:13px !important; overflow:hidden !important; }
+  .question-drive-sidebar { padding:7px !important; display:flex !important; overflow-x:auto !important; }
+  .question-drive-sidebar button { flex:0 0 auto !important; min-height:40px !important; }
+  .drive-toolbar { padding:9px !important; gap:7px !important; }
+  .drive-search { width:100% !important; min-width:0 !important; }
+  .drive-actions { width:100%; display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:5px !important; overflow:visible !important; }
+  .drive-actions button { min-width:0 !important; padding:6px 4px !important; font-size:10px !important; }
+  .drive-items { width:100% !important; padding:8px !important; overflow:hidden !important; }
+  .drive-items article { width:100% !important; min-width:0 !important; grid-template-columns:24px 32px minmax(0,1fr) 32px 32px !important; }
+  .ai-workspace { padding:6px !important; }
+  .ai-chat { width:100% !important; min-width:0 !important; min-height:calc(100dvh - 88px) !important; }
+  .ai-chat-body { width:100% !important; min-width:0 !important; padding:20px 12px !important; }
+  .ai-greeting h2 { font-size:25px !important; }
+  .ai-composer { width:100% !important; padding:10px !important; }
+  .participant-summary { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:8px !important; }
+  .participant-filters { grid-template-columns:minmax(0,1fr) !important; }
+  .participant-table { width:100% !important; max-width:100% !important; padding:8px !important; overflow:visible !important; border-radius:12px !important; }
+  .participant-table-head { display:none !important; }
+  .participant-table-row {
+    width:100% !important; min-width:0 !important; margin-bottom:8px !important; padding:10px !important;
+    display:grid !important; grid-template-columns:28px minmax(0,1fr) !important; gap:7px 9px !important;
+    border:1px solid #e1e6ed !important; border-radius:12px !important; background:#fff !important;
+  }
+  .participant-table-row > .participant-check { grid-column:1; grid-row:1/span 6; align-self:start; }
+  .participant-table-row > span { grid-column:2; min-width:0 !important; padding:5px 0 !important; display:grid !important; gap:2px !important; border-bottom:1px solid #eef1f4; }
+  .participant-table-row > span:last-child { border-bottom:0; }
+  .participant-table-row > span::before { color:#667085; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+  .participant-table-row > span:nth-of-type(1)::before { content:"Peserta"; }
+  .participant-table-row > span:nth-of-type(2)::before { content:"Kelas"; }
+  .participant-table-row > span:nth-of-type(3)::before { content:"Materi"; }
+  .participant-table-row > span:nth-of-type(4)::before { content:"Status"; }
+  .participant-table-row > span:nth-of-type(5)::before { content:"Hasil"; }
+  .participant-table-row > span:nth-of-type(6)::before { content:"Waktu"; }
+  .participant-table-row > .participant-name { display:flex !important; flex-wrap:wrap !important; align-items:center !important; gap:6px !important; }
+  .participant-table-row > .participant-name::before { flex:0 0 100%; }
+  .guide-video-actions { display:grid !important; grid-template-columns:minmax(0,1fr) !important; gap:7px !important; }
+  .guide-option video { width:100% !important; height:auto !important; }
+  .certificate-assets { width:100% !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:8px !important; }
+  .certificate-assets label, .certificate-frame-button { width:100% !important; min-width:0 !important; min-height:112px !important; padding:9px 5px !important; }
+  .certificate-assets span { width:36px !important; height:36px !important; }
+  .certificate-assets b { font-size:11px !important; text-align:center !important; }
+  .certificate-assets small { font-size:8px !important; text-align:center !important; }
+  .certificate-preview-shell { width:100% !important; padding:5px !important; overflow:hidden !important; }
+  .certificate-preview { width:100% !important; min-width:0 !important; aspect-ratio:297/210; padding:13% 6% 5% !important; border-width:4px !important; }
+  .certificate-brand { top:4% !important; left:5% !important; max-width:38% !important; gap:4px !important; font-size:7px !important; }
+  .certificate-brand b { width:28px !important; height:28px !important; border-radius:7px !important; font-size:9px !important; }
+  .certificate-brand img { width:28px !important; height:28px !important; }
+  .certificate-brand span { overflow:hidden !important; text-overflow:ellipsis !important; white-space:nowrap !important; }
+  .certificate-preview > small { font-size:6px !important; letter-spacing:.12em !important; }
+  .certificate-preview > h3 { font-size:clamp(17px,5.3vw,28px) !important; }
+  .certificate-preview > h2 { margin:8px 0 4px !important; font-size:clamp(13px,4vw,21px) !important; }
+  .certificate-preview > p { max-width:86% !important; font-size:8px !important; }
+  .certificate-photo { width:44px !important; height:44px !important; }
+  .certificate-signature { width:105px !important; }
+
+  .file-grid { width:100% !important; grid-template-columns:minmax(0,1fr) !important; gap:10px !important; }
+  .file-grid .tool-card { width:100% !important; min-width:0 !important; }
+  .file-grid .tool-card h2 { font-size:20px !important; }
+  .file-grid .tool-card p { font-size:12px !important; line-height:1.55 !important; }
+  .export-actions { width:100% !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:6px !important; }
+  .export-actions button { min-width:0 !important; min-height:44px !important; padding:6px 3px !important; font-size:10px !important; }
+
+  .clean-share { padding:16px !important; }
+  .clean-share header { align-items:flex-start !important; gap:8px !important; }
+  .clean-share header h2 { font-size:21px !important; line-height:1.2 !important; }
+  .clean-share .link-box { width:100% !important; min-width:0 !important; padding:7px !important; display:grid !important; grid-template-columns:minmax(0,1fr) auto !important; gap:6px !important; }
+  .clean-share .link-box span { min-width:0 !important; overflow:hidden !important; text-overflow:ellipsis !important; white-space:nowrap !important; }
+  .clean-share .link-box button { min-width:72px !important; padding:0 8px !important; }
+  .qr-like-example { width:min(260px,100%) !important; margin:auto !important; padding:8px !important; }
+  .qr-like-example svg { width:100% !important; height:auto !important; aspect-ratio:1; }
+  .clean-share .share-actions { grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:6px !important; }
+  .clean-share .share-actions button { min-width:0 !important; min-height:44px !important; padding:5px !important; font-size:9px !important; }
+  .social-share-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:7px !important; }
+  .social-share-grid button { min-width:0 !important; min-height:44px !important; padding:6px !important; font-size:10px !important; }
+
+  .student-clean { width:100% !important; min-width:0 !important; min-height:100dvh !important; padding:10px !important; align-items:center !important; overflow-x:hidden !important; }
+  .student-box { width:100% !important; min-width:0 !important; padding:18px !important; border-radius:16px !important; }
+  .student-box h1 { font-size:clamp(23px,7vw,31px) !important; line-height:1.2 !important; }
+  .student-box form { width:100% !important; gap:10px !important; margin-top:16px !important; }
+  .student-box input, .student-box .solid-select-trigger { width:100% !important; min-width:0 !important; min-height:48px !important; }
+  .student-slide-clean { position:relative !important; width:100% !important; min-width:0 !important; max-width:100% !important; aspect-ratio:16/9; min-height:0 !important; padding:0 !important; border-radius:12px !important; overflow:hidden !important; }
+  .student-slide-clean .student-top { position:absolute !important; z-index:20; top:5px; left:6px; right:6px; margin:0 !important; padding:4px 6px !important; border-radius:7px; background:rgba(255,255,255,.82); color:#182230 !important; font-size:8px !important; }
+  .student-slide-clean > small { position:absolute; z-index:20; top:29px; right:8px; font-size:7px !important; }
+  .student-slide-clean .positioned-title,
+  .student-slide-clean .positioned-body { max-width:92% !important; overflow:hidden !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
+  .student-slide-clean .student-nav { position:absolute !important; z-index:30; left:7px; right:7px; bottom:7px; margin:0 !important; gap:6px !important; }
+  .student-slide-clean .student-nav button { min-height:34px !important; padding:0 10px !important; border-radius:9px !important; font-size:9px !important; }
+  .quiz-options-clean { gap:8px !important; margin-top:15px !important; }
+  .quiz-options-clean button { min-width:0 !important; min-height:52px !important; padding:8px 10px !important; gap:9px !important; border-radius:12px !important; font-size:12px !important; }
+  .answer-info { padding:12px !important; }
+  .answer-info h2 { font-size:18px !important; }
+  .score-clean { max-width:100% !important; }
+  .workspace-list { width:100% !important; display:grid !important; gap:8px !important; }
+  .workspace-item { width:100% !important; min-width:0 !important; padding:8px !important; grid-template-columns:minmax(0,1fr) 42px !important; border-radius:12px !important; }
+  .workspace-open { min-width:0 !important; text-align:left !important; }
+  .workspace-open b, .workspace-open p { overflow:hidden !important; text-overflow:ellipsis !important; white-space:nowrap !important; }
+
+  /* Modal, dropdown, notifikasi, tur. */
+  .modal-card, .share-modal, .code-modal, .post-publish-survey,
+  .notice-dialog, .tour-card, .mobile-sheet {
+    width:calc(100vw - 20px) !important; max-width:calc(100vw - 20px) !important;
+    max-height:calc(100dvh - 20px) !important; overflow-y:auto !important; border-radius:15px !important;
+  }
+  .solid-select-menu { left:8px !important; right:8px !important; bottom:max(8px,env(safe-area-inset-bottom)) !important; width:auto !important; max-height:58dvh !important; }
+  .solid-select-menu > button { min-height:46px !important; white-space:normal !important; }
+  .tour-game .tour-card.anchored { left:8px !important; right:8px !important; width:auto !important; }
+}
+
+/* v8.2 — editor actions, certificate signing, and roomier mobile controls. */
+.slide-strip-scroll > .slide-thumb-card { position:relative; flex:0 0 146px; display:grid; gap:5px; padding:6px; border:1px solid #d0d5dd; border-radius:12px; background:#fff; }
+.slide-strip-scroll > .slide-thumb-card.active { border-color:#ff641e; box-shadow:0 0 0 2px rgba(255,100,30,.14); }
+.slide-thumb-select { width:100%; min-width:0; padding:0; border:0; background:transparent; color:#182230; }
+.slide-thumb-select > span { position:absolute; z-index:2; top:10px; left:10px; width:22px; height:22px; display:grid; place-items:center; border-radius:6px; background:#182230; color:#fff; font-size:10px; font-weight:800; }
+.slide-thumb-actions { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.slide-thumb-actions button { min-height:32px; display:grid; place-items:center; border:1px solid #d0d5dd; border-radius:8px; background:#f8fafc; color:#344054; }
+.slide-thumb-actions button.danger { border-color:#fecaca; background:#fff1f2; color:#c81e1e; }
+.slide-thumb-actions button:disabled { opacity:.4; cursor:not-allowed; }
+.element-move-handle { position:absolute!important; z-index:11; left:-14px; top:-14px; width:31px!important; height:31px!important; padding:0!important; display:grid!important; place-items:center; border:2px solid #fff!important; border-radius:50%!important; background:#ff641e!important; color:#fff!important; font-size:21px!important; font-weight:700!important; line-height:1!important; cursor:move; touch-action:none; box-shadow:0 5px 12px rgba(15,23,42,.18); }
+.certificate-assets label,.certificate-assets button { align-items:center; justify-items:center; text-align:center; }
+.certificate-draw-button { display:grid; gap:7px; border:1px solid #d0d5dd; border-radius:13px; background:#fff; color:#344054; }
+.certificate-draw-button span { display:grid; place-items:center; }
+.certificate-preview { background:#fff!important; background-image:none!important; color:#182230!important; padding:7.5% 8% 4.5%!important; }
+.certificate-brand { top:3%!important; left:50%!important; transform:translateX(-50%)!important; justify-content:center; max-width:48%; }
+.certificate-photo { width:64px!important; height:64px!important; margin:0 auto 4px!important; }
+.certificate-preview > h3 { margin:5px 0 2px!important; font-size:clamp(25px,3.4vw,42px)!important; }
+.certificate-preview > h2 { margin:9px 0 4px!important; font-size:clamp(18px,2.1vw,28px)!important; }
+.certificate-preview > p { margin:0 0 4px!important; max-width:78%!important; font-size:12px!important; line-height:1.35!important; }
+.certificate-preview > strong { font-size:14px!important; }
+.certificate-preview footer { position:relative; justify-content:center!important; }
+.certificate-preview footer > div:first-child { position:absolute; left:0; bottom:0; }
+.certificate-signature { margin-inline:auto; }
+.signature-pad-backdrop { position:fixed; z-index:10050; inset:0; display:grid; place-items:center; padding:16px; background:rgba(15,23,42,.58); }
+.signature-pad-dialog { width:min(620px,100%); padding:18px; display:grid; gap:12px; border:1px solid #d0d5dd; border-radius:18px; background:#fff; color:#182230; box-shadow:0 24px 64px rgba(15,23,42,.24); }
+.signature-pad-dialog header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.signature-pad-dialog header small { color:#ff641e; font-weight:850; letter-spacing:.08em; }
+.signature-pad-dialog header h3 { margin:3px 0 0; }
+.signature-pad-dialog header button { width:38px; height:38px; display:grid; place-items:center; border:0; border-radius:10px; background:#f2f4f7; color:#344054; }
+.signature-pad-dialog canvas { width:100%; height:auto; aspect-ratio:3/1; border:2px dashed #98a2b3; border-radius:12px; background:#fff; touch-action:none; cursor:crosshair; }
+.signature-pad-dialog p { margin:0; color:#667085; font-size:12px; }
+.signature-pad-dialog footer { display:flex; justify-content:flex-end; gap:8px; }
+.signature-pad-dialog footer button { min-height:42px; padding:0 14px; display:inline-flex; align-items:center; justify-content:center; gap:7px; border:0; border-radius:10px; background:#ff641e; color:#fff; font-weight:800; }
+.signature-pad-dialog footer button.outline { border:1px solid #d0d5dd; background:#fff; color:#344054; }
+
+@media(max-width:760px){
+  .ppt-editor .word-toolbar-row { grid-template-columns:repeat(8,minmax(0,1fr))!important; grid-auto-rows:40px!important; }
+  .ppt-editor .word-toolbar-row > .solid-select:first-child { grid-column:1/4!important; grid-row:1!important; }
+  .ppt-editor .word-toolbar-row > .solid-select.font-select { grid-column:4/7!important; grid-row:1!important; }
+  .ppt-editor .word-toolbar-row > .font-size-input { grid-column:7/8!important; grid-row:1!important; }
+  .ppt-editor .word-toolbar-row > button.toolbar-more { grid-column:8/9!important; grid-row:1!important; }
+  .ppt-editor .word-toolbar-row > button:nth-of-type(1){grid-column:1/3!important;grid-row:2!important}.ppt-editor .word-toolbar-row > button:nth-of-type(2){grid-column:3/5!important;grid-row:2!important}.ppt-editor .word-toolbar-row > button:nth-of-type(3){grid-column:5/7!important;grid-row:2!important}.ppt-editor .word-toolbar-row > button:nth-of-type(4){grid-column:7/9!important;grid-row:2!important}.ppt-editor .word-toolbar-row > button:nth-of-type(5){grid-column:1/3!important;grid-row:3!important}.ppt-editor .word-toolbar-row > button:nth-of-type(6){grid-column:3/5!important;grid-row:3!important}.ppt-editor .word-toolbar-row > button:nth-of-type(7){grid-column:5/7!important;grid-row:3!important}
+  .ppt-editor .slide-strip-scroll > .slide-thumb-card { flex:0 0 min(154px,46vw)!important; }
+  .quiz-stage .editor-toolbar button { min-height:44px!important; padding:8px!important; font-size:11px!important; }
+  .quiz-canvas { padding:14px!important; gap:12px!important; }
+  .quiz-question-input { min-height:112px!important; padding:14px!important; font-size:15px!important; line-height:1.5!important; }
+  .answer-grid button { min-height:64px!important; padding:9px 11px!important; gap:9px!important; }
+  .answer-grid input { font-size:14px!important; }
+  .certificate-assets label,.certificate-frame-button,.certificate-draw-button { min-height:112px!important; padding:9px 5px!important; }
+  .certificate-preview { padding:11% 6% 4%!important; }
+  .certificate-brand { top:2.5%!important; max-width:52%!important; }
+  .certificate-photo { width:36px!important; height:36px!important; margin-bottom:2px!important; }
+  .certificate-preview > h3 { margin:3px 0 1px!important; font-size:clamp(14px,4.4vw,23px)!important; }
+  .certificate-preview > h2 { margin:4px 0 2px!important; font-size:clamp(10px,3.2vw,17px)!important; }
+  .certificate-preview > p { max-width:90%!important; margin-bottom:2px!important; font-size:6.5px!important; }
+  .certificate-preview > strong { font-size:8px!important; }
+  .certificate-signature { width:82px!important; }
+  .signature-pad-dialog { padding:13px; border-radius:15px; }
+  .signature-pad-dialog footer { display:grid; grid-template-columns:1fr 1fr; }
+}
+
+@media (max-width: 380px) {
+  .page { padding:7px !important; }
+  .builder-page { padding:4px !important; }
+  .builder-top { padding:7px !important; }
+  .builder-top > .primary-button { min-width:94px !important; padding:0 9px !important; font-size:11px !important; }
+  .builder-top .autosave-status { font-size:9px !important; }
+  .ppt-editor .mobile-ribbon-tabs > button,
+  .ppt-editor .mobile-ribbon-more > button { font-size:9px !important; }
+  .participant-summary, .card-actions, .welcome-actions, .report-actions { grid-template-columns:minmax(0,1fr) !important; }
+  .stats-grid, .certificate-assets { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .builder-top { position:relative !important; }
+  .ppt-editor .desktop-ribbon-content { max-height:62dvh !important; }
+  .mobile-sheet { max-height:88dvh !important; }
+}
+
+@media (max-width: 760px) {
+  html[data-theme="dark"] body { background:#101318 !important; }
+  html[data-theme="dark"] .builder-top,
+  html[data-theme="dark"] .builder-mobile-menu,
+  html[data-theme="dark"] .media-form,
+  html[data-theme="dark"] .info-form { background:#1b2028 !important; border-color:#343c48 !important; }
+  html[data-theme="dark"] .builder-mobile-current,
+  html[data-theme="dark"] .builder-mobile-menu button { background:#242a33 !important; border-color:#3b4553 !important; color:#f4f7fb !important; }
+  html[data-theme="dark"] .builder-mobile-menu button.active { background:#34251e !important; color:#ff9b61 !important; }
+}
+
+/* v8.3 — controls stay outside the editable zone. */
+.ppt-editor .slide-canvas .movable-text { overflow:visible!important; border:1px dashed rgba(255,255,255,.72); }
+.ppt-editor .slide-canvas .movable-text > .text-box-move,
+.ppt-editor .slide-canvas .movable-text > .text-box-more { position:absolute!important; z-index:24!important; top:-18px!important; width:34px!important; height:34px!important; min-width:34px!important; padding:0!important; display:grid!important; place-items:center!important; border:2px solid #fff!important; border-radius:50%!important; color:#fff!important; box-shadow:0 5px 14px rgba(15,23,42,.22)!important; touch-action:none; }
+.ppt-editor .slide-canvas .movable-text > .text-box-move { left:-18px!important; background:#ff641e!important; font-size:23px!important; line-height:1!important; cursor:move!important; }
+.ppt-editor .slide-canvas .movable-text > .text-box-more { right:-18px!important; left:auto!important; background:#182230!important; }
+.ppt-editor .slide-canvas .movable-text > .text-box-menu { position:absolute!important; z-index:30!important; top:24px!important; right:-18px!important; left:auto!important; width:168px!important; height:auto!important; padding:8px!important; display:grid!important; gap:4px!important; border:1px solid #e1e6ed!important; border-radius:12px!important; background:#fff!important; color:#182230!important; box-shadow:0 16px 34px rgba(15,23,42,.22)!important; }
+.ppt-editor .text-box-menu strong { padding:5px 7px; color:#182230; font-size:11px; }
+.ppt-editor .text-box-menu button { position:static!important; width:100%!important; height:36px!important; min-width:0!important; padding:0 9px!important; display:flex!important; align-items:center!important; justify-content:flex-start!important; gap:8px!important; border:0!important; border-radius:8px!important; background:#fff!important; color:#182230!important; box-shadow:none!important; font-size:12px!important; font-weight:750!important; }
+.ppt-editor .text-box-menu button:hover { background:#fff3eb!important; color:#c2410c!important; }
+.ppt-editor .text-box-menu button.danger { color:#c81e1e!important; }
+.ppt-editor .free-element { overflow:visible!important; }
+.ppt-editor .element-move-handle { left:-18px!important; top:-18px!important; }
+.ppt-editor .element-quick-more { right:-18px!important; top:-18px!important; }
+.ppt-editor .element-quick-delete { display:none!important; }
+.ppt-editor .element-context-menu { transform:translateY(10px); }
+
+.certificate-assets label,
+.certificate-assets .certificate-draw-button,
+.certificate-assets .certificate-frame-button { border:1px solid #ffb48e!important; background:#fff!important; color:#182230!important; box-shadow:none!important; }
+.certificate-assets label:hover,
+.certificate-assets .certificate-draw-button:hover,
+.certificate-assets .certificate-frame-button:hover { border-color:#ff641e!important; background:#fff!important; }
+.certificate-assets label span,
+.certificate-assets .certificate-draw-button span,
+.certificate-assets .certificate-frame-button span { background:#ff641e!important; color:#fff!important; }
+.certificate-assets label b,
+.certificate-assets label small,
+.certificate-assets .certificate-draw-button b,
+.certificate-assets .certificate-draw-button small,
+.certificate-assets .certificate-frame-button b,
+.certificate-assets .certificate-frame-button small { color:#182230!important; }
+html[data-theme="dark"] .certificate-assets label,
+html[data-theme="dark"] .certificate-assets .certificate-draw-button,
+html[data-theme="dark"] .certificate-assets .certificate-frame-button { background:#fff!important; border-color:#ffb48e!important; color:#182230!important; }
+
+@media(max-width:760px){
+  .ppt-editor .slide-canvas .movable-text { overflow:visible!important; }
+  .ppt-editor .slide-canvas .movable-text > .text-box-move { left:-13px!important; top:-15px!important; width:30px!important; height:30px!important; min-width:30px!important; font-size:20px!important; }
+  .ppt-editor .slide-canvas .movable-text > .text-box-more { right:-13px!important; top:-15px!important; width:30px!important; height:30px!important; min-width:30px!important; }
+  .ppt-editor .slide-canvas .movable-text > .text-box-menu { top:20px!important; right:-12px!important; width:150px!important; }
+  .ppt-editor .element-move-handle { left:-13px!important; top:-15px!important; width:30px!important; height:30px!important; }
+  .ppt-editor .element-quick-more { right:-13px!important; top:-15px!important; }
+}
+
+/* v8.4 — document-style dropdowns, solid font color, direct dragging. */
+.solid-select-trigger { display:grid!important; grid-template-columns:minmax(0,1fr) auto!important; align-items:center!important; gap:8px!important; text-align:left!important; }
+.solid-select-trigger > span { min-width:0!important; overflow:hidden!important; text-overflow:ellipsis!important; white-space:nowrap!important; }
+.solid-select-trigger > svg { justify-self:end!important; flex:0 0 auto!important; margin:0!important; }
+.word-toolbar-row > .text-color-control { position:relative; min-width:42px; height:38px; padding:4px 9px 3px; display:grid; grid-template-rows:1fr 4px; place-items:center; border:1px solid #d0d5dd; border-radius:8px; background:#fff; color:#182230; cursor:pointer; overflow:hidden; }
+.text-color-control > span { font-size:18px; line-height:1; font-weight:700; }
+.text-color-control > i { width:100%; height:4px; border-radius:4px; }
+.text-color-control > input { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+.ppt-editor .movable-text { touch-action:none!important; cursor:move; }
+.ppt-editor .movable-text textarea { cursor:text; touch-action:none!important; }
+.ppt-editor .free-element { touch-action:none!important; cursor:grab; }
+.ppt-editor .free-element:active { cursor:grabbing; }
+.ppt-editor .free-element.selected { outline-offset:3px!important; }
+.certificate-corner { display:none!important; }
+
+@media(max-width:760px){
+  .ppt-editor .word-toolbar-row > .text-color-control { grid-column:7/9!important; grid-row:3!important; width:100%!important; height:40px!important; }
+  .ppt-editor .word-toolbar-row > button.toolbar-more { grid-column:8/9!important; grid-row:1!important; }
+  .ppt-editor .movable-text { touch-action:none!important; }
+  .ppt-editor .free-element { touch-action:none!important; }
+}

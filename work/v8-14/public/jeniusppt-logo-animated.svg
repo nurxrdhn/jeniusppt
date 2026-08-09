@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1506" height="391" viewBox="0 0 1506 391" role="img" aria-label="Animated Jeniusppt.online logo">
+  <defs>
+    <filter id="softShadow" x="-10%" y="-30%" width="120%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#9a3412" flood-opacity=".18"/>
+    </filter>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="logoClip"><rect width="1506" height="393" rx="8"/></clipPath>
+  </defs>
+
+  <g filter="url(#softShadow)" transform-origin="753px 196.5px">
+    <animate attributeName="opacity" values="0;1;1;1;0" keyTimes="0;.13;.84;.95;1" dur="3s" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="translate" values="0 22;0 0;0 0;0 0;0 0" keyTimes="0;.18;.84;.95;1" dur="3s" repeatCount="indefinite"/>
+    <image href="jeniusppt-logo-transparent.png" width="1506" height="391" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+
+  <g clip-path="url(#logoClip)" opacity="0">
+    <rect x="-260" y="-80" width="145" height="560" fill="url(#shine)" transform="skewX(-18)">
+      <animate attributeName="x" values="-260;-260;1710;1710" keyTimes="0;.35;.68;1" dur="3s" repeatCount="indefinite"/>
+    </rect>
+    <animate attributeName="opacity" values="0;0;.38;.38;0" keyTimes="0;.34;.42;.68;.7" dur="3s" repeatCount="indefinite"/>
+  </g>
+</svg>
