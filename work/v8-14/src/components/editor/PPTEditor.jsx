@@ -760,7 +760,7 @@ export default function PPTEditor({ material, updateMaterial }) {
               <Settings2 size={17} />
               Slide
             </button>
-            <button onClick={() => setMobileSheet("layers")}>
+            <button onClick={() => setMobileSheet((value) => value === "layers" ? null : "layers")}>
               <Layers3 size={17} />
               Lapisan
             </button>
@@ -825,13 +825,13 @@ export default function PPTEditor({ material, updateMaterial }) {
           <button onClick={swapOrientation}>Putar</button></div>}
           {ribbonTab === "transition" && <div className="desktop-editor-tools ribbon-group"><span className="ribbon-label">Animasi</span><SolidSelect value={active?.transition || "fade"} onChange={(e) => updateSlide({ transition: e.target.value })}>{animations.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</SolidSelect><span className="ribbon-label">Durasi</span><SolidSelect value={active?.duration || 700} onChange={(e) => updateSlide({ duration: Number(e.target.value) })}><option value={400}>Cepat</option><option value={700}>Normal</option><option value={1100}>Lembut</option><option value={1600}>Dramatis</option></SolidSelect></div>}
           {ribbonTab === "view" && <div className="desktop-editor-tools ribbon-group word-command-strip">
-            <div className="word-command-group"><div><button onClick={() => { setMobileSheet("layers"); document.querySelector(".desktop-layer-wrapper")?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }}><Layers3 size={17}/>Lapisan</button><button onClick={() => { setMobileSheet("settings"); document.querySelector(".properties-panel")?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }}><Settings2 size={17}/>Properti</button></div><small>Panel editor</small></div>
+            <div className="word-command-group"><div><button className={mobileSheet === "layers" ? "active" : ""} onClick={() => setMobileSheet((value) => value === "layers" ? null : "layers")}><Layers3 size={17}/>{mobileSheet === "layers" ? "Tutup lapisan" : "Lapisan"}</button><button onClick={() => setMobileSheet((value) => value === "settings" ? null : "settings")}><Settings2 size={17}/>Properti</button></div><small>Panel editor</small></div>
             <div className="word-command-group"><div><button onClick={() => setSelectedElement(null)}><Eye size={17}/>Kanvas bersih</button><button onClick={() => updateSlide({ showGuides: active?.showGuides === false })}><GalleryHorizontal size={17}/>{active?.showGuides === false ? "Panduan aktif" : "Panduan nonaktif"}</button></div><small>Tampilan kanvas</small></div>
             <div className="word-command-group"><div><button onClick={() => alignObjects("size")}>Ukuran sama</button><button onClick={() => alignObjects("row")}>Sejajar</button><button onClick={() => alignObjects("left")}>Rata kiri</button><button onClick={() => distributeObjects("x")}>Sebar mendatar</button><button onClick={() => distributeObjects("y")}>Sebar vertikal</button></div><small>Ukur &amp; rapikan otomatis</small></div>
           </div>}
           {ribbonTab === "slideshow" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button onClick={() => window.open(`/play/${material.shareCode}`, "_blank")}><Eye size={17}/>Dari awal</button><button onClick={() => window.open(`/play/${material.shareCode}?slide=${activeIndex}`, "_blank")}><Presentation size={17}/>Slide aktif</button></div><small>Mulai presentasi</small></div></div>}
           {ribbonTab === "record" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button onClick={() => addMediaLink("audio")}><Volume2 size={17}/>Rekam narasi</button><button onClick={() => audioRef.current?.click()}><Volume2 size={17}/>Audio lokal</button><button onClick={() => videoRef.current?.click()}><Video size={17}/>Video lokal</button></div><small>Rekaman dan media</small></div></div>}
-          {ribbonTab === "review" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button className={spellcheck ? "active" : ""} onClick={() => setSpellcheck((value) => !value)}><FileInput size={17}/>{spellcheck ? "Ejaan aktif" : "Ejaan nonaktif"}</button><button onClick={() => setMobileSheet("layers")}><Layers3 size={17}/>Periksa objek</button></div><small>Pemeriksaan</small></div></div>}
+          {ribbonTab === "review" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button className={spellcheck ? "active" : ""} onClick={() => setSpellcheck((value) => !value)}><FileInput size={17}/>{spellcheck ? "Ejaan aktif" : "Ejaan nonaktif"}</button><button onClick={() => setMobileSheet((value) => value === "layers" ? null : "layers")}><Layers3 size={17}/>Periksa objek</button></div><small>Pemeriksaan</small></div></div>}
           {ribbonTab === "help" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button onClick={() => window.open("/downloads/panduan-lengkap-jeniusppt.pdf", "_blank")}><FileInput size={17}/>Buku PDF</button><button onClick={() => window.open("/downloads/video-tutorial-jeniusppt.mp4", "_blank")}><Video size={17}/>Video tutorial</button></div><small>Bantuan JeniusPPT</small></div></div>}
         </div>
         {ribbonTab === "home" && <div className="desktop-ribbon-content"><TextToolbar target={textTarget} onTarget={setTextTarget} style={currentTextStyle} onChange={updateTextStyle} hasSelectedText={selected?.type === "text"}/></div>}
@@ -1309,9 +1309,9 @@ function LayerPanel({ slide, selected, select, updateTextLayer, updateElement, s
           <article key={layer.key} className={`layer-row text-layer ${layer.box.hidden ? "is-hidden" : ""}`}>
             <button className="layer-main" onClick={() => onTextTarget(layer.key)}><span>{2 - index}</span><div><b>{layer.label}</b><small>Teks utama</small></div></button>
             <div className="layer-actions">
-              <button title={layer.box.hidden ? "Tampilkan" : "Sembunyikan"} onClick={() => updateTextLayer(layer.key, { hidden: !layer.box.hidden })}>{layer.box.hidden ? <EyeOff size={14}/> : <Eye size={14}/>}</button>
+              <button disabled={layer.box.locked} title={layer.box.hidden ? "Tampilkan" : "Sembunyikan"} onClick={() => updateTextLayer(layer.key, { hidden: !layer.box.hidden })}>{layer.box.hidden ? <EyeOff size={14}/> : <Eye size={14}/>}</button>
               <button title={layer.box.locked ? "Buka kunci" : "Kunci"} onClick={() => updateTextLayer(layer.key, { locked: !layer.box.locked })}>{layer.box.locked ? <Unlock size={14}/> : <Lock size={14}/>}</button>
-              <button className="danger" title="Hapus teks" disabled={layer.empty} onClick={() => clearText(layer.key)}><Trash2 size={14}/></button>
+              <button className="danger" title="Hapus teks" disabled={layer.empty || layer.box.locked} onClick={() => clearText(layer.key)}><Trash2 size={14}/></button>
             </div>
           </article>
         ))}
