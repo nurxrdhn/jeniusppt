@@ -93,6 +93,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   const [ribbonTab, setRibbonTab] = useState("home");
   const [mobileRibbonMore, setMobileRibbonMore] = useState(false);
   const [textBoxMenu, setTextBoxMenu] = useState(null);
+  const [slideMenu, setSlideMenu] = useState(null);
   const [spellcheck, setSpellcheck] = useState(true);
   const [smartGuides, setSmartGuides] = useState({ x: null, y: null });
   const [historyStatus, setHistoryStatus] = useState({
@@ -268,6 +269,16 @@ export default function PPTEditor({ material, updateMaterial }) {
     updateMaterial(material.id, { activeSlide: index + 1 });
   }
   function copySlide() { copySlideAt(activeIndex); }
+  async function copySlideContent(index = activeIndex) {
+    const source = slides[index];
+    if (!source) return;
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(source, null, 2));
+    } catch {
+      localStorage.setItem("jeniusppt-slide-clipboard", JSON.stringify(source));
+    }
+    setSlideMenu(null);
+  }
   function deleteSlideAt(index = activeIndex) {
     if (slides.length <= 1) return;
     const next = slides.filter((_, slideIndex) => slideIndex !== index);
@@ -563,6 +574,28 @@ export default function PPTEditor({ material, updateMaterial }) {
     window.addEventListener("pointerup", stop);
     window.addEventListener("pointercancel", stop);
   }
+  function resizeTextBox(event, key, fallback, corner) {
+    event.preventDefault();
+    event.stopPropagation();
+    const canvas = event.currentTarget.closest(".slide-canvas").getBoundingClientRect();
+    const origin = active?.[key] || fallback;
+    if (origin.locked) return;
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const move = (nextEvent) => {
+      const dx = ((nextEvent.clientX - startX) / canvas.width) * 100;
+      const dy = ((nextEvent.clientY - startY) / canvas.height) * 100;
+      let { x, y, w, h } = origin;
+      if (corner.includes("e")) w = Math.max(8, Math.min(100 - x, origin.w + dx));
+      if (corner.includes("s")) h = Math.max(6, Math.min(100 - y, origin.h + dy));
+      if (corner.includes("w")) { const nx = Math.max(0, Math.min(origin.x + origin.w - 8, origin.x + dx)); w = origin.w + origin.x - nx; x = nx; }
+      if (corner.includes("n")) { const ny = Math.max(0, Math.min(origin.y + origin.h - 6, origin.y + dy)); h = origin.h + origin.y - ny; y = ny; }
+      updateSlide({ [key]: { ...origin, x, y, w, h } });
+    };
+    const stop = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", stop); };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+  }
   const selected = (active?.elements || []).find(
     (item) => item.id === selectedElement,
   );
@@ -632,7 +665,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             </button>
             {mobileRibbonMore && (
               <div className="mobile-ribbon-menu" role="menu">
-                {[["file","Berkas"],["tools","100+ Alat"],["draw","Gambar"],["design","Desain"],["transition","Animasi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["templates","Template"],["help","Bantuan"]].map(([key,label]) => (
+                {[["file","Berkas"],["tools","300+ Alat"],["draw","Gambar"],["design","Desain"],["transition","Animasi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["templates","Template"],["help","Bantuan"]].map(([key,label]) => (
                   <button
                     key={key}
                     type="button"
@@ -648,7 +681,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           </div>
         </nav>
         <nav className="editor-ribbon-tabs" aria-label="Menu editor slide" data-tour="editor-ribbon">
-          {[["file","Berkas"],["home","Beranda"],["insert","Sisipkan"],["draw","Gambar"],["elements","Elemen"],["design","Desain"],["transition","Transisi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["templates","Template"],["tools","100+ Alat"],["help","Bantuan"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
+          {[["file","Berkas"],["home","Beranda"],["insert","Sisipkan"],["draw","Gambar"],["elements","Elemen"],["design","Desain"],["transition","Transisi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["templates","Template"],["tools","300+ Alat"],["help","Bantuan"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
         </nav>
         <div className="editor-toolbar">
           <div className="history-controls">
@@ -859,6 +892,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 +
               </button>
               <button className="text-box-more" title="Pilihan judul" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setTextBoxMenu(textBoxMenu === "title" ? null : "title"); }}><MoreHorizontal size={16}/></button>
+              {!titleBox.locked && ["nw","ne","sw","se"].map((corner) => <button key={corner} className={`text-resize-handle ${corner}`} aria-label={`Perkecil atau perbesar judul ${corner}`} onPointerDown={(event) => resizeTextBox(event,"titleBox",titleBox,corner)}/>)}
               {textBoxMenu === "title" && <div className="text-box-menu" onPointerDown={(e) => e.stopPropagation()}>
                 <strong>Pilihan judul</strong>
                 <button onClick={() => duplicateTextBox("title")}><Copy size={15}/>Salin</button>
@@ -904,6 +938,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 +
               </button>
               <button className="text-box-more" title="Pilihan isi" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setTextBoxMenu(textBoxMenu === "body" ? null : "body"); }}><MoreHorizontal size={16}/></button>
+              {!bodyBox.locked && ["nw","ne","sw","se"].map((corner) => <button key={corner} className={`text-resize-handle ${corner}`} aria-label={`Perkecil atau perbesar isi ${corner}`} onPointerDown={(event) => resizeTextBox(event,"bodyBox",bodyBox,corner)}/>)}
               {textBoxMenu === "body" && <div className="text-box-menu" onPointerDown={(e) => e.stopPropagation()}>
                 <strong>Pilihan isi</strong>
                 <button onClick={() => duplicateTextBox("body")}><Copy size={15}/>Salin</button>
@@ -982,8 +1017,12 @@ export default function PPTEditor({ material, updateMaterial }) {
                 </div>
               </button>
               <div className="slide-thumb-actions">
-                <button title="Duplikat slide" aria-label={`Duplikat slide ${index + 1}`} onClick={() => copySlideAt(index)}><CopyPlus size={14}/></button>
-                <button className="danger" title="Hapus slide" aria-label={`Hapus slide ${index + 1}`} disabled={slides.length <= 1} onClick={() => deleteSlideAt(index)}><Trash2 size={14}/></button>
+                <button className="slide-more-button" title="Pilihan slide" aria-label={`Pilihan slide ${index + 1}`} onClick={(event) => { event.stopPropagation(); setSlideMenu(slideMenu === index ? null : index); }}><MoreHorizontal size={17}/></button>
+                {slideMenu === index && <div className="slide-thumb-menu" onClick={(event)=>event.stopPropagation()}>
+                  <button onClick={() => copySlideContent(index)}><Copy size={14}/>Copy isi slide</button>
+                  <button onClick={() => { copySlideAt(index); setSlideMenu(null); }}><CopyPlus size={14}/>Duplikat slide</button>
+                  <button className="danger" disabled={slides.length <= 1} onClick={() => { deleteSlideAt(index); setSlideMenu(null); }}><Trash2 size={14}/>Hapus slide</button>
+                </div>}
               </div>
               </article>
             ))}
@@ -1139,6 +1178,52 @@ export default function PPTEditor({ material, updateMaterial }) {
       {mobileSheet && <button className="mobile-sheet-backdrop" onClick={() => setMobileSheet(null)} aria-label="Tutup panel" />}
     </div>
   );
+}
+
+function CommandCenter({ currentTextStyle, updateTextStyle, active, selected, updateSlide, updateElement, addElement, addSlide, copySlide, deleteSlide, saveNow, swapOrientation, undo, redo, historyStatus, duplicateElement, toggleElementLock, reorderElement, shiftElement, deleteElement, slides }) {
+  const [query, setQuery] = useState("");
+  const patchText = (patch) => updateTextStyle({ ...currentTextStyle, ...patch });
+  const patchElement = (patch) => selected && updateElement(selected.id, patch);
+  const fontCommands = Array.from({ length: 60 }, (_, index) => {
+    const size = index + 8;
+    return ["Ukuran Font", `Font presisi ${size} px`, () => patchText({ fontSize: size })];
+  });
+  const typographyCommands = [
+    ...Array.from({ length: 30 }, (_, index) => {
+      const lineHeight = Number((0.8 + index * 0.07).toFixed(2));
+      return ["Jarak Baris", `Jarak baris ${lineHeight}`, () => patchText({ lineHeight })];
+    }),
+    ...Array.from({ length: 30 }, (_, index) => {
+      const letterSpacing = index - 5;
+      return ["Jarak Huruf", `Jarak huruf ${letterSpacing}`, () => patchText({ letterSpacing })];
+    }),
+  ];
+  const positionCommands = Array.from({ length: 8 }, (_, row) => Array.from({ length: 10 }, (_, column) => {
+    const x = Math.round(column * 8.5);
+    const y = Math.round(row * 11);
+    return ["Posisi Presisi", `Posisi R${row + 1} K${column + 1}`, () => patchElement({ x, y }), !selected];
+  })).flat();
+  const rotationCommands = Array.from({ length: 40 }, (_, index) => {
+    const rotation = index * 9;
+    return ["Rotasi Presisi", `Rotasi ${rotation}°`, () => patchElement({ rotation }), !selected];
+  });
+  const opacityCommands = Array.from({ length: 40 }, (_, index) => {
+    const opacity = Number(((index + 1) / 40).toFixed(3));
+    return ["Transparansi", `Opasitas ${Math.round(opacity * 100)}%`, () => patchElement({ opacity }), !selected];
+  });
+  const backgroundCommands = Array.from({ length: 20 }, (_, index) => {
+    const color = `hsl(${index * 18} 72% ${index % 2 ? 44 : 54}%)`;
+    return ["Latar Solid", `Latar warna ${index + 1}`, () => updateSlide({ background: { type: "css", value: color } }), false, color];
+  });
+  const shapes = [["Kotak",28,22],["Persegi panjang",42,18],["Lingkaran",22,22],["Garis",42,2],["Panah",38,4],["Label",28,12],["Kartu",34,24],["Tabel",38,30],["Bagan",38,30],["Bingkai",42,38]];
+  const shapeCommands = shapes.map(([label,w,h], index) => ["Bentuk", `Tambah ${label}`, () => addElement("shape", { text: label, kind: label.toLowerCase(), w, h, background: `hsl(${index * 32} 70% 48%)` })]);
+  const coreCommands = [
+    ["Perintah Utama","Tambah slide",addSlide],["Perintah Utama","Duplikat slide",copySlide],["Perintah Utama","Hapus slide",deleteSlide,slides.length <= 1],["Perintah Utama","Simpan sekarang",saveNow],["Perintah Utama","Ubah orientasi",swapOrientation],["Perintah Utama","Panduan aktif/nonaktif",()=>updateSlide({showGuides:active?.showGuides===false})],["Perintah Utama","Undo",undo,!historyStatus.canUndo],["Perintah Utama","Redo",redo,!historyStatus.canRedo],["Perintah Utama","Duplikat objek",()=>duplicateElement(),!selected],["Perintah Utama","Kunci objek",()=>toggleElementLock(selected?.id),!selected],["Perintah Utama","Bawa ke depan",()=>reorderElement(selected?.id,"front"),!selected],["Perintah Utama","Kirim ke belakang",()=>reorderElement(selected?.id,"back"),!selected],["Perintah Utama","Hapus objek",()=>deleteElement(),!selected],
+  ];
+  const commands = [...fontCommands, ...typographyCommands, ...positionCommands, ...rotationCommands, ...opacityCommands, ...backgroundCommands, ...shapeCommands, ...coreCommands];
+  const visible = commands.filter(([group,label]) => `${group} ${label}`.toLowerCase().includes(query.toLowerCase()));
+  const groups = [...new Set(visible.map(([group]) => group))];
+  return <section className="command-center"><header><div><Command size={18}/><b>{commands.length} alat aktif</b></div><label><Search size={16}/><input value={query} onChange={(event)=>setQuery(event.target.value)} placeholder="Cari dari 323 perintah..."/></label></header><div className="command-groups">{groups.map((group)=><section key={group}><h3>{group}</h3><div>{visible.filter(([itemGroup])=>itemGroup===group).map(([_,label,run,disabled,color])=><button key={`${group}-${label}`} disabled={disabled} onClick={run}>{color&&<i style={{background:color}}/>}<span>{label}</span></button>)}</div></section>)}</div></section>;
 }
 
 function LayerPanel({ slide, selected, select, updateTextLayer, updateElement, shiftElement, removeElement, clearText, onTextTarget }) {
