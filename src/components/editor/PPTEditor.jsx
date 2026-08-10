@@ -1349,7 +1349,7 @@ function LayerPanel({ slide, selected, select, updateTextLayer, updateElement, s
             <button className="layer-main" onClick={() => select(item.id)}><span>{elements.length - order + 2}</span><div><b>{nameOf(item)}</b><small>{item.type}</small></div></button>
             <div className="layer-actions">
               <button disabled={item.locked} title={item.hidden ? "Tampilkan" : "Sembunyikan"} onClick={() => updateElement(item.id, { hidden: !item.hidden })}>{item.hidden ? <EyeOff size={14}/> : <Eye size={14}/>}</button>
-              <button className={`layer-lock-toggle ${item.locked ? "is-locked" : "is-unlocked"}`} aria-pressed={Boolean(item.locked)} title={item.locked ? "Terkunci. Klik untuk membuka kunci" : "Tidak terkunci. Klik untuk mengunci"} onClick={() => updateElement(item.id, { locked: !item.locked })}>{item.locked ? <Lock size={14}/> : <Unlock size={14}/>}<span className="sr-only">{item.locked ? "Terkunci" : "Tidak terkunci"}</span></button>
+              <button className={`layer-lock-toggle ${item.locked ? "is-locked" : "is-unlocked"}`} aria-label={item.locked ? "Buka kunci" : "Kunci"} aria-pressed={Boolean(item.locked)} title={item.locked ? "Buka kunci" : "Kunci"} onClick={() => updateElement(item.id, { locked: !item.locked })}>{item.locked ? <Lock size={14}/> : <Unlock size={14}/>}</button>
               <button title="Naik satu lapisan" disabled={sourceIndex === elements.length - 1} onClick={() => shiftElement(item.id, "up")}><ChevronUp size={14}/></button>
               <button title="Turun satu lapisan" disabled={sourceIndex === 0} onClick={() => shiftElement(item.id, "down")}><ChevronDown size={14}/></button>
               <button disabled={item.locked} className="danger" title="Hapus" onClick={() => removeElement(item.id)}><Trash2 size={14}/></button>
@@ -1362,7 +1362,7 @@ function LayerPanel({ slide, selected, select, updateTextLayer, updateElement, s
             <button className="layer-main" onClick={() => onTextTarget(layer.key)}><span>{2 - index}</span><div><b>{layer.label}</b><small>Teks utama</small></div></button>
             <div className="layer-actions">
               <button disabled={layer.box.locked} title={layer.box.hidden ? "Tampilkan" : "Sembunyikan"} onClick={() => updateTextLayer(layer.key, { hidden: !layer.box.hidden })}>{layer.box.hidden ? <EyeOff size={14}/> : <Eye size={14}/>}</button>
-              <button className={`layer-lock-toggle ${layer.box.locked ? "is-locked" : "is-unlocked"}`} aria-pressed={Boolean(layer.box.locked)} title={layer.box.locked ? "Terkunci. Klik untuk membuka kunci" : "Tidak terkunci. Klik untuk mengunci"} onClick={() => updateTextLayer(layer.key, { locked: !layer.box.locked })}>{layer.box.locked ? <Lock size={14}/> : <Unlock size={14}/>}<span className="sr-only">{layer.box.locked ? "Terkunci" : "Tidak terkunci"}</span></button>
+              <button className={`layer-lock-toggle ${layer.box.locked ? "is-locked" : "is-unlocked"}`} aria-label={layer.box.locked ? "Buka kunci" : "Kunci"} aria-pressed={Boolean(layer.box.locked)} title={layer.box.locked ? "Buka kunci" : "Kunci"} onClick={() => updateTextLayer(layer.key, { locked: !layer.box.locked })}>{layer.box.locked ? <Lock size={14}/> : <Unlock size={14}/>}</button>
               <button className="danger" title="Hapus teks" disabled={layer.empty || layer.box.locked} onClick={() => clearText(layer.key)}><Trash2 size={14}/></button>
             </div>
           </article>
