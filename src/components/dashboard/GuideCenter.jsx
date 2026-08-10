@@ -6,7 +6,7 @@ const chapters = [
   ["3", "Kuis dan Bank Soal", "Membuat soal, menyimpan ke folder, impor, ekspor, dan memakai kembali."],
   ["4", "Publikasi", "Pratinjau, QR, tautan siswa, nilai, komentar, dan sertifikat."],
   ["5", "Peserta dan laporan", "Filter, pilihan baris, penghapusan riwayat, Excel, serta PDF."],
-  ["6", "Fitur lanjutan", "Jenius AI, Galeri Kreator, Workspace, sampah, keamanan, dan pemulihan."],
+  ["6", "Fitur lanjutan", "Workspace, tempat sampah, keamanan, pemulihan, dan pengelolaan berkas."],
 ];
 
 export default function GuideCenter({ onStartTour }) {

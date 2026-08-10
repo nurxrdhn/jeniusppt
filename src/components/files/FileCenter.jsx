@@ -129,7 +129,76 @@ export async function exportPptx(material) {
           w: (element.w / 100) * size.width,
           h: (element.h / 100) * size.height,
         });
+      } else if (["video", "audio"].includes(element.type) && String(element.src || "").startsWith("data:")) {
+        const mime = String(element.src).match(/^data:([^;,]+)/)?.[1] || (element.type === "video" ? "video/mp4" : "audio/mpeg");
+        slide.addMedia({
+          type: element.type,
+          data: String(element.src).replace(/^data:/, ""),
+          extn: mime.split("/")[1]?.replace("mpeg", "mp3") || (element.type === "video" ? "mp4" : "mp3"),
+          x: (element.x / 100) * size.width,
+          y: (element.y / 100) * size.height,
+          w: (element.w / 100) * size.width,
+          h: (element.h / 100) * size.height,
+        });
+      } else if (["video", "audio"].includes(element.type) && /^https?:/i.test(element.src || "")) {
+        slide.addText(element.type === "video" ? "▶ Buka video" : "🔊 Buka audio", {
+          x: (element.x / 100) * size.width,
+          y: (element.y / 100) * size.height,
+          w: (element.w / 100) * size.width,
+          h: Math.max(0.45, (element.h / 100) * size.height),
+          color: "FFFFFF",
+          bold: true,
+          fill: { color: "172033" },
+          align: "center",
+          valign: "mid",
+          hyperlink: { url: element.src },
+        });
       }
+    }
+  }
+  const contentSlideCount = (material.slides || []).length;
+  const questions = material.questions || [];
+  questions.forEach((question, index) => {
+    const questionSlideNumber = contentSlideCount + index * 2 + 1;
+    const answerSlideNumber = questionSlideNumber + 1;
+    const isTrueFalse = question.type === "truefalse";
+    const options = isTrueFalse ? ["Benar", "Salah"] : (question.options || []);
+    const answerIndex = isTrueFalse
+      ? (question.answer === true || question.answer === "Benar" || question.answer === 0 ? 0 : 1)
+      : Number(question.answer ?? question.correctAnswer ?? 0);
+    const quizSlide = pptx.addSlide();
+    quizSlide.background = { color: "FFF7F1" };
+    quizSlide.addText(`SOAL ${index + 1} / ${questions.length}`, { x: 0.6, y: 0.35, w: 4, h: 0.35, color: "C2410C", bold: true, fontSize: 13 });
+    quizSlide.addText(`⏱ ${Math.max(5, Number(question.timer || 15))} detik`, { x: size.width - 2.5, y: 0.3, w: 1.8, h: 0.4, color: "FFFFFF", fill: { color: "E85D04" }, bold: true, align: "center", valign: "mid", margin: 0.05 });
+    quizSlide.addText(question.question || "Pertanyaan", { x: 0.75, y: 1.05, w: size.width - 1.5, h: 1.2, color: "172033", bold: true, fontSize: 25, breakLine: false, valign: "mid" });
+    options.forEach((option, optionIndex) => {
+      const columns = 2;
+      const optionWidth = (size.width - 2.05) / columns;
+      const x = 0.75 + (optionIndex % columns) * (optionWidth + 0.55);
+      const y = 2.65 + Math.floor(optionIndex / columns) * 1.25;
+      quizSlide.addText(`${isTrueFalse ? (optionIndex === 0 ? "✓" : "✕") : String.fromCharCode(65 + optionIndex)}  ${option}`, {
+        x, y, w: optionWidth, h: 0.82, color: "172033", fill: { color: "FFFFFF" },
+        line: { color: "F4A261", width: 1.2 }, radius: 0.08, bold: true, fontSize: 16,
+        valign: "mid", margin: 0.15, hyperlink: { slide: answerSlideNumber },
+      });
+    });
+    quizSlide.addNotes(`Waktu soal: ${question.timer || 15} detik. Jawaban benar: ${options[answerIndex] || "-"}.`);
+
+    const answerSlide = pptx.addSlide();
+    answerSlide.background = { color: "172033" };
+    answerSlide.addText("JAWABAN BENAR", { x: 0.8, y: 1.15, w: size.width - 1.6, h: 0.55, color: "F4A261", bold: true, fontSize: 18, align: "center" });
+    answerSlide.addText(options[answerIndex] || "Jawaban belum ditentukan", { x: 1, y: 2, w: size.width - 2, h: 1.25, color: "FFFFFF", bold: true, fontSize: 30, align: "center", valign: "mid" });
+    const nextSlide = index < questions.length - 1 ? answerSlideNumber + 1 : contentSlideCount + questions.length * 2 + 1;
+    answerSlide.addText(index < questions.length - 1 ? "Soal berikutnya →" : "Lihat hasil dan sertifikat →", { x: size.width / 2 - 1.65, y: 4.45, w: 3.3, h: 0.6, color: "FFFFFF", fill: { color: "E85D04" }, bold: true, align: "center", valign: "mid", hyperlink: { slide: nextSlide } });
+  });
+  if (questions.length) {
+    const resultSlide = pptx.addSlide();
+    resultSlide.background = { color: "FFF7F1" };
+    resultSlide.addText("Selesai", { x: 0.8, y: 1.15, w: size.width - 1.6, h: 0.8, color: "172033", bold: true, fontSize: 34, align: "center" });
+    resultSlide.addText(material.certificateEnabled ? "Nilai otomatis dan sertifikat tersedia pada versi interaktif JeniusPPT." : "Nilai otomatis tersedia pada versi interaktif JeniusPPT.", { x: 1.2, y: 2.25, w: size.width - 2.4, h: 0.8, color: "475467", fontSize: 17, align: "center" });
+    if (material.shareCode && typeof window !== "undefined") {
+      const liveUrl = `${window.location.origin}/play/${encodeURIComponent(material.shareCode)}`;
+      resultSlide.addText("Buka kuis interaktif, nilai, dan sertifikat", { x: size.width / 2 - 2.4, y: 3.55, w: 4.8, h: 0.72, color: "FFFFFF", fill: { color: "E85D04" }, bold: true, align: "center", valign: "mid", hyperlink: { url: liveUrl } });
     }
   }
   await pptx.writeFile({ fileName: `${safeName(material.title)}.pptx` });

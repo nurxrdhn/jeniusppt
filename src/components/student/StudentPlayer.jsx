@@ -24,6 +24,7 @@ export default function StudentPlayer() {
   const [picked, setPicked] = useState(null);
   const [answers, setAnswers] = useState([]);
   const [formError, setFormError] = useState("");
+  const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {
     async function load() {
@@ -48,6 +49,36 @@ export default function StudentPlayer() {
 
     load().finally(() => setLoading(false));
   }, [code]);
+
+  useEffect(() => {
+    if (mode !== "quiz" || picked !== null) return undefined;
+    const question = material?.questions?.[quizIndex];
+    const seconds = Math.max(5, Number(question?.timer || 15));
+    setTimeLeft(seconds);
+    const timer = window.setInterval(() => {
+      setTimeLeft((current) => {
+        if (current > 1) return current - 1;
+        window.clearInterval(timer);
+        setPicked((chosen) => chosen === null ? -1 : chosen);
+        setAnswers((previous) => {
+          if (previous[quizIndex]) return previous;
+          const copy = [...previous];
+          copy[quizIndex] = {
+            question: question?.question,
+            picked: -1,
+            correctAnswer: question?.type === "truefalse"
+              ? (question.answer === true || question.answer === "Benar" || question.answer === 0 ? 0 : 1)
+              : Number(question?.answer ?? question?.correctAnswer ?? 0),
+            correct: false,
+            timedOut: true,
+          };
+          return copy;
+        });
+        return 0;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [mode, quizIndex, material, picked]);
 
   if (loading) {
     return (
@@ -428,9 +459,10 @@ export default function StudentPlayer() {
     return (
       <main className="student-clean">
         <section className="student-box">
-          <small>
-            Soal {quizIndex + 1} dari {questions.length}
-          </small>
+          <div className={`quiz-timer-bar ${timeLeft <= 5 ? "ending" : ""}`}>
+            <span>Soal {quizIndex + 1} dari {questions.length}</span>
+            <b>{timeLeft} detik</b>
+          </div>
           <h1>{currentQuiz?.question}</h1>
 
           <div className="quiz-options-clean">
@@ -469,7 +501,9 @@ export default function StudentPlayer() {
 
           {picked !== null && (
             <div className="answer-info">
-              {picked === normalizeAnswer(currentQuiz) ? (
+              {picked === -1 ? (
+                <h2>⏱️ Waktu habis</h2>
+              ) : picked === normalizeAnswer(currentQuiz) ? (
                 <h2>✅ Jawaban benar</h2>
               ) : (
                 <h2>❌ Jawaban salah</h2>

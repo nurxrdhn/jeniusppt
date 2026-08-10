@@ -198,7 +198,7 @@ export default function ProductivityHub({
   const helpItems = [
     ["Membuat materi", "Buka Materi, pilih Buat Materi, lalu isi slide dan kuis."],
     ["Mempublikasikan", "Buka materi, tekan Publish, lalu bagikan tautan atau QR."],
-    ["Memakai AI", "Buka menu AI, isi topik, tingkat kelas, dan jumlah slide."],
+    ["Membuat dari kode", "Gunakan Buat dari Kode untuk menyusun slide, kuis, waktu, nilai, dan sertifikat."],
     ["Mengelola peserta", "Buka Peserta untuk melihat progres, nilai, dan laporan."],
     ["Merekam suara", "Buka Media pada editor dan izinkan akses mikrofon."],
   ].filter(([title, text]) =>
@@ -208,16 +208,9 @@ export default function ProductivityHub({
   return (
     <section className="page productivity-page">
       <div className="page-head">
-        <span className="eyebrow">Jenius Workspace</span>
-        <h1>Pusat Produktivitas</h1>
-        <p>Sepuluh alat untuk menjaga materi, desain, kolaborasi, dan keamanan.</p>
-      </div>
-      <div className="productivity-tabs">
-        {FEATURES.map(([key, Icon, label], index) => (
-          <button key={key} className={active === key ? "active" : ""} onClick={() => setActive(key)}>
-            <span>{index + 1}</span><Icon size={18}/><b>{label}</b>
-          </button>
-        ))}
+        <span className="eyebrow">{initialActive === "questions" ? "Penyimpanan Soal" : "Bantuan"}</span>
+        <h1>{initialActive === "questions" ? "Bank Soal" : "Panduan & Tutorial"}</h1>
+        <p>{initialActive === "questions" ? "Kelola dan gunakan kembali soal pembelajaran." : "Pelajari seluruh fitur JeniusPPT melalui panduan interaktif."}</p>
       </div>
 
       <div className="productivity-panel">

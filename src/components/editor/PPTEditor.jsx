@@ -249,6 +249,36 @@ export default function PPTEditor({ material, updateMaterial }) {
       ),
     );
   }
+  function cloneElements(elements = []) {
+    return elements.map((item) => ({ ...item, id: crypto.randomUUID(), style: item.style ? { ...item.style } : item.style }));
+  }
+  function applyActiveToAll(scope) {
+    if (!active || slides.length < 2) return;
+    const stylePatch = {
+      titleStyle: active.titleStyle ? { ...active.titleStyle } : undefined,
+      bodyStyle: active.bodyStyle ? { ...active.bodyStyle } : undefined,
+      titleColor: active.titleColor,
+      bodyColor: active.bodyColor,
+      textAlign: active.textAlign,
+      titleBox: active.titleBox ? { ...active.titleBox } : undefined,
+      bodyBox: active.bodyBox ? { ...active.bodyBox } : undefined,
+    };
+    const next = slides.map((slide, index) => {
+      if (index === activeIndex) return slide;
+      if (scope === "background") return { ...slide, background: { ...active.background } };
+      if (scope === "text") return { ...slide, ...stylePatch };
+      if (scope === "elements") return { ...slide, elements: cloneElements(active.elements) };
+      return {
+        ...slide,
+        ...stylePatch,
+        background: { ...active.background },
+        elements: cloneElements(active.elements),
+        transition: active.transition,
+        duration: active.duration,
+      };
+    });
+    setSlides(next);
+  }
   function addSlide() {
     const next = [
       ...slides,
@@ -745,7 +775,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           <div className="mobile-ribbon-more">
             <button
               type="button"
-              className={["file","draw","design","transition","slideshow","record","review","view","help"].includes(ribbonTab) ? "active" : ""}
+              className={["file","draw","transition","slideshow","record","review","view","help"].includes(ribbonTab) ? "active" : ""}
               aria-expanded={mobileRibbonMore}
               onClick={() => setMobileRibbonMore((value) => !value)}
             >
@@ -754,7 +784,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             </button>
             {mobileRibbonMore && (
               <div className="mobile-ribbon-menu" role="menu">
-                {[["file","Berkas"],["draw","Gambar"],["design","Desain"],["transition","Animasi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["help","Bantuan"]].map(([key,label]) => (
+                {[["file","Berkas"],["draw","Gambar"],["transition","Animasi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["help","Bantuan"]].map(([key,label]) => (
                   <button
                     key={key}
                     type="button"
@@ -770,7 +800,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           </div>
         </nav>
         <nav className="editor-ribbon-tabs" aria-label="Menu editor slide" data-tour="editor-ribbon">
-          {[["file","Berkas"],["home","Beranda"],["insert","Sisipkan"],["draw","Gambar"],["elements","Elemen"],["design","Desain"],["transition","Transisi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["help","Bantuan"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
+          {[["file","Berkas"],["home","Beranda"],["insert","Sisipkan"],["draw","Gambar"],["elements","Elemen"],["transition","Transisi"],["slideshow","Peragaan"],["record","Rekam"],["review","Tinjau"],["view","Tampilan"],["help","Bantuan"]].map(([key,label]) => <button key={key} className={ribbonTab === key ? "active" : ""} onClick={() => setRibbonTab(key)}>{label}</button>)}
         </nav>
         <div className="editor-toolbar">
           <div className="history-controls">
@@ -864,7 +894,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             <div className="word-command-group"><div><button onClick={() => addElement("shape", { text: "Garis", w: 38, h: 2, background: "#ff641e" })}><Shapes size={17}/>Garis</button><button onClick={() => addElement("shape", { text: "Panah", w: 34, h: 4, background: "#ff641e" })}><Shapes size={17}/>Panah</button><button onClick={() => addElement("text", { text: "Catatan", style: { fontFamily: "Caveat", fontSize: 34, color: "#172033" }, color: "#172033" })}><Type size={17}/>Tulis</button></div><small>Alat gambar</small></div>
             <div className="word-command-group"><div><button onClick={() => setShowStickers(true)}><Sticker size={17}/>Stiker</button><button onClick={() => imageRef.current?.click()}><ImagePlus size={17}/>Gambar</button></div><small>Tambahkan</small></div>
           </div>}
-          {ribbonTab === "design" && <div className="desktop-editor-tools ribbon-group design-background-tools"><div className="background-tool-group"><span className="ribbon-label">Latar slide</span><label className="slide-background-color" title="Pilih warna latar"><input type="color" value={bg.type === "css" && /^#[0-9a-f]{6}$/i.test(bg.value) ? bg.value : "#ff641e"} onChange={(event) => updateSlide({ background: { type: "css", value: event.target.value } })}/><span>Warna</span></label><button onClick={() => backgroundRef.current?.click()}><ImagePlus size={16}/>Dari Folder</button><input ref={backgroundRef} hidden type="file" accept="image/*" onChange={uploadBackground}/></div><span className="ribbon-label">Ukuran slide</span><SolidSelect
+          {ribbonTab === "home" && <div className="desktop-editor-tools ribbon-group design-background-tools"><div className="background-tool-group"><span className="ribbon-label">Latar slide</span><label className="slide-background-color" title="Pilih warna latar"><input type="color" value={bg.type === "css" && /^#[0-9a-f]{6}$/i.test(bg.value) ? bg.value : "#ff641e"} onChange={(event) => updateSlide({ background: { type: "css", value: event.target.value } })}/><span>Warna</span></label><button onClick={() => backgroundRef.current?.click()}><ImagePlus size={16}/>Dari Folder</button><input ref={backgroundRef} hidden type="file" accept="image/*" onChange={uploadBackground}/></div><span className="ribbon-label">Ukuran slide</span><SolidSelect
             value={
               Object.keys(SLIDE_SIZES).find(
                 (key) => SLIDE_SIZES[key].label === slideSize.label,
@@ -878,7 +908,7 @@ export default function PPTEditor({ material, updateMaterial }) {
               </option>
             ))}
           </SolidSelect>
-          <button onClick={swapOrientation}>Putar</button></div>}
+          <button onClick={swapOrientation}>Putar</button><span className="ribbon-label">Terapkan ke semua</span><SolidSelect value="" aria-label="Terapkan perubahan ke semua slide" onChange={(event) => applyActiveToAll(event.target.value)}><option value="">Pilih bagian</option><option value="background">Latar slide</option><option value="text">Font, warna &amp; posisi teks</option><option value="elements">Elemen &amp; media</option><option value="all">Semua tampilan</option></SolidSelect></div>}
           {ribbonTab === "transition" && <div className="desktop-editor-tools ribbon-group"><span className="ribbon-label">Animasi</span><SolidSelect value={active?.transition || "fade"} onChange={(e) => updateSlide({ transition: e.target.value })}>{animations.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</SolidSelect><span className="ribbon-label">Durasi</span><SolidSelect value={active?.duration || 700} onChange={(e) => updateSlide({ duration: Number(e.target.value) })}><option value={400}>Cepat</option><option value={700}>Normal</option><option value={1100}>Lembut</option><option value={1600}>Dramatis</option></SolidSelect></div>}
           {ribbonTab === "view" && <div className="desktop-editor-tools ribbon-group word-command-strip">
             <div className="word-command-group"><div><button className={mobileSheet === "layers" ? "active" : ""} onClick={() => setMobileSheet((value) => value === "layers" ? null : "layers")}><Layers3 size={17}/>{mobileSheet === "layers" ? "Tutup lapisan" : "Lapisan"}</button><button onClick={() => setMobileSheet((value) => value === "settings" ? null : "settings")}><Settings2 size={17}/>Properti</button></div><small>Panel editor</small></div>

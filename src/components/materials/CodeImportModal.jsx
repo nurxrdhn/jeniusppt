@@ -5,6 +5,11 @@ const sampleCode = `export default {
   title: "Presiden Indonesia",
   subject: "PPKN",
   className: "XI",
+  passingScore: 75,
+  certificateEnabled: true,
+  certificateTitle: "SERTIFIKAT PENYELESAIAN",
+  certificateIssuer: "Nama Sekolah",
+  certificateSigner: "Nama Guru",
 
   slides: [
     {
@@ -22,12 +27,16 @@ const sampleCode = `export default {
       type: "pg",
       question: "Siapa presiden pertama Indonesia?",
       options: ["Soekarno", "Soeharto", "Habibie", "Megawati"],
-      answer: 0
+      answer: 0,
+      timer: 20,
+      points: 1000
     },
     {
       type: "truefalse",
       question: "Presiden dipilih melalui pemilu.",
-      answer: true
+      answer: true,
+      timer: 15,
+      points: 1000
     }
   ]
 }`;
@@ -56,22 +65,38 @@ export default function CodeImportModal({ onClose, onImport, notify }) {
         className: data.className || data.kelas || "Kelas",
         slideSize: data.slideSize || SLIDE_SIZES.wide,
         slides: (data.slides || []).map((slide) => ({
+          ...slide,
           title: slide.title || "Slide",
           body: slide.body || slide.text || "Mulai mengetik...",
           background: slide.background || {
             type: "css",
             value: "#1d4ed8",
           },
+          elements: Array.isArray(slide.elements) ? slide.elements.map((item) => ({ ...item, id: item.id || crypto.randomUUID() })) : [],
         })),
         questions: (data.questions || data.quiz || []).map((q) => ({
           type: q.type === "bs" ? "truefalse" : q.type || "pg",
           question: q.question,
           options: q.options || ["Benar", "Salah"],
           answer: q.answer,
-          timer: q.timer || 15,
-          points: q.points || 1000,
+          timer: Math.max(5, Number(q.timer || 15)),
+          points: Number(q.points ?? 1000),
         })),
+        passingScore: Number(data.passingScore ?? data.nilaiMinimum ?? 75),
+        certificateEnabled: Boolean(data.certificateEnabled ?? data.sertifikat ?? false),
+        certificateTitle: data.certificateTitle || "SERTIFIKAT PENYELESAIAN",
+        certificateIssuer: data.certificateIssuer || data.penerbit || "JeniusPPT.online",
+        certificateSigner: data.certificateSigner || data.penandatangan || "Guru / Pengajar",
+        certificateDescription: data.certificateDescription || "Telah menyelesaikan materi dan evaluasi pembelajaran",
+        successMessage: data.successMessage || "Lulus dengan hasil sangat baik",
+        equalMessage: data.equalMessage || "Lulus sesuai nilai minimum",
+        failMessage: data.failMessage || "Belum memenuhi nilai minimum",
       };
+
+      if (!material.slides.length) throw new Error("Kode harus memiliki minimal satu slide.");
+      if (material.questions.some((q) => !q.question || (q.type === "pg" && (!Array.isArray(q.options) || q.options.length < 2)))) {
+        throw new Error("Struktur soal belum lengkap.");
+      }
 
       onImport(material);
       onClose();

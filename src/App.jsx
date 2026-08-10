@@ -39,8 +39,6 @@ import { translateVisiblePage } from "./services/translationService";
 import { auth } from "./firebase/config";
 import { signOut } from "firebase/auth";
 import {
-  SubscriptionPage,
-  CreatorMarketplace,
   TemplateRecommendations,
   TrashPage,
 } from "./components/dashboard/FeaturePages";
@@ -668,18 +666,12 @@ export default function App() {
           ? "Peserta"
           : page === "files"
             ? "Impor & Ekspor"
-            : page === "subscription"
-              ? "Langganan"
-              : page === "feedback"
+            : page === "feedback"
                 ? "Saran & Kritik"
-                : page === "productivity"
-                ? "Pusat Produktivitas"
                 : page === "question_bank"
                   ? "Bank Soal"
                   : page === "guide"
                   ? "Panduan & Tutorial"
-                  : page === "creator_market"
-                    ? "Galeri Kreator"
               : page === "trash"
                 ? "Tempat Sampah"
                 : "JeniusPPT";
@@ -773,25 +765,9 @@ export default function App() {
 
         {page === "analytics" && <Analytics state={state} />}
 
-        {page === "ai" && (
-          <AIAssistant onGenerated={createMaterialFromCode} notify={notify} />
-        )}
-
         {page === "feedback" && (
           <FeedbackPage user={user} notify={notify} />
         )}
-
-        {page === "productivity" && (
-          <ProductivityHub
-            state={state}
-            setState={setState}
-            user={user}
-            notify={notify}
-            onNavigate={setPage}
-            onStartTour={() => setShowTour(true)}
-          />
-        )}
-
 
         {page === "question_bank" && (
           <ProductivityHub state={state} setState={setState} user={user} notify={notify} onNavigate={setPage} initialActive="questions" onStartTour={() => setShowTour(true)} />
@@ -800,8 +776,6 @@ export default function App() {
         {page === "guide" && (
           <ProductivityHub state={state} setState={setState} user={user} notify={notify} onNavigate={setPage} initialActive="help" onStartTour={() => setShowTour(true)} />
         )}
-
-        {page === "creator_market" && <CreatorMarketplace user={user} notify={notify} />}
 
         {page === "settings" && (
           <SettingsPage
@@ -824,21 +798,6 @@ export default function App() {
           />
         )}
 
-        {page === "subscription" && (
-          <SubscriptionPage
-            activePlan={state.activePlan}
-            onChoose={(plan) => {
-              setState((old) => ({ ...old, activePlan: plan.name }));
-              notify(`Paket ${plan.name} dipilih.`);
-              addNotification(
-                "Paket langganan diperbarui",
-                `${plan.name} • Rp${plan.price}`,
-                "👑",
-              );
-            }}
-          />
-        )}
-
         {page === "trash" && (
           <TrashPage
             items={state.trash || []}
@@ -854,14 +813,10 @@ export default function App() {
           "files",
           "workspace",
           "analytics",
-          "ai",
           "feedback",
-          "productivity",
           "settings",
-          "subscription",
           "trash",
           "question_bank",
-          "creator_market",
           "guide",
         ].includes(page) && <ComingSoon title={title} />}
       </main>
@@ -951,15 +906,6 @@ function Dashboard({
           value="2"
         />
       </div>
-      <button className="dashboard-ai" onClick={() => onNavigate("ai")}>
-        <span>JP AI</span>
-        <div>
-          <b>Buat PPT dengan Jenius AI</b>
-          <p>Susun materi, desain slide, dan kuis dari satu instruksi.</p>
-        </div>
-        <strong>Mulai →</strong>
-      </button>
-
       <div className="feature-grid">
         <Feature
           title="Ukuran Fleksibel"

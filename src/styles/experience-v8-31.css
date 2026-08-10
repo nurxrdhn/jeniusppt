@@ -1,0 +1,38 @@
+.quiz-timer-bar {
+  width: 100%;
+  min-height: 42px;
+  margin-bottom: 14px;
+  padding: 7px 10px 7px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+  background: #fff7ed;
+  color: #7c2d12;
+  font-weight: 800;
+}
+.quiz-timer-bar b {
+  min-width: 92px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: #ea580c;
+  color: #fff;
+  text-align: center;
+}
+.quiz-timer-bar.ending b { background: #dc2626; }
+.quiz-timer-bar.editor-preview { margin: 0 0 12px; }
+html[data-theme="dark"] .quiz-timer-bar {
+  border-color: #7c2d12;
+  background: #2d211b;
+  color: #fed7aa;
+}
+.ppt-editor .editor-toolbar:has(+ .desktop-ribbon-content) .design-background-tools {
+  flex: 1 1 100%;
+}
+@media (max-width: 760px) {
+  .quiz-timer-bar { min-height: 38px; margin-bottom: 9px; font-size: 11px; }
+  .quiz-timer-bar b { min-width: 76px; padding: 6px 8px; }
+  .ppt-editor .design-background-tools { width: 100%; overflow-x: auto; flex-wrap: nowrap !important; }
+}

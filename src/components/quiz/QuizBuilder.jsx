@@ -145,6 +145,10 @@ export default function QuizBuilder({ material, updateMaterial }) {
           </button>
         </div>
         <section className="quiz-canvas">
+          <div className="quiz-timer-bar editor-preview">
+            <span>Soal {activeIndex + 1} dari {questions.length}</span>
+            <b>⏱ {q?.timer || 15} detik</b>
+          </div>
           <textarea
             value={q?.question || ""}
             onChange={(e) => updateQuestion({ question: e.target.value })}

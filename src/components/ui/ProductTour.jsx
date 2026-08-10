@@ -3,7 +3,6 @@ import { useEffect, useLayoutEffect, useState } from "react";
 
 const steps = [
   { target: '[data-tour="menu-dashboard"]', title: "Dashboard", text: "Mulai dari sini untuk melihat ringkasan materi, peserta, dan aktivitas terbaru." },
-  { target: '[data-tour="menu-ai"]', title: "Jenius AI", text: "Tuliskan topik, jenjang, dan jumlah slide. AI akan membuat rancangan yang tetap dapat diedit." },
   { target: '[data-tour="menu-workspace"]', title: "Workspace", text: "Kelola folder, file, materi, dan pekerjaan yang sedang berjalan dalam satu tempat." },
   { target: '[data-tour="menu-materials"]', title: "Materi dan editor", text: "Buat presentasi, atur font, sisipkan media, tambah kuis, pratinjau, lalu publikasikan." },
   { target: '[data-tour="menu-participants"]', title: "Peserta", text: "Pantau progres dan nilai, gunakan filter, lalu ekspor laporan atau hapus riwayat yang dipilih." },
