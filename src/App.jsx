@@ -995,7 +995,7 @@ function Materials({
   openParticipants,
 }) {
   return (
-    <section className="page">
+    <section className="page materials-page">
       <div className="page-head">
         <span className="eyebrow">Materi</span>
         <h1>Semua Materi</h1>

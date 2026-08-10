@@ -1,0 +1,8 @@
+/* Target khusus kartu halaman Materi desktop. */
+@media (min-width:761px){
+  body .app-shell .main-area .materials-page>.material-grid{display:grid!important;grid-template-columns:1fr!important;width:520px!important;max-width:calc(100% - 24px)!important;margin:0 auto 20px 0!important;gap:10px!important}
+  body .app-shell .main-area .materials-page>.material-grid>.material-card{box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:520px!important;padding:12px!important;border-radius:14px!important}
+  .materials-page .material-state-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+  .materials-page .material-card .material-meta{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .materials-page .material-card .publish-state .card-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
