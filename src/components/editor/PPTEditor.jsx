@@ -1220,9 +1220,16 @@ export default function PPTEditor({ material, updateMaterial }) {
                   <label>Warna</label>
                   <input
                     type="color"
-                    value={selected.color || "#ffffff"}
+                    value={selected.style?.color || selected.color || "#ffffff"}
                     onChange={(e) =>
-                      updateElement(selected.id, { color: e.target.value })
+                      updateElement(selected.id, {
+                        color: e.target.value,
+                        style: {
+                          ...(selected.style || {}),
+                          color: e.target.value,
+                          gradientEnabled: false,
+                        },
+                      })
                     }
                   />
                 </>

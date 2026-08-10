@@ -135,8 +135,15 @@ export function loadWebFont(name) {
 }
 
 export function textStyle(style = {}, fallbackColor = "#ffffff") {
+  const resolvedFont = `"${style.fontFamily || "Arial"}",sans-serif`;
+  const resolvedColor = style.gradientEnabled
+    ? "transparent"
+    : style.color || fallbackColor;
   const result = {
-    fontFamily: `"${style.fontFamily || "Arial"}",sans-serif`,
+    fontFamily: resolvedFont,
+    color: resolvedColor,
+    "--jp-slide-font": resolvedFont,
+    "--jp-slide-color": resolvedColor,
     fontSize: `${style.fontSize || 32}px`,
     fontWeight: style.bold ? 700 : style.fontWeight || 400,
     fontStyle: style.italic ? "italic" : "normal",
@@ -153,6 +160,6 @@ export function textStyle(style = {}, fallbackColor = "#ffffff") {
     result.backgroundClip = "text";
     result.WebkitBackgroundClip = "text";
     result.color = "transparent";
-  } else result.color = style.color || fallbackColor;
+  }
   return result;
 }

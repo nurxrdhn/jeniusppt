@@ -1,0 +1,19 @@
+/* Keep the user's slide typography above global application theme rules. */
+.ppt-editor .slide-canvas .slide-title-input,
+.ppt-editor .slide-canvas .slide-body-input,
+.slide-canvas .positioned-title,
+.slide-canvas .positioned-body,
+.slide-canvas .free-element.text {
+  font-family: var(--jp-slide-font, Arial, sans-serif) !important;
+  color: var(--jp-slide-color, #ffffff) !important;
+}
+
+html[data-theme="dark"] .ppt-editor .slide-canvas .slide-title-input,
+html[data-theme="dark"] .ppt-editor .slide-canvas .slide-body-input,
+html[data-theme="dark"] .slide-canvas .positioned-title,
+html[data-theme="dark"] .slide-canvas .positioned-body,
+html[data-theme="dark"] .slide-canvas .free-element.text {
+  font-family: var(--jp-slide-font, Arial, sans-serif) !important;
+  color: var(--jp-slide-color, #ffffff) !important;
+}
+
