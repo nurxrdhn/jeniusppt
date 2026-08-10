@@ -1,0 +1,18 @@
+/* Kartu Materi desktop lebih ringkas. Mobile dipertahankan. */
+@media (min-width:761px){
+  .page>.material-grid{width:min(100%,580px)!important;max-width:580px!important;gap:12px!important}
+  .page>.material-grid .material-card{padding:14px!important;border-radius:15px!important}
+  .page>.material-grid .material-card>.badge{padding:6px 9px!important;font-size:10px!important}
+  .page>.material-grid .material-card>h2{margin:7px 0 4px!important;font-size:19px!important;line-height:1.2!important}
+  .page>.material-grid .material-card>p{margin:0 0 11px!important;font-size:12px!important}
+  .page>.material-grid .material-meta{gap:7px!important;margin-bottom:11px!important}
+  .page>.material-grid .material-meta span{min-height:30px!important;padding:6px 9px!important;border-radius:10px!important;font-size:9px!important}
+  .page>.material-grid .material-state-grid{gap:7px!important}
+  .page>.material-grid .material-state{padding:9px!important;border-radius:11px!important}
+  .page>.material-grid .material-state header{margin-bottom:7px!important}
+  .page>.material-grid .material-state header span{font-size:8px!important}
+  .page>.material-grid .material-state header small{font-size:7px!important}
+  .page>.material-grid .card-actions{gap:5px!important}
+  .page>.material-grid .card-actions button,.page>.material-grid .card-actions a{min-height:32px!important;padding:5px 6px!important;border-radius:8px!important;font-size:9px!important}
+  .page>.material-grid .material-delete{min-height:30px!important;margin-top:8px!important;padding:5px 9px!important;font-size:8px!important}
+}
