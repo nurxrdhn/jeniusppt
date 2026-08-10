@@ -1,0 +1,14 @@
+/* Kartu Materi desktop kecil, seragam, dan rata tengah. */
+@media (min-width:761px){
+  body .app-shell .main-area .materials-page>.material-grid{width:470px!important;max-width:calc(100% - 24px)!important;margin:0 auto 20px!important;justify-items:stretch!important}
+  body .app-shell .main-area .materials-page>.material-grid>.material-card{width:470px!important;max-width:100%!important;min-height:236px!important;margin:0!important;padding:11px!important}
+  .materials-page .material-card>h2{font-size:17px!important;margin:6px 0 3px!important}
+  .materials-page .material-card>p{font-size:11px!important;margin-bottom:9px!important}
+  .materials-page .material-meta{margin-bottom:9px!important}
+  .materials-page .material-meta span{min-height:27px!important;padding:5px 7px!important}
+  .materials-page .material-state{padding:7px!important}
+  .materials-page .material-state header{margin-bottom:5px!important}
+  .materials-page .card-actions button,.materials-page .card-actions a{min-height:29px!important;padding:4px!important;font-size:8px!important}
+  .materials-page .card-actions svg{width:13px!important;height:13px!important}
+  .materials-page .material-delete{min-height:27px!important;margin-top:7px!important}
+}

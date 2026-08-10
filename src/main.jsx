@@ -23,6 +23,7 @@ import "./styles/experience-v8-19.css";
 import "./styles/experience-v8-20.css";
 import "./styles/experience-v8-23.css";
 import "./styles/experience-v8-24.css";
+import "./styles/experience-v8-25.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
