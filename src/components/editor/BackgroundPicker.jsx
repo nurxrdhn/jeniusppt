@@ -227,6 +227,10 @@ export default function BackgroundPicker({ onPick, onTemplate, onApplyAll }) {
         Terapkan “{selected.name}” ke Semua Slide
       </button>
       <h3 className="custom-bg-title">Latar Kustom</h3>
+      <label className="custom-background-color">
+        <span>Warna solid</span>
+        <input type="color" defaultValue="#ff641e" onChange={(event) => onPick({ type: "css", value: event.target.value })} />
+      </label>
       <button className="upload-bg" onClick={() => ref.current.click()}>
         Upload Gambar
       </button>

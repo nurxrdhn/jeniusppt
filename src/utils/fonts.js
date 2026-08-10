@@ -145,6 +145,8 @@ export function textStyle(style = {}, fallbackColor = "#ffffff") {
     lineHeight: style.lineHeight || 1.2,
     letterSpacing: `${style.letterSpacing || 0}px`,
     textTransform: style.textTransform || "none",
+    fontVariantNumeric: "normal",
+    fontFeatureSettings: "normal",
   };
   if (style.gradientEnabled) {
     result.backgroundImage = `linear-gradient(${style.gradientAngle || 90}deg,${style.gradientFrom || "#f97316"},${style.gradientTo || "#facc15"})`;

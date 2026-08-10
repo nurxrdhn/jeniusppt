@@ -115,6 +115,7 @@ export default function PPTEditor({ material, updateMaterial }) {
   });
   const [savedAt, setSavedAt] = useState(material.lastSavedAt || null);
   const imageRef = useRef(null);
+  const backgroundRef = useRef(null);
   const stickerRef = useRef(null);
   const videoRef = useRef(null);
   const audioRef = useRef(null);
@@ -376,6 +377,16 @@ export default function PPTEditor({ material, updateMaterial }) {
     const reader = new FileReader();
     reader.onload = () =>
       addElement("image", { src: reader.result, w: 28, h: 30 });
+    reader.readAsDataURL(file);
+    event.target.value = "";
+  }
+  function uploadBackground(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => updateSlide({
+      background: { type: "image", value: reader.result, fileName: file.name },
+    });
     reader.readAsDataURL(file);
     event.target.value = "";
   }
@@ -675,7 +686,7 @@ export default function PPTEditor({ material, updateMaterial }) {
     ...ratioStyle(slideSize),
     "--slide-ratio": `${slideSize.width} / ${slideSize.height}`,
     ...(bg.type === "image"
-      ? { backgroundImage: `url(${bg.value})` }
+      ? { backgroundImage: `url(${bg.value})`, backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }
       : { background: bg.value }),
     textAlign: active?.textAlign || "left",
   };
@@ -686,30 +697,34 @@ export default function PPTEditor({ material, updateMaterial }) {
   const layerZ = (id) => 20 + layerOrder.indexOf(id);
   const currentTextStyle =
     textTarget === "title"
-      ? active?.titleStyle || {
+      ? {
           fontFamily: "Arial",
           fontSize: 62,
           bold: true,
-          color: active?.titleColor || "#ffffff",
+          ...(active?.titleStyle || {}),
+          color: active?.titleStyle?.color || active?.titleColor || "#ffffff",
         }
       : textTarget === "body"
-        ? active?.bodyStyle || {
+        ? {
             fontFamily: "Arial",
             fontSize: 30,
-            color: active?.bodyColor || "#fff7ed",
             lineHeight: 1.5,
+            ...(active?.bodyStyle || {}),
+            color: active?.bodyStyle?.color || active?.bodyColor || "#fff7ed",
           }
-        : selected?.style || {
+        : {
             fontFamily: "Arial",
             fontSize: 32,
             bold: true,
-            color: selected?.color || "#ffffff",
+            ...(selected?.style || {}),
+            color: selected?.style?.color || selected?.color || "#ffffff",
           };
   function updateTextStyle(next) {
-    if (textTarget === "title" && !titleBox.locked) updateSlide({ titleStyle: next });
-    else if (textTarget === "body" && !bodyBox.locked) updateSlide({ bodyStyle: next });
+    if (next.fontFamily) loadWebFont(next.fontFamily);
+    if (textTarget === "title" && !titleBox.locked) updateSlide({ titleStyle: next, titleColor: next.color || active?.titleColor });
+    else if (textTarget === "body" && !bodyBox.locked) updateSlide({ bodyStyle: next, bodyColor: next.color || active?.bodyColor });
     else if (selected?.type === "text")
-      updateElement(selected.id, { style: next });
+      updateElement(selected.id, { style: next, color: next.color || selected.color });
   }
   return (
     <div className="ppt-editor">
@@ -849,7 +864,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             <div className="word-command-group"><div><button onClick={() => addElement("shape", { text: "Garis", w: 38, h: 2, background: "#ff641e" })}><Shapes size={17}/>Garis</button><button onClick={() => addElement("shape", { text: "Panah", w: 34, h: 4, background: "#ff641e" })}><Shapes size={17}/>Panah</button><button onClick={() => addElement("text", { text: "Catatan", style: { fontFamily: "Caveat", fontSize: 34, color: "#172033" }, color: "#172033" })}><Type size={17}/>Tulis</button></div><small>Alat gambar</small></div>
             <div className="word-command-group"><div><button onClick={() => setShowStickers(true)}><Sticker size={17}/>Stiker</button><button onClick={() => imageRef.current?.click()}><ImagePlus size={17}/>Gambar</button></div><small>Tambahkan</small></div>
           </div>}
-          {ribbonTab === "design" && <div className="desktop-editor-tools ribbon-group"><span className="ribbon-label">Ukuran slide</span><SolidSelect
+          {ribbonTab === "design" && <div className="desktop-editor-tools ribbon-group design-background-tools"><div className="background-tool-group"><span className="ribbon-label">Latar slide</span><label className="slide-background-color" title="Pilih warna latar"><input type="color" value={bg.type === "css" && /^#[0-9a-f]{6}$/i.test(bg.value) ? bg.value : "#ff641e"} onChange={(event) => updateSlide({ background: { type: "css", value: event.target.value } })}/><span>Warna</span></label><button onClick={() => backgroundRef.current?.click()}><ImagePlus size={16}/>Dari Folder</button><input ref={backgroundRef} hidden type="file" accept="image/*" onChange={uploadBackground}/></div><span className="ribbon-label">Ukuran slide</span><SolidSelect
             value={
               Object.keys(SLIDE_SIZES).find(
                 (key) => SLIDE_SIZES[key].label === slideSize.label,
