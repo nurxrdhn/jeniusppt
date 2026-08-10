@@ -1,0 +1,11 @@
+/* Dua kartu desktop rata kiri dan teks tombol tetap utuh. */
+@media (min-width:1100px){
+  body .app-shell .main-area .materials-page>.material-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important;max-width:1040px!important;margin:0 auto 22px 0!important;gap:14px!important;justify-content:start!important}
+  body .app-shell .main-area .materials-page>.material-grid>.material-card{width:100%!important;max-width:none!important;min-width:0!important}
+  body .app-shell .main-area .materials-page>.material-grid>.material-card:last-child:nth-child(odd){grid-column:auto!important;justify-self:stretch!important}
+  .materials-page .material-state-grid{grid-template-columns:minmax(0,42%) minmax(0,58%)!important;gap:7px!important}
+  .materials-page .material-state{min-width:0!important}
+  .materials-page .card-actions button,.materials-page .card-actions a{min-width:0!important;white-space:nowrap!important;word-break:normal!important;overflow:hidden!important;text-overflow:ellipsis!important;padding-inline:5px!important}
+  .materials-page .publish-state .card-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .materials-page .material-state header small{max-width:58%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
