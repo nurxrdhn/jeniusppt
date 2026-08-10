@@ -37,6 +37,7 @@ import ProductTour from "./components/ui/ProductTour";
 import ProductivityHub from "./components/dashboard/ProductivityHub";
 import { translateVisiblePage } from "./services/translationService";
 import { auth } from "./firebase/config";
+import { signOut } from "firebase/auth";
 import {
   SubscriptionPage,
   CreatorMarketplace,
@@ -592,6 +593,28 @@ export default function App() {
     );
   }
 
+  async function logout() {
+    const approved = await jeniusConfirm({
+      title: "Keluar dari JeniusPPT?",
+      message: "Sesi akun akan ditutup. Materi yang sudah tersimpan tetap aman.",
+      confirmLabel: "Ya, keluar",
+      danger: true,
+    });
+    if (!approved) return;
+    try {
+      await signOut(auth);
+      sessionStorage.removeItem("jeniusppt-auth-session");
+      setEditingId(null);
+      setShareMaterial(null);
+      setPostPublishMaterial(null);
+      setSidebarOpen(false);
+      setPage("dashboard");
+      setUser(null);
+    } catch (error) {
+      notify(error?.message || "Akun gagal dikeluarkan. Silakan coba kembali.", "error");
+    }
+  }
+
   if (!user) {
     return <OpeningLogin onLogin={setUser} />;
   }
@@ -606,7 +629,7 @@ export default function App() {
             setEditingId(null);
             setPage(nextPage);
           }}
-          onLogout={() => setUser(null)}
+          onLogout={logout}
           open={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />
@@ -670,7 +693,7 @@ export default function App() {
         user={user}
         page={page}
         setPage={setPage}
-        onLogout={() => setUser(null)}
+        onLogout={logout}
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
