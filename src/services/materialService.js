@@ -14,8 +14,30 @@ const clean = (value) => {
   return value;
 };
 
-async function uploadLocalAssets(material) {
+const withTimeout = (promise, timeoutMs, message) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(message)), timeoutMs),
+    ),
+  ]);
+
+async function uploadLocalAssets(material, onProgress) {
   const copy = clean(material);
+  const localAssetCount = (copy.slides || []).reduce((total, slide) => {
+    const background = slide.background?.type === "image" &&
+      String(slide.background.value || "").startsWith("data:") ? 1 : 0;
+    const elements = (slide.elements || []).filter((element) =>
+      String(element.src || "").startsWith("data:"),
+    ).length;
+    return total + background + elements;
+  }, 0);
+  let uploaded = 0;
+  const assetDone = () => {
+    uploaded += 1;
+    onProgress?.({ stage: "upload", current: uploaded, total: localAssetCount });
+  };
+  onProgress?.({ stage: "prepare", current: 0, total: localAssetCount });
   copy.slides = await Promise.all(
     (copy.slides || []).map(async (slide, slideIndex) => {
       const next = { ...slide };
@@ -31,19 +53,24 @@ async function uploadLocalAssets(material) {
             `background-${slideIndex + 1}`,
           ),
         };
+      if (
+        slide.background?.type === "image" &&
+        String(slide.background.value || "").startsWith("data:")
+      ) assetDone();
       next.elements = await Promise.all(
-        (next.elements || []).map(async (element, index) =>
-          String(element.src || "").startsWith("data:")
-            ? {
+        (next.elements || []).map(async (element, index) => {
+          if (!String(element.src || "").startsWith("data:")) return element;
+          const uploadedElement = {
                 ...element,
                 src: await uploadDataAsset(
                   element.src,
                   copy.id,
                   `slide-${slideIndex + 1}-element-${index + 1}`,
                 ),
-              }
-            : element,
-        ),
+              };
+          assetDone();
+          return uploadedElement;
+        }),
       );
       return next;
     }),
@@ -51,15 +78,25 @@ async function uploadLocalAssets(material) {
   return copy;
 }
 
-export async function publishMaterialToFirestore(material) {
-  const prepared = await uploadLocalAssets(material);
+export async function publishMaterialToFirestore(material, onProgress) {
+  const prepared = await withTimeout(
+    uploadLocalAssets(material, onProgress),
+    70000,
+    "Unggahan media terlalu lama. Periksa koneksi atau kecilkan ukuran media.",
+  );
   const data = {
     ...prepared,
     status: "Published",
     publishedAt: serverTimestamp(),
   };
 
-  await setDoc(doc(db, "publishedMaterials", material.shareCode), data);
+  onProgress?.({ stage: "save" });
+  await withTimeout(
+    setDoc(doc(db, "publishedMaterials", material.shareCode), data),
+    20000,
+    "Firebase tidak merespons dalam 20 detik. Silakan coba kembali.",
+  );
+  onProgress?.({ stage: "done" });
   return prepared;
 }
 

@@ -419,7 +419,7 @@ export default function App() {
     return updated;
   }
 
-  async function openShare(material) {
+  async function openShare(material, onProgress) {
     const instant = {
       ...material,
       status: "Published",
@@ -427,7 +427,7 @@ export default function App() {
     };
 
     try {
-      const online = await publishMaterialToFirestore(instant);
+      const online = await publishMaterialToFirestore(instant, onProgress);
       localStorage.setItem(
         `jeniusppt_package_${instant.shareCode}`,
         JSON.stringify(online),
@@ -448,7 +448,12 @@ export default function App() {
       return online;
     } catch (err) {
       console.error(err);
-      notify("Publikasi daring gagal. Link belum dapat dibuka di HP.", "error");
+      const message = err?.code === "storage/unauthorized"
+        ? "Firebase Storage menolak unggahan. Periksa aturan Storage."
+        : err?.code === "permission-denied"
+          ? "Firestore menolak publikasi. Periksa aturan publishedMaterials."
+          : err?.message || "Publikasi daring gagal. Link belum dapat dibuka di HP.";
+      notify(message, "error", "Publish gagal");
       return null;
     }
   }

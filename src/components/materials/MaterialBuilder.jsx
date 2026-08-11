@@ -16,6 +16,7 @@ export default function MaterialBuilder({
 }) {
   const [tab, setTab] = useState("Info");
   const [busy, setBusy] = useState(false);
+  const [publishStatus, setPublishStatus] = useState("");
   const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
 
   async function publish() {
@@ -23,9 +24,16 @@ export default function MaterialBuilder({
 
     try {
       setBusy(true);
-      await openShare(material);
+      setPublishStatus("Menyiapkan materi...");
+      await openShare(material, ({ stage, current, total }) => {
+        if (stage === "prepare") setPublishStatus(total ? `Menyiapkan ${total} media...` : "Menyiapkan materi...");
+        if (stage === "upload") setPublishStatus(`Mengunggah media ${current}/${total}...`);
+        if (stage === "save") setPublishStatus("Menerbitkan link...");
+        if (stage === "done") setPublishStatus("Publish selesai");
+      });
     } finally {
       setBusy(false);
+      setPublishStatus("");
     }
   }
 
@@ -79,7 +87,7 @@ export default function MaterialBuilder({
 
         <button className="primary-button" onClick={publish} disabled={busy}>
           <Share2 size={17} />
-          {busy ? "Publishing..." : "Publish"}
+          {busy ? publishStatus || "Publishing..." : "Publish"}
         </button>
       </div>
 
@@ -335,7 +343,7 @@ export default function MaterialBuilder({
 
           <button className="primary-button" onClick={publish} disabled={busy}>
             <Share2 size={17} />
-            {busy ? "Publishing..." : "QR & Link"}
+            {busy ? publishStatus || "Publishing..." : "QR & Link"}
           </button>
         </div>
       )}
