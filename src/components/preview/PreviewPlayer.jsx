@@ -1,15 +1,15 @@
 import { useMemo, useState } from "react";
 import { SLIDE_SIZES, ratioStyle } from "../../utils/slideSizes";
 import MediaPlayer from "../ui/MediaPlayer";
-import { textStyle } from "../../utils/fonts";
+import { scaledTextStyle } from "../../utils/fonts";
 
-function SlideElements({ elements }) {
+function SlideElements({ elements, sourceWidth }) {
   return (
     <div className="free-elements-layer preview-elements">
-      {elements.map((item) => item.hidden ? null : (
+      {elements.map((item, layerIndex) => item.hidden ? null : (
         <div
           key={item.id}
-          className={`free-element ${item.type}`}
+          className={`free-element ${item.type} ${item.kind || ""}`}
           style={{
             left: `${item.x}%`,
             top: `${item.y}%`,
@@ -17,19 +17,25 @@ function SlideElements({ elements }) {
             height: `${item.h}%`,
             color: item.color,
             background: item.type === "shape" ? item.background : "transparent",
+            transform: `rotate(${item.rotation || 0}deg)`,
+            opacity: item.opacity ?? 1,
+            zIndex: 20 + layerIndex,
             ...(item.type === "text"
-              ? textStyle(
+              ? scaledTextStyle(
                   item.style || {
                     color: item.color || "#fff",
                     fontSize: 32,
                     bold: true,
                   },
-                  item.color || "#fff",
+                  item.color || "#fff", sourceWidth,
                 )
               : {}),
           }}
         >
           {item.type === "text" && item.text}
+          {item.type === "shape" && item.kind === "table" && <span className="element-table">{Array.from({ length: 9 }).map((_, index) => <i key={index} />)}</span>}
+          {item.type === "shape" && item.kind === "chart" && <span className="element-chart"><i/><i/><i/><i/></span>}
+          {item.type === "shape" && !["table", "chart"].includes(item.kind) && <span className="shape-label">{item.text}</span>}
           {item.type === "sticker" &&
             (item.src ? <img src={item.src} alt="Stiker" /> : item.text)}
           {item.type === "image" && <img src={item.src} alt="Elemen slide" />}
@@ -117,14 +123,14 @@ export default function PreviewPlayer({ material, teacher = true }) {
             <h1
               className="positioned-title"
               style={{
-                ...textStyle(
+                ...scaledTextStyle(
                   current.item.titleStyle || {
                     fontFamily: "Arial",
                     fontSize: 62,
                     bold: true,
                     color: current.item.titleColor || "#fff",
                   },
-                  current.item.titleColor || "#fff",
+                  current.item.titleColor || "#fff", slideSize.width,
                 ),
                 left: `${current.item.titleBox?.x ?? 8}%`,
                 top: `${current.item.titleBox?.y ?? 12}%`,
@@ -138,14 +144,14 @@ export default function PreviewPlayer({ material, teacher = true }) {
             <p
               className="positioned-body"
               style={{
-                ...textStyle(
+                ...scaledTextStyle(
                   current.item.bodyStyle || {
                     fontFamily: "Arial",
                     fontSize: 30,
                     color: current.item.bodyColor || "#fff7ed",
                     lineHeight: 1.5,
                   },
-                  current.item.bodyColor || "#fff7ed",
+                  current.item.bodyColor || "#fff7ed", slideSize.width,
                 ),
                 left: `${current.item.bodyBox?.x ?? 8}%`,
                 top: `${current.item.bodyBox?.y ?? 36}%`,
@@ -156,7 +162,7 @@ export default function PreviewPlayer({ material, teacher = true }) {
             >
               {current.item.body}
             </p>
-            <SlideElements elements={current.item.elements || []} />
+            <SlideElements elements={current.item.elements || []} sourceWidth={slideSize.width} />
           </section>
         )}
         {current.kind === "question" && (

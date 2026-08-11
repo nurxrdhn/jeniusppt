@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SolidSelect from "./components/ui/SolidSelect";
 
 import {
@@ -46,6 +46,7 @@ import {
 import { SLIDE_SIZES } from "./utils/slideSizes";
 import { publishMaterialToFirestore } from "./services/materialService";
 import { subscribeParticipants, deleteParticipantRecords } from "./services/studentService";
+import { mergeWorkspace, saveWorkspace, subscribeWorkspace, workspacePayload } from "./services/workspaceService";
 import {
   exportParticipantsExcel,
   exportParticipantsPdf,
@@ -148,6 +149,19 @@ export default function App() {
   const [accent, setAccent] = useState(
     () => localStorage.getItem("jeniusppt-accent") || "#ff641e",
   );
+  const [cloudReady, setCloudReady] = useState(false);
+  const stateRef = useRef(state);
+  const skipCloudSave = useRef(false);
+  const cloudInitialized = useRef(false);
+  const firstCloudSnapshot = useRef(true);
+  const deviceId = useRef(
+    sessionStorage.getItem("jeniusppt-device-id") || crypto.randomUUID(),
+  );
+  sessionStorage.setItem("jeniusppt-device-id", deviceId.current);
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   useEffect(() => {
     const openJeniusDialog = (event) => setDialog(event.detail);
@@ -214,6 +228,86 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      setCloudReady(false);
+      cloudInitialized.current = false;
+      firstCloudSnapshot.current = true;
+      return undefined;
+    }
+    setCloudReady(false);
+    cloudInitialized.current = false;
+    firstCloudSnapshot.current = true;
+    return subscribeWorkspace(user.uid, async (remote) => {
+      if (!remote) {
+        if (!cloudInitialized.current) {
+          cloudInitialized.current = true;
+          try {
+            await saveWorkspace(
+              user.uid,
+              workspacePayload(stateRef.current, { theme, accent, tourEnabled }),
+              deviceId.current,
+            );
+          } catch (error) {
+            console.error("Gagal membuat workspace cloud:", error);
+            notify("Workspace daring belum dapat dibuat. Data lokal tetap aman.", "warning");
+          }
+          setCloudReady(true);
+        }
+        return;
+      }
+      cloudInitialized.current = true;
+      if (remote.updatedBy !== deviceId.current && remote.payload) {
+        const currentState = stateRef.current;
+        const incoming = firstCloudSnapshot.current
+          ? mergeWorkspace(currentState, remote.payload)
+          : { ...currentState, ...remote.payload, participants: currentState.participants };
+        skipCloudSave.current = true;
+        setState(incoming);
+        if (remote.payload.settings?.theme) setTheme(remote.payload.settings.theme);
+        if (remote.payload.settings?.accent) setAccent(remote.payload.settings.accent);
+        if (typeof remote.payload.settings?.tourEnabled === "boolean")
+          setTourEnabled(remote.payload.settings.tourEnabled);
+        if (firstCloudSnapshot.current && JSON.stringify(incoming.materials) !== JSON.stringify(remote.payload.materials || [])) {
+          saveWorkspace(
+            user.uid,
+            workspacePayload(incoming, {
+              theme: remote.payload.settings?.theme || theme,
+              accent: remote.payload.settings?.accent || accent,
+              tourEnabled: remote.payload.settings?.tourEnabled ?? tourEnabled,
+            }),
+            deviceId.current,
+          ).catch((error) => console.error("Gagal menggabungkan workspace awal:", error));
+        }
+      }
+      firstCloudSnapshot.current = false;
+      setCloudReady(true);
+    }, (error) => {
+      console.error("Sinkronisasi workspace gagal:", error);
+      setCloudReady(true);
+      notify("Sinkronisasi perangkat terputus. Perubahan tetap disimpan di perangkat ini.", "warning");
+    });
+  }, [user?.uid]);
+
+  useEffect(() => {
+    if (!user?.uid || !cloudReady) return undefined;
+    if (skipCloudSave.current) {
+      skipCloudSave.current = false;
+      return undefined;
+    }
+    const timer = setTimeout(() => {
+      saveWorkspace(
+        user.uid,
+        workspacePayload(state, { theme, accent, tourEnabled }),
+        deviceId.current,
+      ).catch((error) => {
+        console.error("Gagal menyimpan workspace cloud:", error);
+        notify("Perubahan tersimpan lokal, tetapi belum tersinkron ke perangkat lain.", "warning");
+      });
+    }, 900);
+    return () => clearTimeout(timer);
+  }, [state, theme, accent, tourEnabled, user?.uid, cloudReady]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -335,7 +429,7 @@ export default function App() {
     setState((old) => ({
       ...old,
       materials: old.materials.map((m) =>
-        m.id === id ? { ...m, ...patch } : m,
+        m.id === id ? { ...m, ...patch, updatedAt: new Date().toISOString() } : m,
       ),
     }));
   }
@@ -429,8 +523,11 @@ export default function App() {
     try {
       const reportProgress = (progress) => {
         onProgress?.(progress);
-        if (progress.stage === "media-done")
+        if (progress.stage === "media-done") {
+          if (progress.prepared)
+            updateMaterial(instant.id, { ...progress.prepared, status: "Published", mediaSyncing: false });
           notify("Semua media selesai disinkronkan.");
+        }
         if (progress.stage === "media-error")
           notify(progress.error?.message || "Link aktif, tetapi sinkronisasi media gagal.", "warning", "Media belum lengkap");
       };

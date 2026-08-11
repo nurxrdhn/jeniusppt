@@ -163,3 +163,11 @@ export function textStyle(style = {}, fallbackColor = "#ffffff") {
   }
   return result;
 }
+
+export function scaledTextStyle(style = {}, fallbackColor = "#ffffff", sourceWidth = 1920) {
+  const result = textStyle(style, fallbackColor);
+  const width = Math.max(1, Number(sourceWidth) || 1920);
+  result.fontSize = `${((Number(style.fontSize) || 32) / width) * 100}cqw`;
+  result.letterSpacing = `${((Number(style.letterSpacing) || 0) / width) * 100}cqw`;
+  return result;
+}

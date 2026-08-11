@@ -127,7 +127,7 @@ export async function publishMaterialToFirestore(material, onProgress) {
         20000,
         "Penyimpanan media ke materi tidak selesai.",
       );
-      onProgress?.({ stage: "media-done" });
+      onProgress?.({ stage: "media-done", prepared });
     }).catch((error) => {
       console.error("Sinkronisasi media setelah publish gagal:", error);
       onProgress?.({ stage: "media-error", error });

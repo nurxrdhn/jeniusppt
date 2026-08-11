@@ -5,7 +5,7 @@ import {
   saveStudentResult,
 } from "../../services/studentService";
 import MediaPlayer from "../ui/MediaPlayer";
-import { textStyle } from "../../utils/fonts";
+import { scaledTextStyle } from "../../utils/fonts";
 import SolidSelect from "../ui/SolidSelect";
 
 export default function StudentPlayer() {
@@ -103,6 +103,7 @@ export default function StudentPlayer() {
   const questions = material.questions || [];
   const currentSlide = slides[slideIndex];
   const currentQuiz = questions[quizIndex];
+  const slideSourceWidth = Number(material.slideSize?.width) || 1920;
 
   const correctCount = answers.filter((a) => a.correct).length;
   const score = questions.length
@@ -329,10 +330,16 @@ export default function StudentPlayer() {
   if (mode === "slide") {
     return (
       <main className="student-clean">
-        <section
+        <section className="student-presentation">
+          <header className="student-session-bar">
+            <span><b>{student.name}</b><small>{student.className}</small></span>
+            <strong>Slide {slideIndex + 1} dari {slides.length}</strong>
+          </header>
+        <div
           key={`student-slide-${slideIndex}`}
           className={`student-slide-clean transition-${currentSlide?.transition || "fade"}`}
           style={{
+            aspectRatio: `${material.slideSize?.width || 1920} / ${material.slideSize?.height || 1080}`,
             animationDuration: `${currentSlide?.duration || 700}ms`,
             ...(currentSlide?.background?.type === "image"
               ? { backgroundImage: `url(${currentSlide.background.value})` }
@@ -340,25 +347,17 @@ export default function StudentPlayer() {
             textAlign: currentSlide?.textAlign || "left",
           }}
         >
-          <div className="student-top">
-            <b>{student.name}</b>
-            <span>{student.className}</span>
-          </div>
-
-          <small>
-            Slide {slideIndex + 1} dari {slides.length}
-          </small>
           <h1
             className="positioned-title"
             style={{
-              ...textStyle(
+              ...scaledTextStyle(
                 currentSlide?.titleStyle || {
                   fontFamily: "Arial",
                   fontSize: 62,
                   bold: true,
                   color: currentSlide?.titleColor || "#ffffff",
                 },
-                currentSlide?.titleColor || "#ffffff",
+                currentSlide?.titleColor || "#ffffff", slideSourceWidth,
               ),
               left: `${currentSlide?.titleBox?.x ?? 8}%`,
               top: `${currentSlide?.titleBox?.y ?? 12}%`,
@@ -371,14 +370,14 @@ export default function StudentPlayer() {
           <p
             className="positioned-body"
             style={{
-              ...textStyle(
+              ...scaledTextStyle(
                 currentSlide?.bodyStyle || {
                   fontFamily: "Arial",
                   fontSize: 30,
                   color: currentSlide?.bodyColor || "#e4ecff",
                   lineHeight: 1.5,
                 },
-                currentSlide?.bodyColor || "#e4ecff",
+                currentSlide?.bodyColor || "#e4ecff", slideSourceWidth,
               ),
               left: `${currentSlide?.bodyBox?.x ?? 8}%`,
               top: `${currentSlide?.bodyBox?.y ?? 36}%`,
@@ -392,10 +391,10 @@ export default function StudentPlayer() {
           </p>
 
           <div className="free-elements-layer preview-elements">
-            {(currentSlide?.elements || []).map((item) => (
+            {(currentSlide?.elements || []).filter((item) => !item.hidden).map((item, layerIndex) => (
               <div
                 key={item.id}
-                className={`free-element ${item.type}`}
+                className={`free-element ${item.type} ${item.kind || ""}`}
                 style={{
                   left: `${item.x}%`,
                   top: `${item.y}%`,
@@ -404,19 +403,25 @@ export default function StudentPlayer() {
                   color: item.color,
                   background:
                     item.type === "shape" ? item.background : "transparent",
+                  transform: `rotate(${item.rotation || 0}deg)`,
+                  opacity: item.opacity ?? 1,
+                  zIndex: 20 + layerIndex,
                   ...(item.type === "text"
-                    ? textStyle(
+                    ? scaledTextStyle(
                         item.style || {
                           color: item.color || "#fff",
                           fontSize: 32,
                           bold: true,
                         },
-                        item.color || "#fff",
+                        item.color || "#fff", slideSourceWidth,
                       )
                     : {}),
                 }}
               >
                 {item.type === "text" && item.text}
+                {item.type === "shape" && item.kind === "table" && <span className="element-table">{Array.from({ length: 9 }).map((_, index) => <i key={index} />)}</span>}
+                {item.type === "shape" && item.kind === "chart" && <span className="element-chart"><i/><i/><i/><i/></span>}
+                {item.type === "shape" && !["table", "chart"].includes(item.kind) && <span className="shape-label">{item.text}</span>}
                 {item.type === "sticker" &&
                   (item.src ? <img src={item.src} alt="Stiker" /> : item.text)}
                 {item.type === "image" && (
@@ -429,6 +434,7 @@ export default function StudentPlayer() {
             ))}
           </div>
 
+        </div>
           <div className="student-nav">
             <button
               disabled={slideIndex === 0}
