@@ -31,6 +31,20 @@ const pptColor = (value, fallback) =>
   String(value || fallback)
     .replace("#", "")
     .toUpperCase();
+const powerpointSize = (source = {}) => {
+  const width = Number(source.width) || 1920;
+  const height = Number(source.height) || 1080;
+  if (width <= 30 && height <= 30) return { width, height };
+  const label = String(source.label || "").toLowerCase();
+  if (label.includes("a4") && width >= height) return { width: 11.693, height: 8.268 };
+  if (label.includes("a4")) return { width: 8.268, height: 11.693 };
+  if (width >= height) {
+    const safeHeight = 7.5;
+    return { width: Math.min(13.333, safeHeight * (width / height)), height: safeHeight };
+  }
+  const safeWidth = 7.5;
+  return { width: safeWidth, height: Math.min(13.333, safeWidth * (height / width)) };
+};
 const stripXml = (xml) =>
   xml
     .replace(/<a:br\s*\/>/g, "\n")
@@ -105,7 +119,8 @@ async function readPdf(file) {
 
 export async function exportPptx(material) {
   const pptx = new PptxGenJS();
-  const size = material.slideSize || { width: 13.333, height: 7.5 };
+  const sourceSize = material.slideSize || { width: 1920, height: 1080 };
+  const size = powerpointSize(sourceSize);
   pptx.defineLayout({
     name: "JENIUS_CUSTOM",
     width: size.width,
@@ -118,7 +133,7 @@ export async function exportPptx(material) {
     ? `${window.location.origin}/play/${encodeURIComponent(material.shareCode)}`
     : "";
   for (const item of material.slides || []) {
-    const image = await renderSlideToDataUrl(item, size);
+    const image = await renderSlideToDataUrl(item, sourceSize);
     const slide = pptx.addSlide();
     slide.addImage({ data: image, x: 0, y: 0, w: size.width, h: size.height });
     for (const element of item.elements || []) {
