@@ -49,6 +49,7 @@ const defaultBg = {
   type: "css",
   value: "#ff641e",
 };
+const POINTER_SENSITIVITY = 0.68;
 const legacyDefaultBackgrounds = new Set([
   "linear-gradient(135deg,#ff7a25,#e94d08)",
   "linear-gradient(135deg,#7c2d12,#f97316)",
@@ -276,6 +277,21 @@ export default function PPTEditor({ material, updateMaterial }) {
         transition: active.transition,
         duration: active.duration,
       };
+    });
+    setSlides(next);
+  }
+  function applyTextToAll(scope) {
+    const fontKeys = ["fontFamily", "fontSize", "bold", "fontWeight", "italic", "underline", "lineHeight", "letterSpacing", "textTransform", "align"];
+    const colorKeys = ["color", "gradientEnabled", "gradientAngle", "gradientFrom", "gradientTo"];
+    const keys = scope === "font" ? fontKeys : scope === "color" ? colorKeys : [...fontKeys, ...colorKeys];
+    const patch = Object.fromEntries(keys.filter((key) => currentTextStyle[key] !== undefined).map((key) => [key, currentTextStyle[key]]));
+    const next = slides.map((slide) => {
+      if (textTarget === "selected") {
+        return { ...slide, elements: (slide.elements || []).map((item) => item.type === "text" ? { ...item, color: patch.color ?? item.color, style: { ...(item.style || {}), ...patch } } : item) };
+      }
+      const styleKey = textTarget === "body" ? "bodyStyle" : "titleStyle";
+      const colorKey = textTarget === "body" ? "bodyColor" : "titleColor";
+      return { ...slide, [styleKey]: { ...(slide[styleKey] || {}), ...patch }, ...(patch.color ? { [colorKey]: patch.color } : {}) };
     });
     setSlides(next);
   }
@@ -624,8 +640,8 @@ export default function PPTEditor({ material, updateMaterial }) {
     const startX = event.clientX,
       startY = event.clientY;
     const move = (e) => {
-      const rawX = Math.max(0, Math.min(100 - start.w, start.x + ((e.clientX - startX) / canvas.width) * 100));
-      const rawY = Math.max(0, Math.min(100 - start.h, start.y + ((e.clientY - startY) / canvas.height) * 100));
+      const rawX = Math.max(0, Math.min(100 - start.w, start.x + ((e.clientX - startX) / canvas.width) * 100 * POINTER_SENSITIVITY));
+      const rawY = Math.max(0, Math.min(100 - start.h, start.y + ((e.clientY - startY) / canvas.height) * 100 * POINTER_SENSITIVITY));
       const snapped = snapToCanvas(rawX, rawY, start.w, start.h);
       setSmartGuides(snapped.guides);
       updateSlide({
@@ -672,8 +688,8 @@ export default function PPTEditor({ material, updateMaterial }) {
       updateSlide({
         [key]: {
           ...start,
-          x: Math.max(0, Math.min(100 - start.w, start.x + (dx / canvas.width) * 100)),
-          y: Math.max(0, Math.min(100 - start.h, start.y + (dy / canvas.height) * 100)),
+          x: Math.max(0, Math.min(100 - start.w, start.x + (dx / canvas.width) * 100 * POINTER_SENSITIVITY)),
+          y: Math.max(0, Math.min(100 - start.h, start.y + (dy / canvas.height) * 100 * POINTER_SENSITIVITY)),
         },
       });
     };
@@ -695,8 +711,8 @@ export default function PPTEditor({ material, updateMaterial }) {
     const startX = event.clientX;
     const startY = event.clientY;
     const move = (nextEvent) => {
-      const dx = ((nextEvent.clientX - startX) / canvas.width) * 100;
-      const dy = ((nextEvent.clientY - startY) / canvas.height) * 100;
+      const dx = ((nextEvent.clientX - startX) / canvas.width) * 100 * POINTER_SENSITIVITY;
+      const dy = ((nextEvent.clientY - startY) / canvas.height) * 100 * POINTER_SENSITIVITY;
       let { x, y, w, h } = origin;
       if (corner.includes("e")) w = Math.max(8, Math.min(100 - x, origin.w + dx));
       if (corner.includes("s")) h = Math.max(6, Math.min(100 - y, origin.h + dy));
@@ -920,7 +936,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           {ribbonTab === "review" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button className={spellcheck ? "active" : ""} onClick={() => setSpellcheck((value) => !value)}><FileInput size={17}/>{spellcheck ? "Ejaan aktif" : "Ejaan nonaktif"}</button><button onClick={() => setMobileSheet((value) => value === "layers" ? null : "layers")}><Layers3 size={17}/>Periksa objek</button></div><small>Pemeriksaan</small></div></div>}
           {ribbonTab === "help" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button onClick={() => window.open("/downloads/panduan-lengkap-jeniusppt.pdf", "_blank")}><FileInput size={17}/>Buku PDF</button><button onClick={() => window.open("/downloads/video-tutorial-jeniusppt.mp4", "_blank")}><Video size={17}/>Video tutorial</button></div><small>Bantuan JeniusPPT</small></div></div>}
         </div>
-        {ribbonTab === "home" && <div className="desktop-ribbon-content"><TextToolbar target={textTarget} onTarget={setTextTarget} style={currentTextStyle} onChange={updateTextStyle} hasSelectedText={selected?.type === "text"}/></div>}
+        {ribbonTab === "home" && <div className="desktop-ribbon-content"><TextToolbar target={textTarget} onTarget={setTextTarget} style={currentTextStyle} onChange={updateTextStyle} onApplyAll={applyTextToAll} hasSelectedText={selected?.type === "text"}/></div>}
         {ribbonTab === "elements" && <div className="desktop-ribbon-content element-library complete-element-library">
           <section className="element-library-section"><header><Shapes size={18}/><div><b>Bentuk lengkap</b><small>Klik bentuk untuk menambahkannya</small></div></header><div className="shape-library-grid">
             {shapeLibrary.map(([label,kind,w,h]) => <button key={kind} title={label} onClick={() => addElement("shape", { text: label, kind, background: "#ff641e", w, h })}><i className={`shape-preview ${kind}`}/><span>{label}</span></button>)}
@@ -949,6 +965,7 @@ export default function PPTEditor({ material, updateMaterial }) {
             onTarget={setTextTarget}
             style={currentTextStyle}
             onChange={updateTextStyle}
+            onApplyAll={applyTextToAll}
             hasSelectedText={selected?.type === "text"}
           />
         </div>
@@ -1514,8 +1531,8 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
       originX = item.x,
       originY = item.y;
     const move = (e) => {
-      const rawX = Math.max(0, Math.min(100 - item.w, originX + ((e.clientX - startX) / canvas.width) * 100));
-      const rawY = Math.max(0, Math.min(100 - item.h, originY + ((e.clientY - startY) / canvas.height) * 100));
+      const rawX = Math.max(0, Math.min(100 - item.w, originX + ((e.clientX - startX) / canvas.width) * 100 * POINTER_SENSITIVITY));
+      const rawY = Math.max(0, Math.min(100 - item.h, originY + ((e.clientY - startY) / canvas.height) * 100 * POINTER_SENSITIVITY));
       const result = snap(rawX, rawY, item.w, item.h);
       const peers = elements.filter((peer) => peer.id !== item.id && !peer.hidden);
       const threshold = 1.2;
@@ -1545,8 +1562,8 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
     const startX = event.clientX, startY = event.clientY;
     const origin = { x: item.x, y: item.y, w: item.w, h: item.h };
     const move = (e) => {
-      const dx = ((e.clientX - startX) / canvas.width) * 100;
-      const dy = ((e.clientY - startY) / canvas.height) * 100;
+      const dx = ((e.clientX - startX) / canvas.width) * 100 * POINTER_SENSITIVITY;
+      const dy = ((e.clientY - startY) / canvas.height) * 100 * POINTER_SENSITIVITY;
       let { x, y, w, h } = origin;
       if (corner.includes("e")) w = Math.max(4, Math.min(100 - x, origin.w + dx));
       if (corner.includes("s")) h = Math.max(4, Math.min(100 - y, origin.h + dy));

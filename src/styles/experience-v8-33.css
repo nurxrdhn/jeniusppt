@@ -1,0 +1,18 @@
+.word-toolbar .text-apply-all { min-width: 158px; }
+.word-toolbar .text-apply-all .solid-select-trigger {
+  min-height: 38px;
+  border-color: #fdba74 !important;
+  background: #fff7ed !important;
+  color: #9a3412 !important;
+  font-size: 10px;
+  font-weight: 850;
+}
+html[data-theme="dark"] .word-toolbar .text-apply-all .solid-select-trigger {
+  border-color: #7c2d12 !important;
+  background: #2d211b !important;
+  color: #fed7aa !important;
+}
+@media(max-width:760px) {
+  .word-toolbar .text-apply-all { width:100%; min-width:0; }
+  .word-toolbar .text-apply-all .solid-select-trigger { width:100%; }
+}

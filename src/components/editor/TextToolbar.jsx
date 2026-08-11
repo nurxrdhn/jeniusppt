@@ -17,6 +17,7 @@ export default function TextToolbar({
   onTarget,
   style,
   onChange,
+  onApplyAll,
   hasSelectedText,
 }) {
   const [advanced, setAdvanced] = useState(false);
@@ -98,6 +99,12 @@ export default function TextToolbar({
           <i style={{ background: style.color || "#ffffff" }} />
           <input type="color" value={style.color || "#ffffff"} onChange={(e) => patch({ color: e.target.value, gradientEnabled: false })} />
         </label>
+        <SolidSelect className="text-apply-all" value="" aria-label="Terapkan font atau warna ke semua slide" onChange={(event) => onApplyAll?.(event.target.value)}>
+          <option value="">Ke semua slide</option>
+          <option value="font">Font ke semua</option>
+          <option value="color">Warna ke semua</option>
+          <option value="font-color">Font dan warna ke semua</option>
+        </SolidSelect>
         <button
           className={`toolbar-more ${advanced ? "active" : ""}`}
           title="Pengaturan teks lanjutan"
