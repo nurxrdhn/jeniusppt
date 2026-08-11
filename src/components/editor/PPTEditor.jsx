@@ -1015,7 +1015,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 +
               </button>
               <button className="text-box-more" title="Pilihan judul" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setTextBoxMenu(textBoxMenu === "title" ? null : "title"); }}><MoreHorizontal size={16}/></button>
-              {!titleBox.locked && ["nw","ne","sw","se"].map((corner) => <button key={corner} className={`text-resize-handle ${corner}`} aria-label={`Perkecil atau perbesar judul ${corner}`} onPointerDown={(event) => resizeTextBox(event,"titleBox",titleBox,corner)}/>)}
+              {!titleBox.locked && ["nw","n","ne","e","se","s","sw","w"].map((corner) => <button key={corner} className={`text-resize-handle ${corner}`} aria-label={`Perkecil atau perbesar judul ${corner}`} onPointerDown={(event) => resizeTextBox(event,"titleBox",titleBox,corner)}/>)}
               {textBoxMenu === "title" && <div className="text-box-menu" onPointerDown={(e) => e.stopPropagation()}>
                 <strong>Pilihan judul</strong>
                 <button onClick={() => duplicateTextBox("title")}><Copy size={15}/>Salin</button>
@@ -1063,7 +1063,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 +
               </button>
               <button className="text-box-more" title="Pilihan isi" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setTextBoxMenu(textBoxMenu === "body" ? null : "body"); }}><MoreHorizontal size={16}/></button>
-              {!bodyBox.locked && ["nw","ne","sw","se"].map((corner) => <button key={corner} className={`text-resize-handle ${corner}`} aria-label={`Perkecil atau perbesar isi ${corner}`} onPointerDown={(event) => resizeTextBox(event,"bodyBox",bodyBox,corner)}/>)}
+              {!bodyBox.locked && ["nw","n","ne","e","se","s","sw","w"].map((corner) => <button key={corner} className={`text-resize-handle ${corner}`} aria-label={`Perkecil atau perbesar isi ${corner}`} onPointerDown={(event) => resizeTextBox(event,"bodyBox",bodyBox,corner)}/>)}
               {textBoxMenu === "body" && <div className="text-box-menu" onPointerDown={(e) => e.stopPropagation()}>
                 <strong>Pilihan isi</strong>
                 <button onClick={() => duplicateTextBox("body")}><Copy size={15}/>Salin</button>
@@ -1133,16 +1133,7 @@ export default function PPTEditor({ material, updateMaterial }) {
                 }}
               >
                 <span>{index + 1}</span>
-                <div
-                  className="slide-strip-thumb"
-                  style={{
-                    ...ratioStyle(slideSize),
-                    background: slide.background?.value || defaultBg.value,
-                  }}
-                >
-                  <b>{slide.title || "Tanpa Judul"}</b>
-                  <small>{(slide.body || "").slice(0, 48)}</small>
-                </div>
+                <SlideMiniature slide={slide} slideSize={slideSize} />
               </button>
               <div className="slide-thumb-actions">
                 <button className="slide-more-button" title="Pilihan slide" aria-label={`Pilihan slide ${index + 1}`} onClick={(event) => { event.stopPropagation(); setSlideMenu(slideMenu === index ? null : index); }}><MoreHorizontal size={17}/></button>
@@ -1302,6 +1293,30 @@ export default function PPTEditor({ material, updateMaterial }) {
                 />
               </label>
             </div>
+            <div className="element-size-grid">
+              <label>
+                Posisi X
+                <input type="number" min="0" max="100" value={Math.round(selected.x)} onChange={(e) => updateElement(selected.id, { x: Math.max(0, Math.min(100 - selected.w, Number(e.target.value))) })}/>
+              </label>
+              <label>
+                Posisi Y
+                <input type="number" min="0" max="100" value={Math.round(selected.y)} onChange={(e) => updateElement(selected.id, { y: Math.max(0, Math.min(100 - selected.h, Number(e.target.value))) })}/>
+              </label>
+              <label>
+                Rotasi
+                <input type="number" min="-360" max="360" value={Math.round(selected.rotation || 0)} onChange={(e) => updateElement(selected.id, { rotation: Number(e.target.value) })}/>
+              </label>
+              <label>
+                Opasitas
+                <input type="range" min="0.1" max="1" step="0.1" value={selected.opacity ?? 1} onChange={(e) => updateElement(selected.id, { opacity: Number(e.target.value) })}/>
+              </label>
+            </div>
+            <div className="element-property-actions">
+              <button onClick={() => duplicateElement(selected.id)}><CopyPlus size={15}/>Duplikat</button>
+              <button onClick={() => toggleElementLock(selected.id)}>{selected.locked ? <Unlock size={15}/> : <Lock size={15}/>} {selected.locked ? "Buka Kunci" : "Kunci"}</button>
+              <button onClick={() => reorderElement(selected.id, "front")} disabled={selected.locked}><BringToFront size={15}/>Depan</button>
+              <button onClick={() => reorderElement(selected.id, "back")} disabled={selected.locked}><SendToBack size={15}/>Belakang</button>
+            </div>
             <button className="delete-element" onClick={deleteElement}>
               <Trash2 size={15} />
               Hapus Elemen
@@ -1422,6 +1437,31 @@ function LayerPanel({ slide, selected, select, updateTextLayer, updateElement, s
       </div>
     </section>
   );
+}
+
+function SlideMiniature({ slide, slideSize }) {
+  const miniTextStyle = (style, fallback) => {
+    const result = textStyle(style, fallback);
+    return { ...result, fontSize: `${Math.max(4, Number(style?.fontSize || 32) / 7.5)}px`, lineHeight: style?.lineHeight || 1.15 };
+  };
+  const background = slide.background || defaultBg;
+  const titleBox = slide.titleBox || { x: 8, y: 12, w: 84, h: 20 };
+  const bodyBox = slide.bodyBox || { x: 8, y: 36, w: 84, h: 42 };
+  return <div className="slide-strip-thumb miniature-live" style={{
+    ...ratioStyle(slideSize),
+    ...(background.type === "image" ? { backgroundImage: `url(${background.value})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: background.value || defaultBg.value }),
+  }}>
+    {!titleBox.hidden && <b style={{ ...miniTextStyle(slide.titleStyle || { fontSize: 62, bold: true, color: slide.titleColor || "#fff" }, slide.titleColor || "#fff"), left: `${titleBox.x}%`, top: `${titleBox.y}%`, width: `${titleBox.w}%`, height: `${titleBox.h}%` }}>{slide.title || "Tanpa Judul"}</b>}
+    {!bodyBox.hidden && <small style={{ ...miniTextStyle(slide.bodyStyle || { fontSize: 30, color: slide.bodyColor || "#fff7ed" }, slide.bodyColor || "#fff7ed"), left: `${bodyBox.x}%`, top: `${bodyBox.y}%`, width: `${bodyBox.w}%`, height: `${bodyBox.h}%` }}>{slide.body || ""}</small>}
+    {(slide.elements || []).filter((item) => !item.hidden).map((item) => <i key={item.id} className={`miniature-element ${item.type} ${item.kind || ""}`} style={{ left: `${item.x}%`, top: `${item.y}%`, width: `${item.w}%`, height: `${item.h}%`, transform: `rotate(${item.rotation || 0}deg)`, background: item.type === "shape" ? item.background : "transparent", color: item.color, ...(item.type === "text" ? miniTextStyle(item.style || { color: item.color, fontSize: 32 }, item.color) : {}) }}>
+      {(item.type === "image" || (item.type === "sticker" && item.src)) && <img src={item.src} alt=""/>}
+      {item.type === "text" && item.text}
+      {item.type === "sticker" && !item.src && item.text}
+      {item.type === "shape" && item.text}
+      {item.type === "video" && "▶"}
+      {item.type === "audio" && "♫"}
+    </i>)}
+  </div>;
 }
 
 function ElementLayer({ elements, selected, select, update, remove, duplicate, reorder, toggleLock, onGuides, snap, layerOrder = [] }) {
@@ -1556,7 +1596,7 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
               : {}),
           }}
         >
-          {item.type === "text" && item.text}
+          {item.type === "text" && <textarea className="element-inline-text" value={item.text || ""} readOnly={item.locked} aria-label="Edit teks elemen" onPointerDown={(event) => { event.stopPropagation(); select(item.id); }} onChange={(event) => update(item.id, { text: event.target.value })}/>} 
           {item.type === "shape" && item.kind === "table" && <span className="element-table">{Array.from({length:9}).map((_,index) => <i key={index}/>)}</span>}
           {item.type === "shape" && item.kind === "chart" && <span className="element-chart"><i/><i/><i/><i/></span>}
           {item.type === "shape" && !["table","chart"].includes(item.kind) && <span className="shape-label">{item.text}</span>}
@@ -1570,7 +1610,7 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
             <button className="element-move-handle" title="Geser elemen" aria-label="Geser elemen" onPointerDown={(event) => startDrag(event, item)}>+</button>
             <button className="element-quick-more" title="Pilihan elemen" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => openMenu(event, item)}><MoreHorizontal size={16}/></button>
             <button className="element-quick-delete" title="Hapus elemen" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => { event.stopPropagation(); remove(item.id); }}><Trash2 size={15}/></button>
-            {!item.locked && ["nw","ne","sw","se"].map((corner) => <button key={corner} className={`element-resize-handle ${corner}`} aria-label={`Ubah ukuran ${corner}`} onPointerDown={(event) => startResize(event, item, corner)} />)}
+            {!item.locked && ["nw","n","ne","e","se","s","sw","w"].map((corner) => <button key={corner} className={`element-resize-handle ${corner}`} aria-label={`Ubah ukuran ${corner}`} onPointerDown={(event) => startResize(event, item, corner)} />)}
             {!item.locked && <button className="element-rotate-handle" title="Putar elemen" aria-label="Putar elemen" onPointerDown={(event) => startRotate(event, item)}><RotateCw size={13}/></button>}
           </>}
         </div>

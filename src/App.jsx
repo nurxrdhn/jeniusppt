@@ -903,7 +903,7 @@ function Dashboard({
           onClick={() => onNavigate("workspace")}
           icon={<FolderOpen />}
           label="Workspace"
-          value="2"
+          value={state.materials.filter((material) => material.status !== "Published").length}
         />
       </div>
       <div className="feature-grid">

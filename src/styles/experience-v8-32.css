@@ -1,0 +1,56 @@
+.slide-strip-thumb.miniature-live {
+  position: relative !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  isolation: isolate;
+}
+.slide-strip-thumb.miniature-live::after { display: none !important; }
+.miniature-live > b,
+.miniature-live > small,
+.miniature-element {
+  position: absolute !important;
+  z-index: 2;
+  display: block;
+  margin: 0 !important;
+  overflow: hidden;
+  white-space: pre-wrap;
+  text-align: inherit;
+  text-shadow: none !important;
+}
+.miniature-element { display: flex !important; align-items: center; justify-content: center; font-style: normal; }
+.miniature-element img { width: 100%; height: 100%; object-fit: contain; }
+
+.text-resize-handle.n,.element-resize-handle.n { left: 50%; top: -7px; transform: translateX(-50%); cursor: ns-resize; }
+.text-resize-handle.s,.element-resize-handle.s { left: 50%; bottom: -7px; transform: translateX(-50%); cursor: ns-resize; }
+.text-resize-handle.e,.element-resize-handle.e { right: -7px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+.text-resize-handle.w,.element-resize-handle.w { left: -7px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+
+.element-inline-text {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  resize: none !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: inherit !important;
+  letter-spacing: inherit !important;
+  text-align: inherit !important;
+}
+.element-inline-text:focus { outline: 1px dashed rgba(255,255,255,.85) !important; }
+.element-property-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin:9px 0; }
+.element-property-actions button { min-width:0; min-height:38px; padding:6px 8px; display:flex; align-items:center; justify-content:center; gap:5px; border:1px solid #dce3eb; border-radius:9px; background:#fff; color:#344054; font-size:10px; font-weight:800; }
+.element-property-actions button:disabled { opacity:.45; }
+
+@media (max-width:760px) {
+  .text-resize-handle.n,.text-resize-handle.s,.element-resize-handle.n,.element-resize-handle.s { left: 50%; }
+  .text-resize-handle.e,.element-resize-handle.e { right: -10px; }
+  .text-resize-handle.w,.element-resize-handle.w { left: -10px; }
+}
