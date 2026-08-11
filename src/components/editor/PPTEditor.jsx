@@ -44,7 +44,7 @@ import MediaPlayer from "../ui/MediaPlayer";
 import { normalizeVideoUrl } from "../../utils/mediaUrl";
 import TextToolbar from "./TextToolbar";
 import { loadWebFont, textStyle } from "../../utils/fonts";
-import { jeniusPrompt } from "../../utils/jeniusDialog";
+import { jeniusConfirm, jeniusPrompt } from "../../utils/jeniusDialog";
 const defaultBg = {
   type: "css",
   value: "#ff641e",
@@ -154,6 +154,14 @@ export default function PPTEditor({ material, updateMaterial }) {
     (active?.elements || []).forEach((item) => fonts.push(item.style?.fontFamily));
     fonts.filter(Boolean).forEach(loadWebFont);
   }, [activeIndex, active?.titleStyle?.fontFamily, active?.bodyStyle?.fontFamily, active?.elements]);
+
+  useEffect(() => {
+    const closeSlideMenu = (event) => {
+      if (!event.target.closest?.(".slide-thumb-actions")) setSlideMenu(null);
+    };
+    window.addEventListener("pointerdown", closeSlideMenu);
+    return () => window.removeEventListener("pointerdown", closeSlideMenu);
+  }, []);
 
   useEffect(() => {
     function shortcuts(event) {
@@ -335,12 +343,36 @@ export default function PPTEditor({ material, updateMaterial }) {
     try {
       await navigator.clipboard.writeText(JSON.stringify(source, null, 2));
     } catch {
-      localStorage.setItem("jeniusppt-slide-clipboard", JSON.stringify(source));
+      // Salinan internal tetap tersedia jika izin clipboard browser ditolak.
     }
+    localStorage.setItem("jeniusppt-slide-clipboard", JSON.stringify(source));
     setSlideMenu(null);
   }
-  function deleteSlideAt(index = activeIndex) {
+  function pasteSlideContent(index = activeIndex) {
+    try {
+      const copied = JSON.parse(localStorage.getItem("jeniusppt-slide-clipboard") || "null");
+      if (!copied) return;
+      const next = slides.map((slide, slideIndex) => slideIndex === index ? {
+        ...copied,
+        title: copied.title || slide.title,
+        elements: (copied.elements || []).map((item) => ({ ...item, id: crypto.randomUUID() })),
+      } : slide);
+      setSlides(next);
+    } catch {
+      return;
+    } finally {
+      setSlideMenu(null);
+    }
+  }
+  async function renameSlideAt(index) {
+    const title = await jeniusPrompt({ title: "Ubah judul slide", message: `Masukkan judul baru untuk slide ${index + 1}.`, defaultValue: slides[index]?.title || "", confirmLabel: "Ubah" });
+    if (title) setSlides(slides.map((slide, slideIndex) => slideIndex === index ? { ...slide, title } : slide));
+    setSlideMenu(null);
+  }
+  async function deleteSlideAt(index = activeIndex) {
     if (slides.length <= 1) return;
+    const confirmed = await jeniusConfirm({ title: `Hapus slide ${index + 1}?`, message: "Slide beserta seluruh teks, elemen, gambar, audio, dan videonya akan dihapus.", confirmLabel: "Hapus Slide", danger: true });
+    if (!confirmed) return;
     const next = slides.filter((_, slideIndex) => slideIndex !== index);
     setSlides(next);
     updateMaterial(material.id, { activeSlide: Math.max(0, Math.min(index - 1, next.length - 1)) });
@@ -862,10 +894,6 @@ export default function PPTEditor({ material, updateMaterial }) {
               <Settings2 size={17} />
               Slide
             </button>
-            <button onClick={() => setMobileSheet((value) => value === "layers" ? null : "layers")}>
-              <Layers3 size={17} />
-              Lapisan
-            </button>
           </div>
           {ribbonTab === "file" && <div className="desktop-editor-tools ribbon-group word-command-strip">
             <div className="word-command-group"><div><button onClick={saveNow}><Save size={17}/>Simpan</button><button onClick={copySlide}><Copy size={17}/>Duplikat</button><button className="danger" disabled={slides.length <= 1} onClick={deleteSlide}><Trash2 size={17}/>Hapus</button></div><small>Berkas slide</small></div>
@@ -927,16 +955,16 @@ export default function PPTEditor({ material, updateMaterial }) {
           <button onClick={swapOrientation}>Putar</button><span className="ribbon-label">Terapkan ke semua</span><SolidSelect value="" aria-label="Terapkan perubahan ke semua slide" onChange={(event) => applyActiveToAll(event.target.value)}><option value="">Pilih bagian</option><option value="background">Latar slide</option><option value="text">Font, warna &amp; posisi teks</option><option value="elements">Elemen &amp; media</option><option value="all">Semua tampilan</option></SolidSelect></div>}
           {ribbonTab === "transition" && <div className="desktop-editor-tools ribbon-group"><span className="ribbon-label">Animasi</span><SolidSelect value={active?.transition || "fade"} onChange={(e) => updateSlide({ transition: e.target.value })}>{animations.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</SolidSelect><span className="ribbon-label">Durasi</span><SolidSelect value={active?.duration || 700} onChange={(e) => updateSlide({ duration: Number(e.target.value) })}><option value={400}>Cepat</option><option value={700}>Normal</option><option value={1100}>Lembut</option><option value={1600}>Dramatis</option></SolidSelect></div>}
           {ribbonTab === "view" && <div className="desktop-editor-tools ribbon-group word-command-strip">
-            <div className="word-command-group"><div><button className={mobileSheet === "layers" ? "active" : ""} onClick={() => setMobileSheet((value) => value === "layers" ? null : "layers")}><Layers3 size={17}/>{mobileSheet === "layers" ? "Tutup lapisan" : "Lapisan"}</button><button onClick={() => setMobileSheet((value) => value === "settings" ? null : "settings")}><Settings2 size={17}/>Properti</button></div><small>Panel editor</small></div>
+            <div className="word-command-group"><div><button onClick={() => setMobileSheet((value) => value === "settings" ? null : "settings")}><Settings2 size={17}/>Properti</button></div><small>Panel editor</small></div>
             <div className="word-command-group"><div><button onClick={() => setSelectedElement(null)}><Eye size={17}/>Kanvas bersih</button><button onClick={() => updateSlide({ showGuides: active?.showGuides === false })}><GalleryHorizontal size={17}/>{active?.showGuides === false ? "Panduan aktif" : "Panduan nonaktif"}</button></div><small>Tampilan kanvas</small></div>
             <div className="word-command-group"><div><button onClick={() => alignObjects("size")}>Ukuran sama</button><button onClick={() => alignObjects("row")}>Sejajar</button><button onClick={() => alignObjects("left")}>Rata kiri</button><button onClick={() => distributeObjects("x")}>Sebar mendatar</button><button onClick={() => distributeObjects("y")}>Sebar vertikal</button></div><small>Ukur &amp; rapikan otomatis</small></div>
           </div>}
           {ribbonTab === "slideshow" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button onClick={() => window.open(`/play/${material.shareCode}`, "_blank")}><Eye size={17}/>Dari awal</button><button onClick={() => window.open(`/play/${material.shareCode}?slide=${activeIndex}`, "_blank")}><Presentation size={17}/>Slide aktif</button></div><small>Mulai presentasi</small></div></div>}
           {ribbonTab === "record" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button onClick={() => addMediaLink("audio")}><Volume2 size={17}/>Rekam narasi</button><button onClick={() => audioRef.current?.click()}><Volume2 size={17}/>Audio lokal</button><button onClick={() => videoRef.current?.click()}><Video size={17}/>Video lokal</button></div><small>Rekaman dan media</small></div></div>}
-          {ribbonTab === "review" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button className={spellcheck ? "active" : ""} onClick={() => setSpellcheck((value) => !value)}><FileInput size={17}/>{spellcheck ? "Ejaan aktif" : "Ejaan nonaktif"}</button><button onClick={() => setMobileSheet((value) => value === "layers" ? null : "layers")}><Layers3 size={17}/>Periksa objek</button></div><small>Pemeriksaan</small></div></div>}
+          {ribbonTab === "review" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button className={spellcheck ? "active" : ""} onClick={() => setSpellcheck((value) => !value)}><FileInput size={17}/>{spellcheck ? "Ejaan aktif" : "Ejaan nonaktif"}</button></div><small>Pemeriksaan</small></div></div>}
           {ribbonTab === "help" && <div className="desktop-editor-tools ribbon-group word-command-strip"><div className="word-command-group"><div><button onClick={() => window.open("/downloads/panduan-lengkap-jeniusppt.pdf", "_blank")}><FileInput size={17}/>Buku PDF</button><button onClick={() => window.open("/downloads/video-tutorial-jeniusppt.mp4", "_blank")}><Video size={17}/>Video tutorial</button></div><small>Bantuan JeniusPPT</small></div></div>}
         </div>
-        {ribbonTab === "home" && <div className="desktop-ribbon-content"><TextToolbar target={textTarget} onTarget={setTextTarget} style={currentTextStyle} onChange={updateTextStyle} onApplyAll={applyTextToAll} hasSelectedText={selected?.type === "text"}/></div>}
+        {ribbonTab === "home" && <div className="desktop-ribbon-content home-ribbon-content"><button className="home-layer-button" onClick={() => setMobileSheet((value) => value === "layers" ? null : "layers")}><Layers3 size={17}/><span>{mobileSheet === "layers" ? "Tutup Lapisan" : "Buka Lapisan"}</span></button><TextToolbar target={textTarget} onTarget={setTextTarget} style={currentTextStyle} onChange={updateTextStyle} onApplyAll={applyTextToAll} hasSelectedText={selected?.type === "text"}/></div>}
         {ribbonTab === "elements" && <div className="desktop-ribbon-content element-library complete-element-library">
           <section className="element-library-section"><header><Shapes size={18}/><div><b>Bentuk lengkap</b><small>Klik bentuk untuk menambahkannya</small></div></header><div className="shape-library-grid">
             {shapeLibrary.map(([label,kind,w,h]) => <button key={kind} title={label} onClick={() => addElement("shape", { text: label, kind, background: "#ff641e", w, h })}><i className={`shape-preview ${kind}`}/><span>{label}</span></button>)}
@@ -1142,7 +1170,7 @@ export default function PPTEditor({ material, updateMaterial }) {
           </div>
           <div className="slide-strip-scroll">
             {slides.map((slide, index) => (
-              <article data-slide-index={index} key={index} className={`slide-thumb-card ${index === activeIndex ? "active" : ""} ${draggedSlide === index ? "is-dragging" : ""} ${slideDropTarget === index && draggedSlide !== index ? "is-drop-target" : ""}`}>
+              <article data-slide-index={index} key={index} className={`slide-thumb-card ${index === activeIndex ? "active" : ""} ${slideMenu === index ? "menu-open" : ""} ${draggedSlide === index ? "is-dragging" : ""} ${slideDropTarget === index && draggedSlide !== index ? "is-drop-target" : ""}`}>
               <button className="slide-drag-handle" title="Tekan dan tarik untuk mengubah urutan slide" aria-label={`Pindahkan slide ${index + 1}`} onPointerDown={(event) => startSlideDrag(event,index)}><GripVertical size={16}/></button>
               <button className="slide-thumb-select" onClick={() => {
                   updateMaterial(material.id, { activeSlide: index });
@@ -1155,9 +1183,11 @@ export default function PPTEditor({ material, updateMaterial }) {
               <div className="slide-thumb-actions">
                 <button className="slide-more-button" title="Pilihan slide" aria-label={`Pilihan slide ${index + 1}`} onClick={(event) => { event.stopPropagation(); setSlideMenu(slideMenu === index ? null : index); }}><MoreHorizontal size={17}/></button>
                 {slideMenu === index && <div className="slide-thumb-menu" onClick={(event)=>event.stopPropagation()}>
+                  <button onClick={() => renameSlideAt(index)}><Type size={14}/>Ubah judul slide</button>
                   <button onClick={() => copySlideContent(index)}><Copy size={14}/>Copy isi slide</button>
+                  <button disabled={!localStorage.getItem("jeniusppt-slide-clipboard")} onClick={() => pasteSlideContent(index)}><FileInput size={14}/>Tempel isi slide</button>
                   <button onClick={() => { copySlideAt(index); setSlideMenu(null); }}><CopyPlus size={14}/>Duplikat slide</button>
-                  <button className="danger" disabled={slides.length <= 1} onClick={() => { deleteSlideAt(index); setSlideMenu(null); }}><Trash2 size={14}/>Hapus slide</button>
+                  <button className="danger" disabled={slides.length <= 1} onClick={() => deleteSlideAt(index).finally(() => setSlideMenu(null))}><Trash2 size={14}/>Hapus slide</button>
                 </div>}
               </div>
               </article>
