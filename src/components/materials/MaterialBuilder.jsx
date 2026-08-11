@@ -29,6 +29,8 @@ export default function MaterialBuilder({
         if (stage === "prepare") setPublishStatus(total ? `Menyiapkan ${total} media...` : "Menyiapkan materi...");
         if (stage === "upload") setPublishStatus(`Mengunggah media ${current}/${total}...`);
         if (stage === "save") setPublishStatus("Menerbitkan link...");
+        if (stage === "quick-save") setPublishStatus("Mengaktifkan link...");
+        if (stage === "link-ready") setPublishStatus("Link siap");
         if (stage === "done") setPublishStatus("Publish selesai");
       });
     } finally {

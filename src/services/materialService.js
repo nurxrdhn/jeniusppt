@@ -14,6 +14,22 @@ const clean = (value) => {
   return value;
 };
 
+const withoutEmbeddedData = (value) => {
+  if (Array.isArray(value)) return value.map(withoutEmbeddedData);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [key, withoutEmbeddedData(item)]),
+    );
+  }
+  if (typeof value === "string" && value.startsWith("data:")) return "";
+  return value;
+};
+
+const hasLocalAssets = (material) => (material.slides || []).some((slide) =>
+  (slide.background?.type === "image" && String(slide.background.value || "").startsWith("data:")) ||
+  (slide.elements || []).some((element) => String(element.src || "").startsWith("data:")),
+);
+
 const withTimeout = (promise, timeoutMs, message) =>
   Promise.race([
     promise,
@@ -79,25 +95,46 @@ async function uploadLocalAssets(material, onProgress) {
 }
 
 export async function publishMaterialToFirestore(material, onProgress) {
-  const prepared = await withTimeout(
-    uploadLocalAssets(material, onProgress),
-    70000,
-    "Unggahan media terlalu lama. Periksa koneksi atau kecilkan ukuran media.",
-  );
-  const data = {
-    ...prepared,
+  const localAssets = hasLocalAssets(material);
+  const quickData = {
+    ...withoutEmbeddedData(clean(material)),
     status: "Published",
     publishedAt: serverTimestamp(),
+    mediaSyncing: localAssets,
   };
 
-  onProgress?.({ stage: "save" });
+  onProgress?.({ stage: "quick-save" });
   await withTimeout(
-    setDoc(doc(db, "publishedMaterials", material.shareCode), data),
+    setDoc(doc(db, "publishedMaterials", material.shareCode), quickData),
     20000,
     "Firebase tidak merespons dalam 20 detik. Silakan coba kembali.",
   );
-  onProgress?.({ stage: "done" });
-  return prepared;
+  onProgress?.({ stage: "link-ready", backgroundSync: localAssets });
+
+  if (localAssets) {
+    void withTimeout(
+      uploadLocalAssets(material, onProgress),
+      70000,
+      "Sinkronisasi media terlalu lama. Coba publikasikan ulang.",
+    ).then(async (prepared) => {
+      await withTimeout(
+        setDoc(doc(db, "publishedMaterials", material.shareCode), {
+          ...prepared,
+          status: "Published",
+          publishedAt: serverTimestamp(),
+          mediaSyncing: false,
+        }),
+        20000,
+        "Penyimpanan media ke materi tidak selesai.",
+      );
+      onProgress?.({ stage: "media-done" });
+    }).catch((error) => {
+      console.error("Sinkronisasi media setelah publish gagal:", error);
+      onProgress?.({ stage: "media-error", error });
+    });
+  }
+
+  return { ...material, status: "Published", mediaSyncing: localAssets };
 }
 
 export async function getPublishedMaterial(shareCode) {

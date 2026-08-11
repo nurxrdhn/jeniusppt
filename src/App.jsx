@@ -427,7 +427,14 @@ export default function App() {
     };
 
     try {
-      const online = await publishMaterialToFirestore(instant, onProgress);
+      const reportProgress = (progress) => {
+        onProgress?.(progress);
+        if (progress.stage === "media-done")
+          notify("Semua media selesai disinkronkan.");
+        if (progress.stage === "media-error")
+          notify(progress.error?.message || "Link aktif, tetapi sinkronisasi media gagal.", "warning", "Media belum lengkap");
+      };
+      const online = await publishMaterialToFirestore(instant, reportProgress);
       localStorage.setItem(
         `jeniusppt_package_${instant.shareCode}`,
         JSON.stringify(online),
@@ -439,7 +446,9 @@ export default function App() {
       });
       setShareMaterial(online);
       setPostPublishMaterial(online);
-      notify("QR dan link siswa siap dibuka di HP.");
+      notify(online.mediaSyncing
+        ? "QR dan link sudah aktif. Media sedang disinkronkan di latar belakang."
+        : "QR dan link siswa siap dibuka di HP.");
       addNotification(
         "Tautan dibagikan",
         `QR dan tautan ${instant.title} siap digunakan.`,
