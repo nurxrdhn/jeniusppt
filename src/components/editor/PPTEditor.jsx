@@ -150,10 +150,13 @@ export default function PPTEditor({ material, updateMaterial }) {
   }, [material.id]);
 
   useEffect(() => {
-    const fonts = [active?.titleStyle?.fontFamily, active?.bodyStyle?.fontFamily];
-    (active?.elements || []).forEach((item) => fonts.push(item.style?.fontFamily));
+    const fonts = [];
+    slides.forEach((slide) => {
+      fonts.push(slide?.titleStyle?.fontFamily, slide?.bodyStyle?.fontFamily);
+      (slide?.elements || []).forEach((item) => fonts.push(item.style?.fontFamily));
+    });
     fonts.filter(Boolean).forEach(loadWebFont);
-  }, [activeIndex, active?.titleStyle?.fontFamily, active?.bodyStyle?.fontFamily, active?.elements]);
+  }, [slides]);
 
   useEffect(() => {
     const closeSlideMenu = (event) => {
@@ -376,6 +379,8 @@ export default function PPTEditor({ material, updateMaterial }) {
     const next = slides.filter((_, slideIndex) => slideIndex !== index);
     setSlides(next);
     updateMaterial(material.id, { activeSlide: Math.max(0, Math.min(index - 1, next.length - 1)) });
+    setSelectedElement(null);
+    setSmartGuides({ x: null, y: null });
   }
   function deleteSlide() { deleteSlideAt(activeIndex); }
   function moveSlide(from, to) {
@@ -560,6 +565,8 @@ export default function PPTEditor({ material, updateMaterial }) {
       ),
     });
     setSelectedElement(null);
+    setSmartGuides({ x: null, y: null });
+    setTextBoxMenu(null);
   }
   function duplicateElement(elementId = selectedElement) {
     const source = (active.elements || []).find((item) => item.id === elementId);
@@ -602,6 +609,7 @@ export default function PPTEditor({ material, updateMaterial }) {
     if (active?.[boxKey]?.locked) return;
     updateSlide({ [key]: "" });
     setTextBoxMenu(null);
+    setSmartGuides({ x: null, y: null });
   }
   function reorderElement(elementId, position) {
     const items = [...(active.elements || [])];
@@ -688,9 +696,13 @@ export default function PPTEditor({ material, updateMaterial }) {
       setSmartGuides({ x: null, y: null });
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
+      window.removeEventListener("blur", stop);
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
+    window.addEventListener("blur", stop);
   }
   function snapToCanvas(x, y, w, h) {
     const threshold = 1.35;
@@ -1581,9 +1593,13 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
       onGuides({ x: null, y: null });
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
+      window.removeEventListener("blur", stop);
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
+    window.addEventListener("blur", stop);
   }
   function startResize(event, item, corner) {
     event.preventDefault(); event.stopPropagation();
@@ -1601,8 +1617,8 @@ function ElementLayer({ elements, selected, select, update, remove, duplicate, r
       if (corner.includes("n")) { const ny = Math.max(0, Math.min(origin.y + origin.h - 4, origin.y + dy)); h = origin.h + origin.y - ny; y = ny; }
       update(item.id, { x, y, w, h });
     };
-    const stop = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", stop); };
-    window.addEventListener("pointermove", move); window.addEventListener("pointerup", stop);
+    const stop = () => { onGuides({ x: null, y: null }); window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", stop); window.removeEventListener("pointercancel", stop); window.removeEventListener("blur", stop); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", stop); window.addEventListener("pointercancel", stop); window.addEventListener("blur", stop);
   }
   function startRotate(event, item) {
     event.preventDefault(); event.stopPropagation();

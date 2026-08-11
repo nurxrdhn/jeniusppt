@@ -1,0 +1,15 @@
+.slide-strip-thumb.miniature-live > b,
+.slide-strip-thumb.miniature-live > small,
+.slide-strip-thumb.miniature-live .miniature-element.text {
+  color: var(--jp-slide-color, #ffffff) !important;
+  font-family: var(--jp-slide-font, Arial, sans-serif) !important;
+  text-shadow: none !important;
+}
+.slide-strip-thumb.miniature-live > b,
+.slide-strip-thumb.miniature-live > small {
+  z-index: 3 !important;
+  opacity: 1 !important;
+}
+.slide-canvas:not(:has(.free-element.selected)):not(:has(.movable-text:focus-within)) .smart-guide {
+  display: none !important;
+}
