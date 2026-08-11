@@ -27,6 +27,7 @@ export default function MaterialBuilder({
       setPublishStatus("Menyiapkan materi...");
       await openShare(material, ({ stage, current, total }) => {
         if (stage === "prepare") setPublishStatus(total ? `Menyiapkan ${total} media...` : "Menyiapkan materi...");
+        if (stage === "prepare-background") setPublishStatus("Menyiapkan latar slide...");
         if (stage === "upload") setPublishStatus(`Mengunggah media ${current}/${total}...`);
         if (stage === "save") setPublishStatus("Menerbitkan link...");
         if (stage === "quick-save") setPublishStatus("Mengaktifkan link...");

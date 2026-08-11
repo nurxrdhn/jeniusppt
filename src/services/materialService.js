@@ -25,6 +25,50 @@ const withoutEmbeddedData = (value) => {
   return value;
 };
 
+const compressBackground = (dataUrl) => new Promise((resolve) => {
+  if (!String(dataUrl || "").startsWith("data:image/")) {
+    resolve(dataUrl);
+    return;
+  }
+  const image = new Image();
+  image.onload = () => {
+    const maxWidth = 1100;
+    let scale = Math.min(1, maxWidth / image.naturalWidth);
+    const canvas = document.createElement("canvas");
+    let result = dataUrl;
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      result = canvas.toDataURL("image/webp", Math.max(0.38, 0.68 - attempt * 0.08));
+      if (result.length <= 90000) break;
+      scale *= 0.78;
+    }
+    resolve(result);
+  };
+  image.onerror = () => resolve(dataUrl);
+  image.src = dataUrl;
+});
+
+async function quickPublishedData(material) {
+  const quick = withoutEmbeddedData(clean(material));
+  quick.slides = await Promise.all((material.slides || []).map(async (slide, index) => {
+    const safeSlide = quick.slides?.[index] || withoutEmbeddedData(clean(slide));
+    if (
+      slide.background?.type === "image" &&
+      String(slide.background.value || "").startsWith("data:image/")
+    ) {
+      safeSlide.background = {
+        ...slide.background,
+        value: await compressBackground(slide.background.value),
+      };
+    }
+    return safeSlide;
+  }));
+  return quick;
+}
+
 const hasLocalAssets = (material) => (material.slides || []).some((slide) =>
   (slide.background?.type === "image" && String(slide.background.value || "").startsWith("data:")) ||
   (slide.elements || []).some((element) => String(element.src || "").startsWith("data:")),
@@ -96,8 +140,10 @@ async function uploadLocalAssets(material, onProgress) {
 
 export async function publishMaterialToFirestore(material, onProgress) {
   const localAssets = hasLocalAssets(material);
+  onProgress?.({ stage: "prepare-background" });
+  const quickMaterial = await quickPublishedData(material);
   const quickData = {
-    ...withoutEmbeddedData(clean(material)),
+    ...quickMaterial,
     status: "Published",
     publishedAt: serverTimestamp(),
     mediaSyncing: localAssets,
