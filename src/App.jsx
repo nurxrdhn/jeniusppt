@@ -258,7 +258,7 @@ export default function App() {
         return;
       }
       cloudInitialized.current = true;
-      if (remote.updatedBy !== deviceId.current && remote.payload) {
+      if ((remote.updatedBy !== deviceId.current || remote.mediaResolved) && remote.payload) {
         const currentState = stateRef.current;
         const incoming = firstCloudSnapshot.current
           ? mergeWorkspace(currentState, remote.payload)
