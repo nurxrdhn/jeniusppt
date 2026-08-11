@@ -50,6 +50,25 @@
   margin: 0 !important;
 }
 
+.student-presentation > .student-nav button {
+  min-width: 132px;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 1px solid #e85d04;
+  border-radius: 12px;
+  background: #e85d04;
+  color: #ffffff;
+  font: 800 13px "Inter", "Segoe UI", sans-serif;
+  cursor: pointer;
+}
+
+.student-presentation > .student-nav button:disabled {
+  border-color: #d0d5dd;
+  background: #eaecf0;
+  color: #98a2b3;
+  cursor: not-allowed;
+}
+
 html[data-theme="dark"] .student-session-bar {
   border-color: #344054;
   background: #101828;
@@ -86,6 +105,7 @@ html[data-theme="dark"] .student-session-bar {
     bottom: auto !important;
   }
   .student-presentation > .student-nav button {
+    min-width: 112px !important;
     min-height: 40px !important;
     padding: 0 14px !important;
     font-size: 11px !important;

@@ -166,8 +166,9 @@ export function textStyle(style = {}, fallbackColor = "#ffffff") {
 
 export function scaledTextStyle(style = {}, fallbackColor = "#ffffff", sourceWidth = 1920) {
   const result = textStyle(style, fallbackColor);
-  const width = Math.max(1, Number(sourceWidth) || 1920);
-  result.fontSize = `${((Number(style.fontSize) || 32) / width) * 100}cqw`;
-  result.letterSpacing = `${((Number(style.letterSpacing) || 0) / width) * 100}cqw`;
+  const source = Number(sourceWidth) || 1920;
+  const editorReferenceWidth = source > 100 ? Math.min(source, 1040) : 1040;
+  result.fontSize = `${((Number(style.fontSize) || 32) / editorReferenceWidth) * 100}cqw`;
+  result.letterSpacing = `${((Number(style.letterSpacing) || 0) / editorReferenceWidth) * 100}cqw`;
   return result;
 }
