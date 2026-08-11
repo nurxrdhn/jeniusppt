@@ -129,7 +129,8 @@ export async function exportPptx(material) {
   pptx.layout = "JENIUS_CUSTOM";
   pptx.author = "JeniusPPT";
   pptx.subject = material.subject;
-  const liveUrl = material.shareCode && typeof window !== "undefined"
+  const isPublished = material.status === "Published";
+  const liveUrl = isPublished && material.shareCode && typeof window !== "undefined"
     ? `${window.location.origin}/play/${encodeURIComponent(material.shareCode)}`
     : "";
   for (const item of material.slides || []) {
@@ -138,8 +139,11 @@ export async function exportPptx(material) {
     slide.addImage({ data: image, x: 0, y: 0, w: size.width, h: size.height });
     for (const element of item.elements || []) {
       if (["video", "audio"].includes(element.type)) {
-        const mediaUrl = /^https?:/i.test(element.src || "") ? element.src : liveUrl;
-        slide.addText(element.type === "video" ? "BUKA VIDEO" : "BUKA AUDIO", {
+        const directUrl = /^https?:/i.test(element.src || "") ? element.src : "";
+        const mediaUrl = directUrl || liveUrl;
+        slide.addText(mediaUrl
+          ? (element.type === "video" ? "BUKA VIDEO" : "BUKA AUDIO")
+          : "PUBLIKASIKAN UNTUK MEMBUKA MEDIA", {
           x: (element.x / 100) * size.width,
           y: (element.y / 100) * size.height,
           w: (element.w / 100) * size.width,
@@ -191,6 +195,8 @@ export async function exportPptx(material) {
     resultSlide.addText(material.certificateEnabled ? "Nilai otomatis dan sertifikat tersedia pada versi interaktif JeniusPPT." : "Nilai otomatis tersedia pada versi interaktif JeniusPPT.", { x: 1.2, y: 2.25, w: size.width - 2.4, h: 0.8, color: "475467", fontSize: 17, align: "center" });
     if (liveUrl) {
       resultSlide.addText("Buka kuis interaktif, nilai, dan sertifikat", { x: size.width / 2 - 2.4, y: 3.55, w: 4.8, h: 0.72, color: "FFFFFF", fill: { color: "E85D04" }, bold: true, align: "center", valign: "mid", hyperlink: { url: liveUrl } });
+    } else {
+      resultSlide.addText("Terbitkan materi untuk mengaktifkan kuis interaktif, nilai, QR, dan sertifikat.", { x: size.width / 2 - 2.8, y: 3.45, w: 5.6, h: 0.85, color: "9A3412", fill: { color: "FFEDD5" }, line: { color: "FDBA74" }, bold: true, align: "center", valign: "mid", margin: 0.12 });
     }
   }
   await pptx.writeFile({ fileName: `${safeName(material.title)}.pptx` });
@@ -215,15 +221,111 @@ export async function exportDocx(material) {
   );
 }
 export async function exportPdf(material) {
-  const size = material.slideSize || { width: 13.333, height: 7.5 };
+  const size = material.slideSize || { width: 1920, height: 1080 };
   const width = 297,
     height = width * (size.height / size.width);
   const orientation = width >= height ? "landscape" : "portrait";
   const pdf = new jsPDF({ orientation, unit: "mm", format: [width, height] });
+  let pageStarted = false;
+  const nextPage = () => {
+    if (pageStarted) pdf.addPage([width, height], orientation);
+    pageStarted = true;
+  };
+  const paintBackground = (r, g, b) => {
+    pdf.setFillColor(r, g, b);
+    pdf.rect(0, 0, width, height, "F");
+  };
   for (let i = 0; i < (material.slides || []).length; i++) {
-    if (i) pdf.addPage([width, height], orientation);
+    nextPage();
     const image = await renderSlideToDataUrl(material.slides[i], size);
     pdf.addImage(image, "PNG", 0, 0, width, height, undefined, "FAST");
+  }
+  const questions = material.questions || [];
+  questions.forEach((question, index) => {
+    const isTrueFalse = question.type === "truefalse";
+    const options = isTrueFalse ? ["Benar", "Salah"] : (question.options || []);
+    const answerIndex = isTrueFalse
+      ? (question.answer === true || question.answer === "Benar" || question.answer === 0 ? 0 : 1)
+      : Number(question.answer ?? question.correctAnswer ?? 0);
+
+    nextPage();
+    paintBackground(255, 247, 241);
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(194, 65, 12);
+    pdf.setFontSize(12);
+    pdf.text(`SOAL ${index + 1} / ${questions.length}`, 16, 15);
+    pdf.setFillColor(232, 93, 4);
+    pdf.roundedRect(width - 62, 8, 46, 12, 2, 2, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(10);
+    pdf.text(`WAKTU ${Math.max(5, Number(question.timer || 15))} DETIK`, width - 39, 15.5, { align: "center" });
+
+    pdf.setTextColor(23, 32, 51);
+    pdf.setFontSize(20);
+    const questionLines = pdf.splitTextToSize(question.question || "Pertanyaan", width - 34);
+    pdf.text(questionLines, width / 2, 38, { align: "center", maxWidth: width - 34 });
+
+    const boxGap = 10;
+    const boxWidth = (width - 42 - boxGap) / 2;
+    const boxHeight = Math.max(22, Math.min(30, height * 0.16));
+    const startY = Math.max(68, height * 0.42);
+    options.forEach((option, optionIndex) => {
+      const column = optionIndex % 2;
+      const row = Math.floor(optionIndex / 2);
+      const x = 16 + column * (boxWidth + boxGap);
+      const y = startY + row * (boxHeight + 8);
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(244, 162, 97);
+      pdf.setLineWidth(0.6);
+      pdf.roundedRect(x, y, boxWidth, boxHeight, 2, 2, "FD");
+      pdf.setTextColor(23, 32, 51);
+      pdf.setFontSize(11);
+      const label = `${String.fromCharCode(65 + optionIndex)}. ${option}`;
+      const lines = pdf.splitTextToSize(label, boxWidth - 10);
+      pdf.text(lines, x + 5, y + boxHeight / 2 - ((lines.length - 1) * 2.5), { maxWidth: boxWidth - 10 });
+    });
+
+    nextPage();
+    paintBackground(23, 32, 51);
+    pdf.setTextColor(244, 162, 97);
+    pdf.setFontSize(15);
+    pdf.text("JAWABAN BENAR", width / 2, height * 0.32, { align: "center" });
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(25);
+    const answerLines = pdf.splitTextToSize(options[answerIndex] || "Jawaban belum ditentukan", width - 50);
+    pdf.text(answerLines, width / 2, height * 0.5, { align: "center", maxWidth: width - 50 });
+  });
+
+  if (questions.length) {
+    const isPublished = material.status === "Published";
+    const liveUrl = isPublished && material.shareCode && typeof window !== "undefined"
+      ? `${window.location.origin}/play/${encodeURIComponent(material.shareCode)}`
+      : "";
+    nextPage();
+    paintBackground(255, 247, 241);
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(23, 32, 51);
+    pdf.setFontSize(27);
+    pdf.text("Selesai", width / 2, height * 0.3, { align: "center" });
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(71, 84, 103);
+    pdf.setFontSize(13);
+    const resultText = liveUrl
+      ? "Buka kuis interaktif untuk mengerjakan soal, memperoleh nilai, dan menerima sertifikat."
+      : "Materi ini masih Draft. Terbitkan materi untuk mengaktifkan kuis interaktif, nilai, QR, dan sertifikat.";
+    pdf.text(pdf.splitTextToSize(resultText, width - 70), width / 2, height * 0.45, { align: "center", maxWidth: width - 70 });
+    if (liveUrl) {
+      const buttonWidth = 105;
+      const buttonX = (width - buttonWidth) / 2;
+      const buttonY = height * 0.62;
+      pdf.setFillColor(232, 93, 4);
+      pdf.roundedRect(buttonX, buttonY, buttonWidth, 15, 3, 3, "F");
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(11);
+      pdf.text("BUKA KUIS INTERAKTIF", width / 2, buttonY + 9.5, { align: "center" });
+      pdf.link(buttonX, buttonY, buttonWidth, 15, { url: liveUrl });
+    }
   }
   pdf.save(`${safeName(material.title)}.pdf`);
 }
